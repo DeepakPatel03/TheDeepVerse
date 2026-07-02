@@ -1,0 +1,79 @@
+/* ============================================================
+   THEDEEPVERSE — THE VAULT PAGE
+   ============================================================ */
+
+.vault-page {
+  padding-top: calc(var(--nav-height-mobile) + var(--space-8));
+  padding-bottom: var(--space-16);
+}
+
+@media (min-width: 768px) {
+  .vault-page {
+    padding-top: calc(var(--nav-height) + var(--space-12));
+  }
+}
+
+.vault-header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.vault-header__title {
+  margin-bottom: var(--space-3);
+}
+
+.vault-header__desc {
+  font-size: var(--text-lg);
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto var(--space-8);
+}
+
+.vault-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-10);
+}
+
+.vault-controls .search-bar {
+  max-width: 480px;
+}
+
+.vault-grid {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .vault-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .vault-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.vault-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-16) var(--space-4);
+  color: var(--text-muted);
+}
+
+.vault-empty__icon {
+  font-size: var(--text-4xl);
+  margin-bottom: var(--space-4);
+}
+
+.vault-count {
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--space-6);
+}
