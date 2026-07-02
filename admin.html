@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | TheDeepVerse</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     LOGIN SCREEN
+     ═══════════════════════════════════════ -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <div class="login-box__logo">TheDeepVerse</div>
+    <div class="login-box__subtitle">Admin Dashboard</div>
+    <input type="password" id="loginPassword" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">Login</button>
+    <div class="login-error" id="loginError">❌ Wrong password. Try again.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     DASHBOARD
+     ═══════════════════════════════════════ -->
+<div id="dashboard" class="admin-layout" style="display:none">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo">TheDeepVerse<small>Admin Panel</small></div>
+    <div class="sidebar-section-title">Management</div>
+    <a href="#" class="sidebar-link active" onclick="showSection('products')"><span class="sidebar-link__icon">📦</span> Products</a>
+    <a href="#" class="sidebar-link" onclick="showSection('add')"><span class="sidebar-link__icon">➕</span> Add Product</a>
+    <a href="#" class="sidebar-link" onclick="showSection('data')"><span class="sidebar-link__icon">💾</span> Import / Export</a>
+    <a href="#" class="sidebar-link" onclick="showSection('settings')"><span class="sidebar-link__icon">⚙️</span> Settings</a>
+    <div class="sidebar-section-title">Quick Links</div>
+    <a href="store.html" class="sidebar-link" target="_blank"><span class="sidebar-link__icon">🛒</span> View Store</a>
+    <a href="index.html" class="sidebar-link" target="_blank"><span class="sidebar-link__icon">🌐</span> View Website</a>
+    <div class="sidebar-section-title" style="margin-top:auto;padding-top:24px"></div>
+    <a href="#" class="sidebar-link" onclick="doLogout()"><span class="sidebar-link__icon">🚪</span> Logout</a>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+
+    <!-- ── PRODUCTS SECTION ── -->
+    <div id="section-products">
+      <div class="admin-header">
+        <h1>Products</h1>
+        <div class="admin-header__actions">
+          <button class="btn-admin btn-admin--primary" onclick="showSection('add')">➕ Add Product</button>
+          <button class="btn-admin" onclick="resetProducts()">🔄 Reset Defaults</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <!-- Products Table -->
+      <div class="products-table-wrap">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Type</th>
+              <th>Price</th>
+              <th>Tag</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ADD/EDIT PRODUCT SECTION ── -->
+    <div id="section-add" style="display:none">
+      <div class="admin-header">
+        <h1 id="formTitle">Add New Product</h1>
+        <button class="btn-admin" onclick="showSection('products')">← Back to Products</button>
+      </div>
+
+      <div class="data-section">
+        <form id="productForm" onsubmit="return saveProduct(event)">
+          <input type="hidden" id="editId" value="">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Product Title *</label>
+              <input type="text" id="pTitle" required placeholder="e.g., Dark Psychology Mastery">
+            </div>
+            <div class="form-group">
+              <label>Category *</label>
+              <select id="pCategory" required>
+                <option value="course">📚 Course</option>
+                <option value="notes">📝 Notes</option>
+                <option value="prompt">⚡ AI Prompt</option>
+                <option value="method">🎬 Method</option>
+                <option value="bundle">🏆 Bundle</option>
+                <option value="free">🎁 Free</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Description *</label>
+            <textarea id="pDesc" required placeholder="Write a compelling product description..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Sale Price (₹) *</label>
+              <input type="number" id="pPrice" required min="0" placeholder="499">
+              <small>Set to 0 for free products</small>
+            </div>
+            <div class="form-group">
+              <label>Original Price (₹)</label>
+              <input type="number" id="pOriginalPrice" min="0" placeholder="999">
+              <small>Leave empty or 0 for no strikethrough</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tag Label</label>
+              <input type="text" id="pTag" placeholder="e.g., Bestseller, New, Popular">
+            </div>
+            <div class="form-group">
+              <label>Tag Color</label>
+              <select id="pTagColor">
+                <option value="">None</option>
+                <option value="gold">🟡 Gold</option>
+                <option value="red">🔴 Red</option>
+                <option value="green">🟢 Green</option>
+                <option value="purple">🟣 Purple</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Emoji Icon</label>
+            <input type="text" id="pEmoji" placeholder="🧠" maxlength="4">
+            <small>Used when no thumbnail is set</small>
+          </div>
+
+          <div class="form-group">
+            <label>Thumbnail URL</label>
+            <div class="thumb-upload">
+              <div class="thumb-preview" id="thumbPreview">📦</div>
+              <div class="thumb-upload__controls">
+                <input type="text" id="pThumbnail" placeholder="https://example.com/image.jpg" oninput="previewThumb()">
+                <small>Paste image URL. Use Imgur, Google Drive, or any image host</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Download / Course URL</label>
+            <input type="text" id="pDownloadUrl" placeholder="https://drive.google.com/...">
+            <small>Google Drive link, Gumroad, or any file hosting URL</small>
+          </div>
+
+          <div class="form-group">
+            <label>Features (one per line)</label>
+            <textarea id="pFeatures" placeholder="12 chapters of content&#10;Real-world case studies&#10;Lifetime access" style="min-height:80px"></textarea>
+            <small>For featured/bundle products — shows as checklist</small>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group form-group--toggle">
+              <label class="toggle-switch">
+                <input type="checkbox" id="pActive" checked>
+                <span class="slider"></span>
+              </label>
+              <span>Active (visible in store)</span>
+            </div>
+            <div class="form-group form-group--toggle">
+              <label class="toggle-switch">
+                <input type="checkbox" id="pFeatured">
+                <span class="slider"></span>
+              </label>
+              <span>Featured (show as hero)</span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;justify-content:flex-end;padding-top:16px;border-top:1px solid var(--admin-border)">
+            <button type="button" class="btn-admin" onclick="showSection('products')">Cancel</button>
+            <button type="submit" class="btn-admin btn-admin--primary" id="formSubmitBtn">💾 Save Product</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ── IMPORT/EXPORT SECTION ── -->
+    <div id="section-data" style="display:none">
+      <div class="admin-header">
+        <h1>Import / Export Data</h1>
+        <button class="btn-admin" onclick="showSection('products')">← Back</button>
+      </div>
+
+      <div class="data-section">
+        <h3>📤 Export Products</h3>
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Download all product data as JSON. Use this for backup or migrating to a new device.</p>
+        <button class="btn-admin btn-admin--success" onclick="exportData()">📥 Download JSON</button>
+        <button class="btn-admin" onclick="copyExport()" style="margin-left:8px">📋 Copy to Clipboard</button>
+        <textarea id="exportArea" style="margin-top:16px" readonly></textarea>
+      </div>
+
+      <div class="data-section">
+        <h3>📥 Import Products</h3>
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Paste JSON data below to replace all products. ⚠️ This will overwrite existing data.</p>
+        <textarea id="importArea" placeholder="Paste JSON here..."></textarea>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn-admin btn-admin--primary" onclick="importData()">📤 Import & Replace</button>
+          <label class="btn-admin" style="cursor:pointer">
+            📁 Upload File
+            <input type="file" accept=".json" onchange="importFile(event)" style="display:none">
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS SECTION ── -->
+    <div id="section-settings" style="display:none">
+      <div class="admin-header">
+        <h1>⚙️ Settings</h1>
+        <button class="btn-admin" onclick="showSection('products')">← Back</button>
+      </div>
+
+      <div class="data-section">
+        <h3>💳 Razorpay Payment Gateway</h3>
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Connect Razorpay to accept payments. Get your API key from <a href="https://dashboard.razorpay.com" target="_blank" style="color:var(--admin-accent)">dashboard.razorpay.com</a></p>
+        <div class="form-group">
+          <label>Razorpay Key ID</label>
+          <input type="text" id="settRazorpayKey" placeholder="rzp_live_XXXXXXXXXX or rzp_test_XXXXXXXXXX">
+          <small>Starts with <code style="color:var(--admin-accent)">rzp_live_</code> (production) or <code style="color:var(--admin-accent)">rzp_test_</code> (testing)</small>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Business Name (shown in checkout)</label>
+            <input type="text" id="settBusinessName" placeholder="TheDeepVerse" value="TheDeepVerse">
+          </div>
+          <div class="form-group">
+            <label>Theme Color</label>
+            <input type="text" id="settThemeColor" placeholder="#d4af37" value="#d4af37">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Logo URL (shown in Razorpay popup)</label>
+          <input type="text" id="settLogoUrl" placeholder="https://thedeepverse.com/assets/images/logo.png">
+        </div>
+        <button class="btn-admin btn-admin--primary" onclick="saveSettings()">💾 Save Settings</button>
+        <button class="btn-admin btn-admin--success" onclick="testRazorpay()" style="margin-left:8px">🧪 Test Payment (₹1)</button>
+      </div>
+
+      <div class="data-section">
+        <h3>🔐 Admin Password</h3>
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Current password is set in <code style="color:var(--admin-accent)">js/store-data.js</code> → search for <code style="color:var(--admin-accent)">ADMIN_PASSWORD</code></p>
+        <div class="form-group">
+          <label>Current Password</label>
+          <input type="text" value="deepverse2026" readonly style="opacity:0.6;cursor:not-allowed">
+          <small>To change: open <code>js/store-data.js</code>, find <code>ADMIN_PASSWORD</code>, change the value</small>
+        </div>
+      </div>
+
+      <div class="data-section">
+        <h3>📊 Quick Stats</h3>
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:8px">Storage used: <strong id="storageUsed">—</strong></p>
+        <p style="color:var(--admin-text-2);font-size:0.85rem">Products in database: <strong id="productCount">—</strong></p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ── SCRIPTS ── -->
+<script src="js/store-data.js"></script>
+<script>
+// ═══ AUTH ═══
+function doLogin() {
+  const pw = document.getElementById('loginPassword').value;
+  if (StoreEngine.login(pw)) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'flex';
+    loadDashboard();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('loginPassword').value = '';
+  }
+}
+
+function doLogout() {
+  StoreEngine.logout();
+  location.reload();
+}
+
+// Check auth on load
+if (StoreEngine.isAuthenticated()) {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'flex';
+  setTimeout(loadDashboard, 50);
+}
+
+// ═══ DASHBOARD ═══
+function loadDashboard() {
+  renderStats();
+  renderProducts();
+}
+
+function renderStats() {
+  const products = StoreEngine.getProducts();
+  const active = products.filter(p => p.active).length;
+  const courses = products.filter(p => p.category === 'course').length;
+  const freeProducts = products.filter(p => p.price === 0).length;
+  const totalRevenuePotential = products.reduce((sum, p) => sum + p.price, 0);
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-card__label">Total Products</div>
+      <div class="stat-card__value">${products.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__label">Active</div>
+      <div class="stat-card__value stat-card__value--success">${active}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__label">Courses</div>
+      <div class="stat-card__value stat-card__value--accent">${courses}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__label">Free Products</div>
+      <div class="stat-card__value">${freeProducts}</div>
+    </div>
+  `;
+}
+
+function renderProducts() {
+  const products = StoreEngine.getProducts();
+  const tbody = document.getElementById('productsTableBody');
+
+  if (products.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-state__icon">📦</div><div class="empty-state__title">No products yet</div><p>Click "Add Product" to create your first product.</p></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = products.map(p => {
+    const thumbHtml = p.thumbnail
+      ? `<img src="${p.thumbnail}" alt="${p.title}">`
+      : (p.emoji || '📦');
+    const tagHtml = p.tag
+      ? `<span class="product-row__tag product-row__tag--${p.tagColor || 'gold'}">${p.tag}</span>`
+      : '—';
+    const priceHtml = p.price === 0
+      ? '<span style="color:#22c55e;font-weight:700">Free</span>'
+      : `<span class="product-row__price">₹${p.price.toLocaleString('en-IN')}</span>${p.originalPrice ? `<span class="product-row__price-old">₹${p.originalPrice.toLocaleString('en-IN')}</span>` : ''}`;
+
+    return `<tr>
+      <td><div class="product-row__info"><div class="product-row__thumb">${thumbHtml}</div><div><div class="product-row__title">${p.title}</div><div class="product-row__type">${p.category}</div></div></div></td>
+      <td>${p.category}</td>
+      <td>${priceHtml}</td>
+      <td>${tagHtml}</td>
+      <td><span class="product-row__status product-row__status--${p.active ? 'active' : 'inactive'}"></span> ${p.active ? 'Active' : 'Hidden'}</td>
+      <td><div class="product-row__actions">
+        <button class="btn-admin btn-admin--sm" onclick="editProduct('${p.id}')">✏️</button>
+        <button class="btn-admin btn-admin--sm btn-admin--danger" onclick="deleteProduct('${p.id}')">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══ PRODUCT CRUD ═══
+function editProduct(id) {
+  const p = StoreEngine.getProduct(id);
+  if (!p) return;
+
+  document.getElementById('editId').value = p.id;
+  document.getElementById('pTitle').value = p.title;
+  document.getElementById('pCategory').value = p.category;
+  document.getElementById('pDesc').value = p.description;
+  document.getElementById('pPrice').value = p.price;
+  document.getElementById('pOriginalPrice').value = p.originalPrice || '';
+  document.getElementById('pTag').value = p.tag || '';
+  document.getElementById('pTagColor').value = p.tagColor || '';
+  document.getElementById('pEmoji').value = p.emoji || '';
+  document.getElementById('pThumbnail').value = p.thumbnail || '';
+  document.getElementById('pDownloadUrl').value = p.downloadUrl || '';
+  document.getElementById('pFeatures').value = (p.features || []).join('\n');
+  document.getElementById('pActive').checked = p.active;
+  document.getElementById('pFeatured').checked = p.featured;
+
+  document.getElementById('formTitle').textContent = 'Edit Product';
+  document.getElementById('formSubmitBtn').textContent = '💾 Update Product';
+  previewThumb();
+  showSection('add');
+}
+
+function saveProduct(event) {
+  event.preventDefault();
+  const editId = document.getElementById('editId').value;
+  const featuresText = document.getElementById('pFeatures').value.trim();
+
+  const productData = {
+    title: document.getElementById('pTitle').value.trim(),
+    category: document.getElementById('pCategory').value,
+    type: document.getElementById('pCategory').value,
+    description: document.getElementById('pDesc').value.trim(),
+    price: parseInt(document.getElementById('pPrice').value) || 0,
+    originalPrice: parseInt(document.getElementById('pOriginalPrice').value) || 0,
+    tag: document.getElementById('pTag').value.trim(),
+    tagColor: document.getElementById('pTagColor').value,
+    emoji: document.getElementById('pEmoji').value.trim(),
+    thumbnail: document.getElementById('pThumbnail').value.trim(),
+    downloadUrl: document.getElementById('pDownloadUrl').value.trim(),
+    features: featuresText ? featuresText.split('\n').map(f => f.trim()).filter(f => f) : [],
+    active: document.getElementById('pActive').checked,
+    featured: document.getElementById('pFeatured').checked
+  };
+
+  if (editId) {
+    StoreEngine.updateProduct(editId, productData);
+    showToast('Product updated successfully!', 'success');
+  } else {
+    productData.id = StoreEngine.generateId(productData.title);
+    StoreEngine.addProduct(productData);
+    showToast('Product added successfully!', 'success');
+  }
+
+  resetForm();
+  showSection('products');
+  return false;
+}
+
+function deleteProduct(id) {
+  const p = StoreEngine.getProduct(id);
+  if (!p) return;
+  if (!confirm(`Delete "${p.title}"? This cannot be undone.`)) return;
+  StoreEngine.deleteProduct(id);
+  showToast('Product deleted.', 'info');
+  loadDashboard();
+}
+
+function resetProducts() {
+  if (!confirm('Reset all products to defaults? This will delete any custom products.')) return;
+  StoreEngine.resetToDefaults();
+  showToast('Products reset to defaults.', 'success');
+  loadDashboard();
+}
+
+function resetForm() {
+  document.getElementById('productForm').reset();
+  document.getElementById('editId').value = '';
+  document.getElementById('formTitle').textContent = 'Add New Product';
+  document.getElementById('formSubmitBtn').textContent = '💾 Save Product';
+  document.getElementById('thumbPreview').innerHTML = '📦';
+  document.getElementById('pActive').checked = true;
+}
+
+function previewThumb() {
+  const url = document.getElementById('pThumbnail').value.trim();
+  const preview = document.getElementById('thumbPreview');
+  if (url) {
+    preview.innerHTML = `<img src="${url}" onerror="this.parentElement.innerHTML='❌'">`;
+  } else {
+    const emoji = document.getElementById('pEmoji').value || '📦';
+    preview.innerHTML = emoji;
+  }
+}
+
+// ═══ IMPORT/EXPORT ═══
+function exportData() {
+  const json = StoreEngine.exportJSON();
+  document.getElementById('exportArea').value = json;
+
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `thedeepverse-products-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Products exported!', 'success');
+}
+
+function copyExport() {
+  const json = StoreEngine.exportJSON();
+  document.getElementById('exportArea').value = json;
+  navigator.clipboard.writeText(json).then(() => showToast('Copied to clipboard!', 'success'));
+}
+
+function importData() {
+  const json = document.getElementById('importArea').value.trim();
+  if (!json) { showToast('Paste JSON data first.', 'error'); return; }
+  if (!confirm('This will replace ALL existing products. Continue?')) return;
+  try {
+    StoreEngine.importJSON(json);
+    showToast('Products imported successfully!', 'success');
+    loadDashboard();
+    showSection('products');
+  } catch(e) {
+    showToast('Import failed: ' + e.message, 'error');
+  }
+}
+
+function importFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('importArea').value = e.target.result;
+    showToast('File loaded. Click "Import & Replace" to apply.', 'info');
+  };
+  reader.readAsText(file);
+}
+
+// ═══ UI HELPERS ═══
+function showSection(name) {
+  ['products', 'add', 'data', 'settings'].forEach(s => {
+    document.getElementById('section-' + s).style.display = s === name ? '' : 'none';
+  });
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  const link = document.querySelector(`.sidebar-link[onclick="showSection('${name}')"]`);
+  if (link) link.classList.add('active');
+  if (name === 'products') { resetForm(); loadDashboard(); }
+  if (name === 'data') { document.getElementById('exportArea').value = StoreEngine.exportJSON(); }
+  if (name === 'settings') { loadSettings(); }
+  window.scrollTo(0, 0);
+}
+
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${type}`;
+  toast.innerHTML = message;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(40px)'; setTimeout(() => toast.remove(), 300); }, 3000);
+}
+</script>
+</body>
+</html>

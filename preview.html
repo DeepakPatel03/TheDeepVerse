@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design System Preview — TheDeepVerse</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Design System -->
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <style>
+    /* Preview-specific styles only */
+    .preview-section {
+      padding: var(--space-12) 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .preview-label {
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-widest);
+      color: var(--accent);
+      margin-bottom: var(--space-6);
+    }
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: var(--space-3);
+    }
+    .color-swatch {
+      aspect-ratio: 1;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--space-2);
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+    }
+    .preview-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      align-items: center;
+    }
+    .spacer-preview {
+      margin-top: var(--space-8);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ========================================
+       NAVIGATION PREVIEW
+       ======================================== -->
+  <nav class="nav is-scrolled" role="navigation" aria-label="Main navigation">
+    <div class="nav__inner">
+      <a href="#" class="nav__logo">TheDeepVerse</a>
+
+      <div class="nav__links">
+        <a href="#" class="nav__link is-active">Home</a>
+        <a href="#" class="nav__link">The Vault</a>
+        <a href="#" class="nav__link">Videos</a>
+        <a href="#" class="nav__link">Articles</a>
+        <a href="#" class="nav__link">About</a>
+      </div>
+
+      <div class="nav__cta">
+        <a href="#" class="btn btn--primary btn--sm">Subscribe</a>
+      </div>
+
+      <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">
+        <div class="nav__toggle-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+    </div>
+  </nav>
+
+  <main class="container" style="padding-top: calc(var(--nav-height) + var(--space-8));">
+
+    <!-- ========================================
+         TYPOGRAPHY PREVIEW
+         ======================================== -->
+    <div class="preview-section">
+      <div class="preview-label">Typography</div>
+
+      <h1>Decode the Human Mind</h1>
+      <div class="spacer-preview"></div>
+      <h2>The Psychology of Deception</h2>
+      <div class="spacer-preview"></div>
+      <h3>Cognitive Biases That Control You</h3>
+      <div class="spacer-preview"></div>
+      <h4>Understanding Dark Psychology</h4>
+      <div class="spacer-preview"></div>
+      <h5>Why Your Brain Lies to You</h5>
+      <div class="spacer-preview"></div>
+      <h6>The Science Behind Manipulation</h6>
+      <div class="spacer-preview"></div>
+      <p>Your mind is not your friend. It distorts reality, fabricates memories, and makes decisions for reasons you'll never consciously understand. Every day, invisible psychological forces shape your beliefs, your relationships, and your identity — and you have no idea it's happening.</p>
+      <p>TheDeepVerse exists to pull back the curtain. To decode the hidden architecture of human behavior. To make you see what was always there, hiding in plain sight.</p>
+    </div>
+
+
+    <!-- ========================================
+         COLOR PALETTE PREVIEW
+         ======================================== -->
+    <div class="preview-section">
+      <div class="preview-label">Color Palette — 80% Black / 15% Gray / 5% White + Gold Accent</div>
+
+      <h5 style="margin-bottom: var(--space-4);">80% Layer — Deep Black</h5>
+      <div class="color-grid">
+        <div class="color-swatch" style="background: #000000;"><span>#000000</span></div>
+        <div class="color-swatch" style="background: #030303;"><span>#030303</span></div>
+        <div class="color-swatch" style="background: #050505;"><span>#050505 (body)</span></div>
+        <div class="color-swatch" style="background: #080808;"><span>#080808</span></div>
+      </div>
+
+      <div class="spacer-preview"></div>
+      <h5 style="margin-bottom: var(--space-4);">15% Layer — Dark Grays</h5>
+      <div class="color-grid">
+        <div class="color-swatch" style="background: #0A0A0A;"><span>#0A0A0A (surface)</span></div>
+        <div class="color-swatch" style="background: #0F0F0F;"><span>#0F0F0F</span></div>
+        <div class="color-swatch" style="background: #141414;"><span>#141414 (hover)</span></div>
+        <div class="color-swatch" style="background: #1A1A1A;"><span>#1A1A1A (elevated)</span></div>
+        <div class="color-swatch" style="background: #222222;"><span>#222222</span></div>
+        <div class="color-swatch" style="background: #2A2A2A;"><span>#2A2A2A (border)</span></div>
+        <div class="color-swatch" style="background: #333333;"><span>#333333</span></div>
+      </div>
+
+      <div class="spacer-preview"></div>
+      <h5 style="margin-bottom: var(--space-4);">5% Layer — White / Silver</h5>
+      <div class="color-grid">
+        <div class="color-swatch" style="background: #FFFFFF; color: #333;"><span>#FFFFFF</span></div>
+        <div class="color-swatch" style="background: #F5F5F5; color: #333;"><span>#F5F5F5 (primary)</span></div>
+        <div class="color-swatch" style="background: #E8E8E8; color: #333;"><span>#E8E8E8</span></div>
+        <div class="color-swatch" style="background: #D0D0D0; color: #333;"><span>#D0D0D0</span></div>
+        <div class="color-swatch" style="background: #AAAAAA; color: #333;"><span>#AAAAAA</span></div>
+        <div class="color-swatch" style="background: #888888; color: #222;"><span>#888888 (secondary)</span></div>
+        <div class="color-swatch" style="background: #666666;"><span>#666666 (muted)</span></div>
+      </div>
+
+      <div class="spacer-preview"></div>
+      <h5 style="margin-bottom: var(--space-4);">Gold Accent (Subtle — Interactive Elements Only)</h5>
+      <div class="color-grid">
+        <div class="color-swatch" style="background: #E0CFA0; color: #222;"><span>#E0CFA0</span></div>
+        <div class="color-swatch" style="background: #D4B97A; color: #222;"><span>#D4B97A (hover)</span></div>
+        <div class="color-swatch" style="background: #C0A062; color: #222;"><span>#C0A062 (accent)</span></div>
+        <div class="color-swatch" style="background: #A88B50; color: #222;"><span>#A88B50 (active)</span></div>
+        <div class="color-swatch" style="background: #8F7640;"><span>#8F7640 (dark)</span></div>
+      </div>
+    </div>
+
+
+    <!-- ========================================
+         BUTTONS PREVIEW
+         ======================================== -->
+    <div class="preview-section">
+      <div class="preview-label">Buttons</div>
+
+      <h5 style="margin-bottom: var(--space-4);">Primary (Gold Accent — CTAs)</h5>
+      <div class="preview-row">
+        <button class="btn btn--primary btn--sm">Small</button>
+        <button class="btn btn--primary btn--md">Explore The Vault</button>
+        <button class="btn btn--primary btn--lg">Get Started</button>
+        <button class="btn btn--primary btn--md" disabled>Disabled</button>
+      </div>
+
+      <div class="spacer-preview"></div>
+      <h5 style="margin-bottom: var(--space-4);">Secondary (White Outline)</h5>
+      <div class="preview-row">
+        <button class="btn btn--secondary btn--sm">Small</button>
+        <button class="btn btn--secondary btn--md">Watch on YouTube</button>
+        <button class="btn btn--secondary btn--lg">Read More</button>
+      </div>
+
+      <div class="spacer-preview"></div>
+      <h5 style="margin-bottom: var(--space-4);">Ghost (Minimal)</h5>
+      <div class="preview-row">
+        <button class="btn btn--ghost btn--sm">View All →</button>
+        <button class="btn btn--ghost btn--md">Learn More</button>
+      </div>
+
+      <div class="spacer-preview"></div>
+      <h5 style="margin-bottom: var(--space-4);">YouTube (Specific Use Only)</h5>
+      <div class="preview-row">
+        <button class="btn btn--youtube btn--md">
+          <svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          Subscribe
+        </button>
+      </div>
+    </div>
+
+
+    <!-- ========================================
+         CARDS PREVIEW
+         ======================================== -->
+    <div class="preview-section">
+      <div class="preview-label">Content Cards</div>
+
+      <div class="grid grid--3">
+        <div class="card">
+          <span class="card__tag">Cognitive Biases</span>
+          <h3 class="card__title" style="font-size: var(--text-xl);">The Dunning-Kruger Effect</h3>
+          <p class="card__desc">Why incompetent people think they're brilliant — and experts doubt themselves. The most dangerous bias is the one you can't see.</p>
+          <div class="card__meta">
+            <span>5 min read</span>
+            <span class="card__meta-divider"></span>
+            <span>Beginner</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="card__tag">Dark Psychology</span>
+          <h3 class="card__title" style="font-size: var(--text-xl);">The Art of Gaslighting</h3>
+          <p class="card__desc">How manipulators distort your reality and make you doubt your own perception. A technique as old as human civilization.</p>
+          <div class="card__meta">
+            <span>8 min read</span>
+            <span class="card__meta-divider"></span>
+            <span>Intermediate</span>
+          </div>
+        </div>
+
+        <div class="card card--premium">
+          <span class="card__tag" style="color: var(--accent);">Influence</span>
+          <h3 class="card__title" style="font-size: var(--text-xl);">Cialdini's 6 Weapons</h3>
+          <p class="card__desc">The six principles of persuasion that every marketer, salesperson, and politician uses against you — whether you know it or not.</p>
+          <div class="card__meta">
+            <span>10 min read</span>
+            <span class="card__meta-divider"></span>
+            <span>Advanced</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========================================
+         STATS BAR PREVIEW
+         ======================================== -->
+    <div class="preview-section">
+      <div class="preview-label">Social Proof Bar</div>
+
+      <div class="stats-bar">
+        <div class="stats-bar__item">
+          <div class="stats-bar__number">50K+</div>
+          <div class="stats-bar__label">Subscribers</div>
+        </div>
+        <div class="stats-bar__item">
+          <div class="stats-bar__number">100+</div>
+          <div class="stats-bar__label">Concepts</div>
+        </div>
+        <div class="stats-bar__item">
+          <div class="stats-bar__number">200+</div>
+          <div class="stats-bar__label">Videos</div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========================================
+         FILTER TABS + SEARCH BAR PREVIEW
+         ======================================== -->
+    <div class="preview-section">
+      <div class="preview-label">Filter Tabs & Search</div>
+
+      <div class="search-bar" style="margin-bottom: var(--space-6);">
+        <input type="text" class="search-bar__input" placeholder="Search concepts, biases, theories...">
+        <svg class="search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      </div>
+
+      <div class="filter-tabs">
+        <button class="filter-tab is-active">All</button>
+        <button class="filter-tab">Dark Psychology</button>
+        <button class="filter-tab">Cognitive Biases</button>
+        <button class="filter-tab">Emotions</button>
+        <button class="filter-tab">Relationships</button>
+        <button class="filter-tab">Influence</button>
+        <button class="filter-tab">Self & Identity</button>
+        <button class="filter-tab">Fear & Trauma</button>
+      </div>
+    </div>
+
+
+    <!-- ========================================
+         NEWSLETTER CTA PREVIEW
+         ======================================== -->
+    <div class="preview-section">
+      <div class="preview-label">Newsletter CTA</div>
+
+      <div class="newsletter">
+        <h2 class="newsletter__title">Join the Curious Minds</h2>
+        <p class="newsletter__subtitle">Free psychology insights delivered every week. No spam. No fluff. Just the patterns hidden inside human behavior.</p>
+        <form class="newsletter__form" onsubmit="return false;">
+          <input type="email" class="newsletter__input" placeholder="your@email.com" required>
+          <button type="submit" class="btn btn--primary btn--md">Subscribe</button>
+        </form>
+        <div class="newsletter__trust">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          We respect your privacy. Unsubscribe anytime.
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========================================
+         FAQ ACCORDION PREVIEW
+         ======================================== -->
+    <div class="preview-section">
+      <div class="preview-label">FAQ Accordion</div>
+
+      <div class="accordion" id="faqAccordion">
+        <div class="accordion__item">
+          <button class="accordion__trigger" aria-expanded="true" aria-controls="faq-1">
+            <span>What is TheDeepVerse?</span>
+            <svg class="accordion__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+          <div class="accordion__content" id="faq-1" style="max-height: 200px;">
+            <div class="accordion__content-inner">
+              TheDeepVerse is a premium psychology education platform founded by Deepak Patel. We decode the hidden patterns of human behavior through cinematic storytelling — covering dark psychology, cognitive biases, emotional intelligence, manipulation tactics, and the science of the mind.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion__item">
+          <button class="accordion__trigger" aria-expanded="false" aria-controls="faq-2">
+            <span>Is all the content free?</span>
+            <svg class="accordion__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+          <div class="accordion__content" id="faq-2">
+            <div class="accordion__content-inner">
+              Yes. All content in The Vault, Articles, and YouTube videos is completely free. In the future, we'll offer premium courses and ebooks for those who want deeper, structured learning.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion__item">
+          <button class="accordion__trigger" aria-expanded="false" aria-controls="faq-3">
+            <span>How can I support TheDeepVerse?</span>
+            <svg class="accordion__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+          <div class="accordion__content" id="faq-3">
+            <div class="accordion__content-inner">
+              The best way to support us is to subscribe on YouTube, share our content, and join our newsletter. Every subscriber helps us reach more curious minds.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========================================
+         BADGES PREVIEW
+         ======================================== -->
+    <div class="preview-section">
+      <div class="preview-label">Badges & Tags</div>
+
+      <div class="preview-row">
+        <span class="badge badge--default">Beginner</span>
+        <span class="badge badge--default">5 min read</span>
+        <span class="badge badge--accent">Premium</span>
+        <span class="badge badge--default">Dark Psychology</span>
+      </div>
+    </div>
+
+
+    <!-- ========================================
+         DIVIDERS PREVIEW
+         ======================================== -->
+    <div class="preview-section">
+      <div class="preview-label">Section Dividers</div>
+
+      <p style="margin-bottom: var(--space-6); color: var(--text-muted);">Standard divider:</p>
+      <hr class="divider">
+
+      <div style="height: var(--space-8);"></div>
+
+      <p style="margin-bottom: var(--space-6); color: var(--text-muted);">Accent divider:</p>
+      <hr class="divider divider--accent">
+
+      <div style="height: var(--space-8);"></div>
+
+      <p style="margin-bottom: var(--space-6); color: var(--text-muted);">Victorian divider:</p>
+      <div class="section-divider">
+        <div class="section-divider__line"></div>
+        <div class="section-divider__icon"></div>
+        <div class="section-divider__line"></div>
+      </div>
+    </div>
+
+
+    <!-- ========================================
+         SKELETON LOADING PREVIEW
+         ======================================== -->
+    <div class="preview-section">
+      <div class="preview-label">Skeleton Loading States</div>
+
+      <div class="grid grid--3">
+        <div class="card" style="pointer-events: none;">
+          <div class="skeleton" style="width: 80px; height: 14px;"></div>
+          <div class="skeleton" style="width: 100%; height: 22px;"></div>
+          <div class="skeleton" style="width: 100%; height: 14px;"></div>
+          <div class="skeleton" style="width: 60%; height: 14px;"></div>
+          <div style="margin-top: auto; padding-top: var(--space-2);">
+            <div class="skeleton" style="width: 120px; height: 12px;"></div>
+          </div>
+        </div>
+
+        <div class="card" style="pointer-events: none;">
+          <div class="skeleton" style="width: 100px; height: 14px;"></div>
+          <div class="skeleton" style="width: 90%; height: 22px;"></div>
+          <div class="skeleton" style="width: 100%; height: 14px;"></div>
+          <div class="skeleton" style="width: 70%; height: 14px;"></div>
+          <div style="margin-top: auto; padding-top: var(--space-2);">
+            <div class="skeleton" style="width: 100px; height: 12px;"></div>
+          </div>
+        </div>
+
+        <div class="card" style="pointer-events: none;">
+          <div class="skeleton" style="width: 90px; height: 14px;"></div>
+          <div class="skeleton" style="width: 95%; height: 22px;"></div>
+          <div class="skeleton" style="width: 100%; height: 14px;"></div>
+          <div class="skeleton" style="width: 50%; height: 14px;"></div>
+          <div style="margin-top: auto; padding-top: var(--space-2);">
+            <div class="skeleton" style="width: 110px; height: 12px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========================================
+         FOOTER PREVIEW
+         ======================================== -->
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="footer__logo">TheDeepVerse</div>
+          <p class="footer__tagline">Decode the human mind. Understand the psychology that shapes your reality — one concept at a time.</p>
+        </div>
+
+        <div>
+          <div class="footer__heading">Explore</div>
+          <a href="#" class="footer__link">Home</a>
+          <a href="#" class="footer__link">The Vault</a>
+          <a href="#" class="footer__link">Videos</a>
+          <a href="#" class="footer__link">Articles</a>
+          <a href="#" class="footer__link">About</a>
+        </div>
+
+        <div>
+          <div class="footer__heading">Connect</div>
+          <a href="#" class="footer__link" target="_blank" rel="noopener noreferrer">YouTube</a>
+          <a href="#" class="footer__link" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href="#" class="footer__link" target="_blank" rel="noopener noreferrer">X (Twitter)</a>
+          <a href="#" class="footer__link">Contact</a>
+        </div>
+
+        <div>
+          <div class="footer__heading">Legal</div>
+          <a href="#" class="footer__link">Privacy Policy</a>
+          <a href="#" class="footer__link">Terms of Service</a>
+          <a href="#" class="footer__link">FAQ</a>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <div class="footer__copyright">© 2026 TheDeepVerse. All rights reserved. Made with 🧠 by Deepak Patel</div>
+        <div class="footer__social">
+          <a href="#" class="footer__social-link" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a href="#" class="footer__social-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+          <a href="#" class="footer__social-link" aria-label="X (Twitter)" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- Minimal JS for preview interactivity -->
+  <script>
+    // FAQ Accordion toggle
+    document.querySelectorAll('.accordion__trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+        const content = document.getElementById(trigger.getAttribute('aria-controls'));
+
+        // Close all
+        document.querySelectorAll('.accordion__trigger').forEach(t => {
+          t.setAttribute('aria-expanded', 'false');
+          const c = document.getElementById(t.getAttribute('aria-controls'));
+          if (c) c.style.maxHeight = '0';
+        });
+
+        // Open clicked (if it was closed)
+        if (!isExpanded) {
+          trigger.setAttribute('aria-expanded', 'true');
+          content.style.maxHeight = content.scrollHeight + 'px';
+        }
+      });
+    });
+
+    // Mobile nav toggle
+    const navToggle = document.querySelector('.nav__toggle');
+    if (navToggle) {
+      navToggle.addEventListener('click', () => {
+        navToggle.classList.toggle('is-active');
+      });
+    }
+  </script>
+
+</body>
+</html>

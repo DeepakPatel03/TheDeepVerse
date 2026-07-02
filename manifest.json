@@ -1,0 +1,10 @@
+{
+  "name": "TheDeepVerse",
+  "short_name": "DeepVerse",
+  "description": "Decode the Human Mind — Psychology, Dark Psychology, Cognitive Biases, and the Science of Human Behavior",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": []
+}
