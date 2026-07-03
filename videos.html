@@ -33,9 +33,10 @@
         <a href="index.html" class="nav__link">Home</a>
         <a href="hub.html" class="nav__link">DeepVerse Hub</a>
         <a href="videos.html" class="nav__link is-active">Videos</a>
-        <a href="articles.html" class="nav__link">Articles</a>
+        <a href="shorts.html" class="nav__link">Shorts</a>
         <a href="store.html" class="nav__link">Store</a>
         <a href="about.html" class="nav__link">About</a>
+        <a href="contact.html" class="nav__link">Contact</a>
       </div>
       <div class="nav__cta"><a href="https://youtube.com/@TheDeepVerse-YT" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--sm">Subscribe</a></div>
       <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false"><div class="nav__toggle-icon"><span></span><span></span><span></span></div></button>
@@ -44,10 +45,10 @@
       <a href="index.html" class="nav__mobile-link">Home</a>
       <a href="hub.html" class="nav__mobile-link">DeepVerse Hub</a>
       <a href="videos.html" class="nav__mobile-link is-active">Videos</a>
-      <a href="articles.html" class="nav__mobile-link">Articles</a>
+      <a href="shorts.html" class="nav__mobile-link">Shorts</a>
       <a href="store.html" class="nav__mobile-link">Store</a>
       <a href="about.html" class="nav__mobile-link">About</a>
-      <a href="faq.html" class="nav__mobile-link">FAQ</a>
+      <a href="contact.html" class="nav__mobile-link">Contact</a>
       <div class="nav__mobile-footer">
         <a href="https://youtube.com/@TheDeepVerse-YT" target="_blank" rel="noopener noreferrer" class="btn btn--youtube btn--md" style="width:100%;justify-content:center;">Subscribe on YouTube</a>
       </div>
@@ -73,81 +74,11 @@
         </div>
       </div>
 
-      <!-- Videos grid — REAL YouTube Videos -->
-      <div class="videos-page-grid reveal-stagger">
-
-        <!-- Video 1 -->
-        <div class="video-card reveal" data-category="dark-psychology" data-videoid="xK43iBwzr6k">
-          <div class="video-card__thumbnail">
-            <img src="https://i.ytimg.com/vi/xK43iBwzr6k/hqdefault.jpg" alt="5 Psychology Truths That Are Secretly Destroying Your Life" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-            <button class="video-card__play" aria-label="Play" onclick="playYouTube(this)"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
-          </div>
-          <div class="video-card__body">
-            <h3 class="video-card__title">5 Psychology Truths That Are Secretly Destroying Your Life</h3>
-            <div class="video-card__meta"><span>Dark Psychology</span></div>
-          </div>
+      <!-- Videos grid — AUTO-LOADED from YouTube RSS -->
+      <div class="videos-page-grid reveal-stagger" id="allVideosGrid">
+        <div style="text-align:center;padding:var(--space-10);color:var(--text-muted);">
+          <p>Loading latest videos from YouTube...</p>
         </div>
-
-        <!-- Video 2 -->
-        <div class="video-card reveal" data-category="psychology" data-videoid="Tgbay2J7bZk">
-          <div class="video-card__thumbnail">
-            <img src="https://i.ytimg.com/vi/Tgbay2J7bZk/hqdefault.jpg" alt="पैसा आपका जुनून क्यों छीन लेता है? | Deci Effect Psychology" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-            <button class="video-card__play" aria-label="Play" onclick="playYouTube(this)"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
-          </div>
-          <div class="video-card__body">
-            <h3 class="video-card__title">💰 पैसा आपका जुनून क्यों छीन लेता है? | Deci Effect Psychology</h3>
-            <div class="video-card__meta"><span>Psychology</span></div>
-          </div>
-        </div>
-
-        <!-- Video 3 -->
-        <div class="video-card reveal" data-category="dark-psychology" data-videoid="IqVC343UJY8">
-          <div class="video-card__thumbnail">
-            <img src="https://i.ytimg.com/vi/IqVC343UJY8/hqdefault.jpg" alt="Why Good People Become Evil? | Moral Disengagement Explained" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-            <button class="video-card__play" aria-label="Play" onclick="playYouTube(this)"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
-          </div>
-          <div class="video-card__body">
-            <h3 class="video-card__title">Why Good People Become Evil? | Moral Disengagement Explained</h3>
-            <div class="video-card__meta"><span>Dark Psychology</span></div>
-          </div>
-        </div>
-
-        <!-- Video 4 -->
-        <div class="video-card reveal" data-category="cognitive-biases" data-videoid="E-9hmCi4PTo">
-          <div class="video-card__thumbnail">
-            <img src="https://i.ytimg.com/vi/E-9hmCi4PTo/hqdefault.jpg" alt="Escape These 4 Mental Traps Before It's Too Late" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-            <button class="video-card__play" aria-label="Play" onclick="playYouTube(this)"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
-          </div>
-          <div class="video-card__body">
-            <h3 class="video-card__title">Escape These 4 Mental Traps Before It's Too Late</h3>
-            <div class="video-card__meta"><span>Cognitive Biases</span></div>
-          </div>
-        </div>
-
-        <!-- Video 5 -->
-        <div class="video-card reveal" data-category="psychology" data-videoid="tnpOQIu3W8E">
-          <div class="video-card__thumbnail">
-            <img src="https://i.ytimg.com/vi/tnpOQIu3W8E/hqdefault.jpg" alt="3 Psychology Stories That Will Change The Way You See People" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-            <button class="video-card__play" aria-label="Play" onclick="playYouTube(this)"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
-          </div>
-          <div class="video-card__body">
-            <h3 class="video-card__title">3 Psychology Stories That Will Change The Way You See People</h3>
-            <div class="video-card__meta"><span>Psychology</span></div>
-          </div>
-        </div>
-
-        <!-- Video 6 -->
-        <div class="video-card reveal" data-category="dark-psychology" data-videoid="Cv4v2QND490">
-          <div class="video-card__thumbnail">
-            <img src="https://i.ytimg.com/vi/Cv4v2QND490/hqdefault.jpg" alt="10 Mental Traps Jo Aapki Life Barbaad Kar Rahe Hain" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-            <button class="video-card__play" aria-label="Play" onclick="playYouTube(this)"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
-          </div>
-          <div class="video-card__body">
-            <h3 class="video-card__title">10 Mental Traps Jo Aapki Life Barbaad Kar Rahe Hain</h3>
-            <div class="video-card__meta"><span>Dark Psychology</span></div>
-          </div>
-        </div>
-
       </div>
 
       <!-- YouTube Subscribe CTA -->
@@ -180,5 +111,6 @@
   </footer>
 
   <script src="js/main.js"></script>
+  <script src="js/youtube-feed.js"></script>
 </body>
 </html>
