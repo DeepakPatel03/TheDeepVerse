@@ -1,79 +1,157 @@
 /* ============================================================
-   THEDEEPVERSE — THE VAULT PAGE
+   DEEPVERSE HUB (formerly The Vault) + Hub Tabs
    ============================================================ */
 
 .vault-page {
-  padding-top: calc(var(--nav-height-mobile) + var(--space-8));
+  padding-top: calc(var(--nav-height) + var(--space-8));
   padding-bottom: var(--space-16);
-}
-
-@media (min-width: 768px) {
-  .vault-page {
-    padding-top: calc(var(--nav-height) + var(--space-12));
-  }
+  min-height: 100vh;
 }
 
 .vault-header {
   text-align: center;
-  margin-bottom: var(--space-8);
+  padding: var(--space-12) 0;
 }
-
 .vault-header__title {
-  margin-bottom: var(--space-3);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #FFFFFF 30%, #FFD700 60%, #FFA500 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-4);
 }
-
 .vault-header__desc {
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
   color: var(--text-muted);
   max-width: 600px;
-  margin: 0 auto var(--space-8);
+  margin: 0 auto;
+  line-height: var(--leading-relaxed);
 }
 
-.vault-controls {
+/* Hub Tabs */
+.hub-tabs {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-6);
+  gap: var(--space-2);
+  justify-content: center;
+  flex-wrap: wrap;
   margin-bottom: var(--space-10);
+  padding: var(--space-1);
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
 }
 
-.vault-controls .search-bar {
-  max-width: 480px;
+.hub-tab {
+  padding: var(--space-3) var(--space-5);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-base) var(--ease-default);
+  white-space: nowrap;
+}
+.hub-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface-hover);
+}
+.hub-tab.is-active {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #000;
+  font-weight: var(--weight-semibold);
 }
 
+/* Hub Panels */
+.hub-panel { display: none; }
+.hub-panel.is-active { display: block; }
+
+/* Coming Soon sections */
+.hub-coming {
+  text-align: center;
+  padding: var(--space-16) 0;
+}
+.hub-coming__icon {
+  font-size: 4rem;
+  margin-bottom: var(--space-4);
+}
+.hub-coming__title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+}
+.hub-coming__desc {
+  font-size: var(--text-base);
+  color: var(--text-muted);
+  max-width: 500px;
+  margin: 0 auto var(--space-10);
+  line-height: var(--leading-relaxed);
+}
+.hub-coming__cards {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: 1fr;
+  max-width: 800px;
+  margin: 0 auto var(--space-10);
+}
+@media (min-width: 640px) {
+  .hub-coming__cards { grid-template-columns: repeat(3, 1fr); }
+}
+
+.hub-preview-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  text-align: center;
+  position: relative;
+  transition: all var(--duration-base) var(--ease-default);
+}
+.hub-preview-card:hover {
+  border-color: var(--accent-border);
+  transform: translateY(-4px);
+}
+.hub-preview-card__icon {
+  font-size: 2rem;
+  margin-bottom: var(--space-3);
+}
+.hub-preview-card h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+.hub-preview-card p {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+.hub-preview-card__badge {
+  display: inline-block;
+  background: #FF4444;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+}
+
+/* Vault controls & grid */
+.vault-controls { margin-bottom: var(--space-10); }
 .vault-grid {
   display: grid;
   gap: var(--space-6);
   grid-template-columns: 1fr;
 }
-
 @media (min-width: 640px) {
-  .vault-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .vault-grid { grid-template-columns: repeat(2, 1fr); }
 }
-
 @media (min-width: 1024px) {
-  .vault-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.vault-empty {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: var(--space-16) var(--space-4);
-  color: var(--text-muted);
-}
-
-.vault-empty__icon {
-  font-size: var(--text-4xl);
-  margin-bottom: var(--space-4);
-}
-
-.vault-count {
-  text-align: center;
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  margin-bottom: var(--space-6);
+  .vault-grid { grid-template-columns: repeat(3, 1fr); }
 }

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — TheDeepVerse</title>
+  <meta name="description" content="Contact TheDeepVerse for queries, collaborations, course support, or technical issues. Reach Deepak Patel via form or social media.">
+  <meta name="author" content="Deepak Patel">
+  <meta name="keywords" content="TheDeepVerse contact, Deepak Patel contact, contact form, collaboration, course support">
+  <link rel="canonical" href="https://thedeepverse.netlify.app/contact.html">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23050505'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-size='18' font-weight='bold' fill='%23F5F5F5'%3ED%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    .contact-page { padding-top: calc(var(--nav-height) + var(--space-8)); padding-bottom: var(--space-16); min-height: 100vh; }
+    .contact-header { text-align: center; padding: var(--space-12) 0; }
+    .contact-header__title {
+      font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 800;
+      background: linear-gradient(135deg, #FFFFFF 30%, #FFD700 60%, #FFA500 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: var(--space-4);
+    }
+    .contact-header__desc { font-size: var(--text-base); color: var(--text-muted); max-width: 500px; margin: 0 auto; }
+    .contact-grid { display: grid; gap: var(--space-8); grid-template-columns: 1fr; max-width: 900px; margin: 0 auto; }
+    @media (min-width: 768px) { .contact-grid { grid-template-columns: 1.5fr 1fr; } }
+    .contact-form { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-8); }
+    .contact-form .form-group { margin-bottom: var(--space-5); }
+    .contact-form label { display: block; font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--text-primary); margin-bottom: var(--space-2); }
+    .contact-form input, .contact-form select, .contact-form textarea {
+      width: 100%; padding: var(--space-3) var(--space-4); background: var(--color-gray-800); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); color: var(--text-primary); font-family: var(--font-body); font-size: var(--text-base);
+      transition: border-color var(--duration-base) var(--ease-default);
+    }
+    .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { outline: none; border-color: var(--accent); }
+    .contact-form textarea { min-height: 150px; resize: vertical; }
+    .contact-form select { appearance: none; cursor: pointer; }
+    .contact-social { display: flex; flex-direction: column; gap: var(--space-6); }
+    .contact-social-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; transition: all var(--duration-base) var(--ease-default); }
+    .contact-social-card:hover { border-color: var(--accent-border); transform: translateY(-2px); }
+    .contact-social-card__icon { font-size: 2rem; margin-bottom: var(--space-3); }
+    .contact-social-card__title { font-family: var(--font-display); font-size: var(--text-lg); color: var(--text-primary); margin-bottom: var(--space-1); }
+    .contact-social-card__link { font-size: var(--text-sm); color: var(--accent); text-decoration: none; }
+    .contact-social-card__link:hover { text-decoration: underline; }
+    .form-success { display: none; text-align: center; padding: var(--space-10); }
+    .form-success__icon { font-size: 3rem; margin-bottom: var(--space-4); }
+    .form-success__title { font-family: var(--font-display); font-size: var(--text-xl); color: var(--text-primary); margin-bottom: var(--space-2); }
+    .form-success__desc { font-size: var(--text-sm); color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo">TheDeepVerse</a>
+      <div class="nav__links">
+        <a href="index.html" class="nav__link">Home</a>
+        <a href="hub.html" class="nav__link">DeepVerse Hub</a>
+        <a href="videos.html" class="nav__link">Videos</a>
+        <a href="shorts.html" class="nav__link">Shorts</a>
+        <a href="store.html" class="nav__link">Store</a>
+        <a href="about.html" class="nav__link">About</a>
+        <a href="contact.html" class="nav__link is-active">Contact</a>
+      </div>
+      <div class="nav__cta"><a href="https://youtube.com/@TheDeepVerse-YT" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--sm">Subscribe</a></div>
+      <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false"><div class="nav__toggle-icon"><span></span><span></span><span></span></div></button>
+    </div>
+    <div class="nav__mobile">
+      <a href="index.html" class="nav__mobile-link">Home</a>
+      <a href="hub.html" class="nav__mobile-link">DeepVerse Hub</a>
+      <a href="videos.html" class="nav__mobile-link">Videos</a>
+      <a href="shorts.html" class="nav__mobile-link">Shorts</a>
+      <a href="store.html" class="nav__mobile-link">Store</a>
+      <a href="about.html" class="nav__mobile-link">About</a>
+      <a href="contact.html" class="nav__mobile-link is-active">Contact</a>
+      <div class="nav__mobile-footer">
+        <a href="https://youtube.com/@TheDeepVerse-YT" target="_blank" rel="noopener noreferrer" class="btn btn--youtube btn--md" style="width:100%;justify-content:center;">Subscribe on YouTube</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="contact-page">
+    <div class="container">
+      <div class="contact-header">
+        <h1 class="contact-header__title">&#128172; Contact Us</h1>
+        <p class="contact-header__desc">Have a question, want to collaborate, or need support? We'd love to hear from you.</p>
+      </div>
+
+      <div class="contact-grid">
+        <!-- Contact Form -->
+        <div class="contact-form" id="contactFormWrap">
+          <form id="contactForm" onsubmit="handleContact(event)">
+            <div class="form-group">
+              <label for="contactName">Name *</label>
+              <input type="text" id="contactName" required placeholder="Your name">
+            </div>
+            <div class="form-group">
+              <label for="contactEmail">Email *</label>
+              <input type="email" id="contactEmail" required placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+              <label for="contactSubject">Subject *</label>
+              <select id="contactSubject" required>
+                <option value="">Select a topic...</option>
+                <option value="general">General Query</option>
+                <option value="course">Course Related</option>
+                <option value="collab">Collaboration</option>
+                <option value="technical">Technical Issue</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="contactMessage">Message *</label>
+              <textarea id="contactMessage" required placeholder="Write your message..."></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary btn--md" style="width:100%;">Send Message</button>
+          </form>
+          <div class="form-success" id="formSuccess">
+            <div class="form-success__icon">&#9989;</div>
+            <h3 class="form-success__title">Message Sent!</h3>
+            <p class="form-success__desc">We'll get back to you within 24-48 hours.</p>
+          </div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="contact-social">
+          <a href="https://instagram.com/thedeepverse" target="_blank" rel="noopener noreferrer" class="contact-social-card">
+            <div class="contact-social-card__icon">&#128248;</div>
+            <h3 class="contact-social-card__title">Instagram</h3>
+            <span class="contact-social-card__link">@thedeepverse</span>
+          </a>
+          <a href="https://youtube.com/@TheDeepVerse-YT" target="_blank" rel="noopener noreferrer" class="contact-social-card">
+            <div class="contact-social-card__icon">&#9654;</div>
+            <h3 class="contact-social-card__title">YouTube</h3>
+            <span class="contact-social-card__link">@TheDeepVerse-YT</span>
+          </a>
+          <a href="#" class="contact-social-card">
+            <div class="contact-social-card__icon">&#128241;</div>
+            <h3 class="contact-social-card__title">WhatsApp</h3>
+            <span class="contact-social-card__link">Join Channel</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand"><div class="footer__logo">TheDeepVerse</div><p class="footer__tagline">Stories That Change The Way You Think</p></div>
+        <div><div class="footer__heading">Quick Links</div><a href="index.html" class="footer__link">Home</a><a href="hub.html" class="footer__link">DeepVerse Hub</a><a href="shorts.html" class="footer__link">Shorts</a><a href="store.html" class="footer__link">Store</a><a href="about.html" class="footer__link">About</a><a href="contact.html" class="footer__link">Contact</a></div>
+        <div><div class="footer__heading">Connect</div><a href="https://youtube.com/@TheDeepVerse-YT" class="footer__link" target="_blank" rel="noopener noreferrer">YouTube</a><a href="https://instagram.com/thedeepverse" class="footer__link" target="_blank" rel="noopener noreferrer">Instagram</a><a href="#" class="footer__link">WhatsApp Channel</a><a href="#" class="footer__link">Telegram</a></div>
+        <div><div class="footer__heading">Legal</div><a href="privacy.html" class="footer__link">Privacy Policy</a><a href="terms.html" class="footer__link">Terms &amp; Conditions</a><a href="refund.html" class="footer__link">Refund Policy</a><a href="disclaimer.html" class="footer__link">Disclaimer</a></div>
+      </div>
+      <div class="footer__bottom"><div class="footer__copyright">&copy; 2025 TheDeepVerse. All Rights Reserved.</div></div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></button>
+  <script src="js/main.js"></script>
+  <script>
+    function handleContact(e) {
+      e.preventDefault();
+      document.getElementById('contactForm').style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
