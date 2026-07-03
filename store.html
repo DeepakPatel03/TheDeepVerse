@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store — Premium Psychology Courses & Digital Products | TheDeepVerse</title>
+  <meta name="description" content="Learn psychology the cinematic way. Premium courses, notes, master prompts, and video creation methods by Deepak Patel. Unlock the secrets of the human mind.">
+  <meta name="keywords" content="psychology courses, dark psychology course, master prompt, video creation method, TheDeepVerse, Deepak Patel, psychology notes">
+  <link rel="canonical" href="https://thedeepverse.com/store.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://thedeepverse.com/store.html">
+  <meta property="og:title" content="Store — Premium Psychology Products | TheDeepVerse">
+  <meta property="og:description" content="Premium psychology courses, notes, prompts, and methods by Deepak Patel. Learn what schools never teach you.">
+  <meta property="og:image" content="https://thedeepverse.com/assets/images/og-home.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23050505'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-size='18' font-weight='bold' fill='%23F5F5F5'%3ED%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/store.css">
+
+  <!-- Razorpay Checkout SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+  <!-- ── NAVIGATION ── -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo">TheDeepVerse</a>
+      <div class="nav__links">
+        <a href="index.html" class="nav__link">Home</a>
+        <a href="vault.html" class="nav__link">The Vault</a>
+        <a href="videos.html" class="nav__link">Videos</a>
+        <a href="articles.html" class="nav__link">Articles</a>
+        <a href="store.html" class="nav__link is-active">Store</a>
+        <a href="about.html" class="nav__link">About</a>
+      </div>
+      <div class="nav__cta">
+        <a href="https://youtube.com/@TheDeepVerse-YT" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--sm">Subscribe</a>
+      </div>
+      <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">
+        <div class="nav__toggle-icon"><span></span><span></span><span></span></div>
+      </button>
+    </div>
+    <div class="nav__mobile">
+      <a href="index.html" class="nav__mobile-link">Home</a>
+      <a href="vault.html" class="nav__mobile-link">The Vault</a>
+      <a href="videos.html" class="nav__mobile-link">Videos</a>
+      <a href="articles.html" class="nav__mobile-link">Articles</a>
+      <a href="store.html" class="nav__mobile-link is-active">Store</a>
+      <a href="about.html" class="nav__mobile-link">About</a>
+      <a href="faq.html" class="nav__mobile-link">FAQ</a>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- ── STORE HERO ── -->
+    <section class="store-hero reveal">
+      <div class="container">
+        <span class="store-hero__badge">🔓 Digital Products</span>
+        <h1 class="store-hero__title">Learn What Schools Never Teach You.</h1>
+        <p class="store-hero__subtitle">Premium psychology courses, exclusive notes, AI master prompts, and the exact methods behind TheDeepVerse videos. Built by Deepak Patel for serious learners.</p>
+      </div>
+    </section>
+
+    <!-- ── TRUST INDICATORS ── -->
+    <section class="trust-section reveal">
+      <div class="container">
+        <div class="trust-grid">
+          <div class="trust-item">
+            <div class="trust-item__icon">🎓</div>
+            <div class="trust-item__label"><strong>Research-Based</strong>Every course is backed by real psychology research</div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-item__icon">📱</div>
+            <div class="trust-item__label"><strong>Instant Access</strong>Download immediately after purchase</div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-item__icon">♻️</div>
+            <div class="trust-item__label"><strong>Lifetime Access</strong>Buy once, access forever — no subscriptions</div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-item__icon">🔒</div>
+            <div class="trust-item__label"><strong>Secure Payment</strong>100% safe checkout via Razorpay / UPI</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FEATURED PRODUCT (Dynamic) ── -->
+    <section class="container reveal" style="padding-top: var(--space-12);" id="featuredSection"></section>
+
+    <!-- ── CATEGORY TABS ── -->
+    <section class="container">
+      <div class="store-tabs" id="storeTabs">
+        <button class="filter-tab is-active" data-filter="all">All Products</button>
+        <button class="filter-tab" data-filter="course">Courses</button>
+        <button class="filter-tab" data-filter="notes">Notes</button>
+        <button class="filter-tab" data-filter="prompt">Prompts</button>
+        <button class="filter-tab" data-filter="method">Methods</button>
+        <button class="filter-tab" data-filter="free">Free</button>
+      </div>
+
+      <!-- ── PRODUCTS GRID (Dynamic) ── -->
+      <div class="products-grid reveal-stagger" id="productsGrid"></div>
+    </section>
+
+    <!-- ── STORE FAQ ── -->
+    <section class="container reveal">
+      <div class="store-faq">
+        <div class="store-section-header">
+          <h2>Frequently Asked Questions</h2>
+          <p>Everything you need to know before purchasing.</p>
+        </div>
+        <div class="faq-list">
+          <details class="faq-item" id="storeFaq1">
+            <summary class="faq-question">How will I receive my purchase?</summary>
+            <div class="faq-answer"><p>After successful payment, you'll receive an instant download link via email. You'll also get access to a Google Drive folder with all your purchased content.</p></div>
+          </details>
+          <details class="faq-item" id="storeFaq2">
+            <summary class="faq-question">What payment methods do you accept?</summary>
+            <div class="faq-answer"><p>We accept UPI, debit cards, credit cards, net banking, and wallets via Razorpay — India's most trusted payment gateway. International cards are also supported.</p></div>
+          </details>
+          <details class="faq-item" id="storeFaq3">
+            <summary class="faq-question">Is there a refund policy?</summary>
+            <div class="faq-answer"><p>Due to the digital nature of our products, we generally don't offer refunds. However, if you're genuinely unsatisfied, contact us within 7 days and we'll work something out.</p></div>
+          </details>
+          <details class="faq-item" id="storeFaq4">
+            <summary class="faq-question">Can I share these with others?</summary>
+            <div class="faq-answer"><p>All products are for personal use only. Sharing, redistributing, or reselling is strictly prohibited. Each purchase is tied to your email.</p></div>
+          </details>
+          <details class="faq-item" id="storeFaq5">
+            <summary class="faq-question">Will new products be added?</summary>
+            <div class="faq-answer"><p>Yes! We regularly add new courses, notes, and tools. Master Bundle buyers get all future products for free — forever.</p></div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── NEWSLETTER CTA ── -->
+    <section class="newsletter reveal" aria-label="Newsletter signup">
+      <div class="container">
+        <div class="newsletter__inner">
+          <h2 class="newsletter__title">Get notified about new products.</h2>
+          <p class="newsletter__subtitle">Be the first to know when we launch new courses, notes, and exclusive deals.</p>
+          <form class="newsletter__form" id="storeNewsletterForm">
+            <input type="email" name="email" placeholder="your@email.com" required class="newsletter__input" aria-label="Email address" id="storeNewsletterEmail">
+            <button type="submit" class="btn btn--primary btn--md newsletter__btn" id="storeNewsletterBtn">Notify Me</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="footer__logo">TheDeepVerse</div>
+          <p class="footer__tagline">Decode the human mind.</p>
+        </div>
+        <div>
+          <div class="footer__heading">Explore</div>
+          <a href="index.html" class="footer__link">Home</a>
+          <a href="vault.html" class="footer__link">The Vault</a>
+          <a href="videos.html" class="footer__link">Videos</a>
+          <a href="articles.html" class="footer__link">Articles</a>
+          <a href="store.html" class="footer__link">Store</a>
+          <a href="about.html" class="footer__link">About</a>
+        </div>
+        <div>
+          <div class="footer__heading">Legal</div>
+          <a href="privacy.html" class="footer__link">Privacy Policy</a>
+          <a href="terms.html" class="footer__link">Terms of Service</a>
+          <a href="faq.html" class="footer__link">FAQ</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <div class="footer__copyright">© 2026 TheDeepVerse. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/store-data.js"></script>
+  <script>
+    // ═══ DYNAMIC STORE RENDERER ═══
+    (function() {
+      const products = StoreEngine.getProducts().filter(p => p.active);
+      const featured = products.find(p => p.featured);
+      const regular = products.filter(p => !p.featured);
+
+      // ── Gradient backgrounds for cards ──
+      const gradients = [
+        'linear-gradient(135deg, #1a0505 0%, #0a0a1a 100%)',
+        'linear-gradient(135deg, #050510 0%, #0a0f1a 100%)',
+        'linear-gradient(135deg, #0a100a 0%, #050a06 100%)',
+        'linear-gradient(135deg, #0f0a1a 0%, #0a0510 100%)',
+        'linear-gradient(135deg, #1a0808 0%, #100505 100%)',
+        'linear-gradient(135deg, #0a0a00 0%, #1a1a05 50%, #0a0a00 100%)',
+        'linear-gradient(135deg, #0a050f 0%, #150a1a 100%)',
+        'linear-gradient(135deg, #100a05 0%, #0a0805 100%)',
+        'linear-gradient(135deg, #050f0a 0%, #0a1a10 100%)'
+      ];
+
+      const tagColorMap = {
+        gold: '', red: 'product-card__tag--popular', green: 'product-card__tag--free',
+        purple: 'product-card__tag--new', '': ''
+      };
+
+      // ── Render Featured Product ──
+      if (featured) {
+        const thumbHtml = featured.thumbnail
+          ? `<img src="${featured.thumbnail}" alt="${featured.title}" style="width:100%;height:100%;object-fit:cover">`
+          : `<span>${featured.emoji || '🧠'}</span>`;
+        const featuresHtml = (featured.features || []).map(f => `<li>${f}</li>`).join('');
+        const priceOriginal = featured.originalPrice
+          ? `<span class="featured-product__price-original">₹${featured.originalPrice.toLocaleString('en-IN')}</span>`
+          : '';
+
+        document.getElementById('featuredSection').innerHTML = `
+          <div class="featured-product">
+            <span class="featured-product__badge">${featured.tag ? '🔥 ' + featured.tag : '🔥 Featured'}</span>
+            <div class="featured-product__image" style="background:${gradients[0]}">${thumbHtml}</div>
+            <div class="featured-product__content">
+              <span class="featured-product__category">${featured.category}</span>
+              <h2 class="featured-product__title">${featured.title}</h2>
+              <p class="featured-product__desc">${featured.description}</p>
+              ${featuresHtml ? `<ul class="featured-product__features">${featuresHtml}</ul>` : ''}
+              <div class="featured-product__cta">
+                <span class="featured-product__price">₹${featured.price.toLocaleString('en-IN')} ${priceOriginal}</span>
+                <a href="#" class="product-card__buy" onclick="handleBuy('${featured.id}', ${featured.price}, '${featured.downloadUrl || ''}')">Get ${featured.category === 'bundle' ? 'Bundle' : 'Now'} →</a>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      // ── Render Product Cards ──
+      const grid = document.getElementById('productsGrid');
+      grid.innerHTML = regular.map((p, i) => {
+        const gradient = gradients[i % gradients.length];
+        const imageHtml = p.thumbnail
+          ? `<img src="${p.thumbnail}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover">`
+          : `<div class="product-card__image-bg" style="background:${gradient}">${p.emoji || '📦'}</div>`;
+        const tagHtml = p.tag
+          ? `<span class="product-card__tag ${tagColorMap[p.tagColor] || ''}">${p.tag}</span>`
+          : '';
+        const priceHtml = p.price === 0
+          ? '<span class="product-card__price" style="color:#22c55e">Free</span>'
+          : `<span class="product-card__price">₹${p.price.toLocaleString('en-IN')}${p.originalPrice ? ` <span class="product-card__price-original">₹${p.originalPrice.toLocaleString('en-IN')}</span>` : ''}</span>`;
+        const buyClass = p.price === 0 ? 'product-card__buy product-card__buy--free' : 'product-card__buy';
+        const buyText = p.price === 0 ? 'Download' : 'Buy Now';
+
+        return `
+          <div class="product-card reveal" data-category="${p.category}" id="product-${p.id}">
+            <div class="product-card__image">${imageHtml}${tagHtml}</div>
+            <div class="product-card__body">
+              <span class="product-card__category">${p.category}</span>
+              <h3 class="product-card__title">${p.title}</h3>
+              <p class="product-card__desc">${p.description}</p>
+              <div class="product-card__footer">
+                ${priceHtml}
+                <a href="#" class="${buyClass}" onclick="handleBuy('${p.id}', ${p.price}, '${p.downloadUrl || ''}')">${buyText}</a>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+
+      // ── Filter Tabs ──
+      const tabs = document.querySelectorAll('#storeTabs .filter-tab');
+      const cards = document.querySelectorAll('#productsGrid .product-card');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('is-active'));
+          tab.classList.add('is-active');
+          const filter = tab.dataset.filter;
+          cards.forEach(c => {
+            if (filter === 'all' || c.dataset.category === filter) {
+              c.style.display = '';
+              c.style.opacity = '0';
+              requestAnimationFrame(() => { c.style.transition = 'opacity 0.3s ease'; c.style.opacity = '1'; });
+            } else {
+              c.style.display = 'none';
+            }
+          });
+        });
+      });
+    })();
+
+    // ── Razorpay Configuration ──
+    const RAZORPAY_CONFIG = {
+      key: 'rzp_live_T8fCgJ0kFyrOYl',
+      currency: 'INR',
+      name: 'TheDeepVerse',
+      description: 'Premium Psychology Products',
+      image: '',
+      prefill: { name: '', email: '', contact: '' },
+      theme: { color: '#d4af37' }
+    };
+
+    // ── Buy Handler with Razorpay ──
+    function handleBuy(productId, price, downloadUrl) {
+      event.preventDefault();
+
+      // Free product — direct download
+      if (price === 0 && downloadUrl) {
+        window.open(downloadUrl, '_blank');
+        return;
+      }
+      if (price === 0) {
+        alert('🎁 Free download!\n\nThis product will be available for download once the download link is configured in Admin Dashboard.');
+        return;
+      }
+
+      // Get product details
+      const product = StoreEngine.getProduct(productId);
+      const productName = product ? product.title : productId;
+
+      // Check if Razorpay key is configured
+      if (!RAZORPAY_CONFIG.key || RAZORPAY_CONFIG.key.includes('XXXXXXXXXX')) {
+        // Fallback: show payment info modal
+        showPaymentFallback(productName, price);
+        return;
+      }
+
+      // Razorpay Checkout
+      const options = {
+        key: RAZORPAY_CONFIG.key,
+        amount: price * 100, // Razorpay amount is in paise
+        currency: RAZORPAY_CONFIG.currency,
+        name: RAZORPAY_CONFIG.name,
+        description: productName,
+        image: RAZORPAY_CONFIG.image,
+        prefill: RAZORPAY_CONFIG.prefill,
+        theme: RAZORPAY_CONFIG.theme,
+        handler: function(response) {
+          // Payment successful
+          showPaymentSuccess(productName, response.razorpay_payment_id, downloadUrl);
+        },
+        modal: {
+          ondismiss: function() {
+            console.log('Payment cancelled by user');
+          }
+        },
+        notes: {
+          product_id: productId,
+          product_name: productName
+        }
+      };
+
+      try {
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', function(response) {
+          alert('❌ Payment failed.\n\nError: ' + response.error.description + '\n\nPlease try again or contact support.');
+        });
+        rzp.open();
+      } catch(e) {
+        console.error('Razorpay error:', e);
+        showPaymentFallback(productName, price);
+      }
+    }
+
+    // ── Payment Success ──
+    function showPaymentSuccess(productName, paymentId, downloadUrl) {
+      const msg = '✅ Payment Successful!\n\n' +
+        '🛒 Product: ' + productName + '\n' +
+        '🆔 Payment ID: ' + paymentId + '\n\n' +
+        'You will receive the product via email shortly.\n' +
+        'Save your Payment ID for reference.';
+      alert(msg);
+      if (downloadUrl) window.open(downloadUrl, '_blank');
+    }
+
+    // ── Fallback (when Razorpay key not configured) ──
+    function showPaymentFallback(productName, price) {
+      alert(
+        '🛒 ' + productName + '\n' +
+        '💰 Price: ₹' + price.toLocaleString('en-IN') + '\n\n' +
+        '📱 To purchase, contact:\n' +
+        '• Instagram: @thedeepverse\n' +
+        '• YouTube: @TheDeepVerse-YT\n\n' +
+        '💳 Online payment will be available soon!'
+      );
+    }
+  </script>
+</body>
+</html>
