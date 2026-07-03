@@ -745,6 +745,51 @@ function cancelTestimonial() {
   document.getElementById('testimonialForm').style.display = 'none';
 }
 
+// ═══ SETTINGS ═══
+function loadSettings() {
+  try {
+    var settings = JSON.parse(localStorage.getItem('tdv_settings') || '{}');
+    document.getElementById('settRazorpayKey').value = settings.razorpayKey || '';
+    document.getElementById('settBusinessName').value = settings.businessName || 'TheDeepVerse';
+    document.getElementById('settThemeColor').value = settings.themeColor || '#d4af37';
+    document.getElementById('settLogoUrl').value = settings.logoUrl || '';
+    // Update stats
+    var used = 0;
+    for (var k in localStorage) { if (localStorage.hasOwnProperty(k)) used += localStorage.getItem(k).length; }
+    document.getElementById('storageUsed').textContent = (used / 1024).toFixed(1) + ' KB';
+    document.getElementById('productCount').textContent = StoreEngine.getProducts().length;
+  } catch(e) { console.error('Error loading settings:', e); }
+}
+
+function saveSettings() {
+  var settings = {
+    razorpayKey: document.getElementById('settRazorpayKey').value.trim(),
+    businessName: document.getElementById('settBusinessName').value.trim(),
+    themeColor: document.getElementById('settThemeColor').value.trim(),
+    logoUrl: document.getElementById('settLogoUrl').value.trim()
+  };
+  localStorage.setItem('tdv_settings', JSON.stringify(settings));
+  showToast('Settings saved!', 'success');
+}
+
+function testRazorpay() {
+  var key = document.getElementById('settRazorpayKey').value.trim();
+  if (!key) { showToast('Enter Razorpay Key ID first.', 'error'); return; }
+  try {
+    var options = {
+      key: key,
+      amount: 100,
+      currency: 'INR',
+      name: document.getElementById('settBusinessName').value || 'TheDeepVerse',
+      description: 'Test Payment (₹1)',
+      theme: { color: document.getElementById('settThemeColor').value || '#d4af37' },
+      handler: function() { showToast('Test payment successful!', 'success'); }
+    };
+    var rzp = new Razorpay(options);
+    rzp.open();
+  } catch(e) { showToast('Razorpay error: ' + e.message, 'error'); }
+}
+
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
