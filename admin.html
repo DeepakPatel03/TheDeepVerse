@@ -36,6 +36,8 @@
     <div class="sidebar-section-title">Management</div>
     <a href="#" class="sidebar-link active" onclick="showSection('products')"><span class="sidebar-link__icon">📦</span> Products</a>
     <a href="#" class="sidebar-link" onclick="showSection('add')"><span class="sidebar-link__icon">➕</span> Add Product</a>
+    <a href="#" class="sidebar-link" onclick="showSection('social')"><span class="sidebar-link__icon">🔗</span> Social Links</a>
+    <a href="#" class="sidebar-link" onclick="showSection('testimonials')"><span class="sidebar-link__icon">⭐</span> Testimonials</a>
     <a href="#" class="sidebar-link" onclick="showSection('data')"><span class="sidebar-link__icon">💾</span> Import / Export</a>
     <a href="#" class="sidebar-link" onclick="showSection('settings')"><span class="sidebar-link__icon">⚙️</span> Settings</a>
     <div class="sidebar-section-title">Quick Links</div>
@@ -273,6 +275,85 @@
         <h3>📊 Quick Stats</h3>
         <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:8px">Storage used: <strong id="storageUsed">—</strong></p>
         <p style="color:var(--admin-text-2);font-size:0.85rem">Products in database: <strong id="productCount">—</strong></p>
+      </div>
+    </div>
+
+    <!-- ── SOCIAL LINKS SECTION ── -->
+    <div id="section-social" style="display:none">
+      <div class="admin-header">
+        <h1>🔗 Social Links Manager</h1>
+        <button class="btn-admin" onclick="showSection('products')">← Back</button>
+      </div>
+      <div class="data-section">
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Update your social media links. Changes are saved to browser storage and reflected across the website.</p>
+        <div class="form-group">
+          <label>📺 YouTube Channel URL</label>
+          <input type="text" id="socialYoutube" placeholder="https://youtube.com/@YourChannel">
+        </div>
+        <div class="form-group">
+          <label>📸 Instagram URL</label>
+          <input type="text" id="socialInstagram" placeholder="https://www.instagram.com/yourhandle/">
+        </div>
+        <div class="form-group">
+          <label>💬 WhatsApp Channel URL</label>
+          <input type="text" id="socialWhatsapp" placeholder="https://whatsapp.com/channel/...">
+        </div>
+        <div class="form-group">
+          <label>✈️ Telegram URL</label>
+          <input type="text" id="socialTelegram" placeholder="https://t.me/YourChannel">
+        </div>
+        <div class="form-group">
+          <label>📘 Facebook URL</label>
+          <input type="text" id="socialFacebook" placeholder="https://www.facebook.com/yourpage">
+        </div>
+        <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--admin-border)">
+          <button class="btn-admin btn-admin--primary" onclick="saveSocialLinks()">💾 Save Links</button>
+          <button class="btn-admin" onclick="loadSocialLinks()">🔄 Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TESTIMONIALS SECTION ── -->
+    <div id="section-testimonials" style="display:none">
+      <div class="admin-header">
+        <h1>⭐ Testimonials Manager</h1>
+        <div class="admin-header__actions">
+          <button class="btn-admin btn-admin--primary" onclick="addTestimonial()">➕ Add Testimonial</button>
+          <button class="btn-admin" onclick="showSection('products')">← Back</button>
+        </div>
+      </div>
+      <div class="data-section">
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Manage testimonials shown on the homepage. Add student reviews and feedback.</p>
+        <div id="testimonialsList"></div>
+        <div id="testimonialForm" style="display:none;margin-top:16px;padding:16px;border:1px solid var(--admin-border);border-radius:8px;">
+          <input type="hidden" id="testEditId">
+          <div class="form-group">
+            <label>Name *</label>
+            <input type="text" id="testName" required placeholder="Student name">
+          </div>
+          <div class="form-group">
+            <label>Role / Title</label>
+            <input type="text" id="testRole" placeholder="e.g., Psychology Student">
+          </div>
+          <div class="form-group">
+            <label>Review Text *</label>
+            <textarea id="testReview" required placeholder="Write the review..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Rating (1-5)</label>
+              <input type="number" id="testRating" min="1" max="5" value="5">
+            </div>
+            <div class="form-group">
+              <label>Avatar Emoji</label>
+              <input type="text" id="testAvatar" placeholder="👤" maxlength="4" value="👤">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-admin btn-admin--primary" onclick="saveTestimonial()">💾 Save</button>
+            <button class="btn-admin" onclick="cancelTestimonial()">Cancel</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -523,8 +604,9 @@ function importFile(event) {
 
 // ═══ UI HELPERS ═══
 function showSection(name) {
-  ['products', 'add', 'data', 'settings'].forEach(s => {
-    document.getElementById('section-' + s).style.display = s === name ? '' : 'none';
+  ['products', 'add', 'data', 'settings', 'social', 'testimonials'].forEach(s => {
+    var el = document.getElementById('section-' + s);
+    if (el) el.style.display = s === name ? '' : 'none';
   });
   document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
   const link = document.querySelector(`.sidebar-link[onclick="showSection('${name}')"]`);
@@ -532,7 +614,135 @@ function showSection(name) {
   if (name === 'products') { resetForm(); loadDashboard(); }
   if (name === 'data') { document.getElementById('exportArea').value = StoreEngine.exportJSON(); }
   if (name === 'settings') { loadSettings(); }
+  if (name === 'social') { loadSocialLinks(); }
+  if (name === 'testimonials') { loadTestimonials(); }
   window.scrollTo(0, 0);
+}
+
+// ═══ SOCIAL LINKS MANAGER ═══
+var DEFAULT_SOCIAL = {
+  youtube: 'https://youtube.com/@TheDeepVerse-YT',
+  instagram: 'https://www.instagram.com/thedeepverse03/',
+  whatsapp: 'https://whatsapp.com/channel/0029VbCOHN0AojYp5TozJ50N',
+  telegram: 'https://t.me/TheDeepVerse',
+  facebook: 'https://www.facebook.com/thedeepverse03'
+};
+
+function loadSocialLinks() {
+  var links = JSON.parse(localStorage.getItem('tdv_social_links') || 'null') || DEFAULT_SOCIAL;
+  document.getElementById('socialYoutube').value = links.youtube || '';
+  document.getElementById('socialInstagram').value = links.instagram || '';
+  document.getElementById('socialWhatsapp').value = links.whatsapp || '';
+  document.getElementById('socialTelegram').value = links.telegram || '';
+  document.getElementById('socialFacebook').value = links.facebook || '';
+}
+
+function saveSocialLinks() {
+  var links = {
+    youtube: document.getElementById('socialYoutube').value.trim(),
+    instagram: document.getElementById('socialInstagram').value.trim(),
+    whatsapp: document.getElementById('socialWhatsapp').value.trim(),
+    telegram: document.getElementById('socialTelegram').value.trim(),
+    facebook: document.getElementById('socialFacebook').value.trim()
+  };
+  localStorage.setItem('tdv_social_links', JSON.stringify(links));
+  showToast('Social links saved! Changes will reflect on the website.', 'success');
+}
+
+// ═══ TESTIMONIALS MANAGER ═══
+var DEFAULT_TESTIMONIALS = [
+  { id: 't1', name: 'Rahul S.', role: 'Psychology Student', review: 'TheDeepVerse ne meri psychology ki samajh hi badal di. Har video ek eye-opener hai!', rating: 5, avatar: '🧠' },
+  { id: 't2', name: 'Priya M.', role: 'Content Creator', review: 'Master Prompt aur Production Bible lene ke baad mera content quality 10x improve ho gaya.', rating: 5, avatar: '🎯' },
+  { id: 't3', name: 'Amit K.', role: 'MBA Student', review: 'Dark psychology concepts ko itna clearly kisi ne nahi samjhaya. The best Hindi psychology channel!', rating: 5, avatar: '📚' }
+];
+
+function getTestimonials() {
+  return JSON.parse(localStorage.getItem('tdv_testimonials') || 'null') || DEFAULT_TESTIMONIALS;
+}
+
+function loadTestimonials() {
+  var testimonials = getTestimonials();
+  var html = '';
+  if (testimonials.length === 0) {
+    html = '<div style="text-align:center;padding:24px;color:var(--admin-text-2)">No testimonials yet. Click "Add Testimonial" to create one.</div>';
+  } else {
+    testimonials.forEach(function(t) {
+      html += '<div style="display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--admin-border);border-radius:8px;margin-bottom:8px">' +
+        '<div style="font-size:2rem">' + (t.avatar || '👤') + '</div>' +
+        '<div style="flex:1">' +
+          '<div style="font-weight:600;color:var(--admin-text-1)">' + t.name + ' <small style="color:var(--admin-text-2)">' + (t.role || '') + '</small></div>' +
+          '<div style="font-size:0.85rem;color:var(--admin-text-2)">' + t.review.substring(0, 80) + (t.review.length > 80 ? '...' : '') + '</div>' +
+          '<div style="color:#FFD700;font-size:0.8rem">' + '⭐'.repeat(t.rating || 5) + '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:4px">' +
+          '<button class="btn-admin btn-admin--sm" onclick="editTestimonial(\'' + t.id + '\')">✏️</button>' +
+          '<button class="btn-admin btn-admin--sm btn-admin--danger" onclick="deleteTestimonial(\'' + t.id + '\')">🗑️</button>' +
+        '</div>' +
+      '</div>';
+    });
+  }
+  document.getElementById('testimonialsList').innerHTML = html;
+}
+
+function addTestimonial() {
+  document.getElementById('testEditId').value = '';
+  document.getElementById('testName').value = '';
+  document.getElementById('testRole').value = '';
+  document.getElementById('testReview').value = '';
+  document.getElementById('testRating').value = '5';
+  document.getElementById('testAvatar').value = '👤';
+  document.getElementById('testimonialForm').style.display = 'block';
+}
+
+function editTestimonial(id) {
+  var testimonials = getTestimonials();
+  var t = testimonials.find(function(x) { return x.id === id; });
+  if (!t) return;
+  document.getElementById('testEditId').value = t.id;
+  document.getElementById('testName').value = t.name;
+  document.getElementById('testRole').value = t.role || '';
+  document.getElementById('testReview').value = t.review;
+  document.getElementById('testRating').value = t.rating || 5;
+  document.getElementById('testAvatar').value = t.avatar || '👤';
+  document.getElementById('testimonialForm').style.display = 'block';
+}
+
+function saveTestimonial() {
+  var editId = document.getElementById('testEditId').value;
+  var name = document.getElementById('testName').value.trim();
+  var review = document.getElementById('testReview').value.trim();
+  if (!name || !review) { showToast('Name and review are required.', 'error'); return; }
+  var testimonials = getTestimonials();
+  var data = {
+    name: name,
+    role: document.getElementById('testRole').value.trim(),
+    review: review,
+    rating: parseInt(document.getElementById('testRating').value) || 5,
+    avatar: document.getElementById('testAvatar').value.trim() || '👤'
+  };
+  if (editId) {
+    var idx = testimonials.findIndex(function(x) { return x.id === editId; });
+    if (idx >= 0) { data.id = editId; testimonials[idx] = data; }
+  } else {
+    data.id = 't' + Date.now();
+    testimonials.push(data);
+  }
+  localStorage.setItem('tdv_testimonials', JSON.stringify(testimonials));
+  showToast('Testimonial saved!', 'success');
+  cancelTestimonial();
+  loadTestimonials();
+}
+
+function deleteTestimonial(id) {
+  if (!confirm('Delete this testimonial?')) return;
+  var testimonials = getTestimonials().filter(function(x) { return x.id !== id; });
+  localStorage.setItem('tdv_testimonials', JSON.stringify(testimonials));
+  showToast('Testimonial deleted.', 'info');
+  loadTestimonials();
+}
+
+function cancelTestimonial() {
+  document.getElementById('testimonialForm').style.display = 'none';
 }
 
 function showToast(message, type = 'info') {
