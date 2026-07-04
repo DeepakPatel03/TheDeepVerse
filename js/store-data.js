@@ -201,8 +201,46 @@ const StoreEngine = (function() {
   const DATA_VERSION = '2026-07-04-v2'; // Updated: 30% discount on courses/notes
   const VERSION_KEY = 'tdv_data_version';
 
+  // ── Firebase Reference (set after Firebase loads) ──
+  let firebaseDB = null;
+  let firebaseReady = false;
+  let firebaseProducts = null; // Cached Firebase data
+
+  function initFirebase() {
+    if (typeof FIREBASE_ENABLED === 'undefined' || !FIREBASE_ENABLED) return;
+    if (typeof firebase === 'undefined') return;
+
+    try {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(FIREBASE_CONFIG);
+      }
+      firebaseDB = firebase.database();
+      firebaseReady = true;
+      console.log('[StoreEngine] Firebase connected ✅');
+
+      // Listen for realtime changes
+      firebaseDB.ref('products').on('value', function(snapshot) {
+        const data = snapshot.val();
+        if (data && Array.isArray(data)) {
+          firebaseProducts = data;
+          // Also update localStorage cache
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+          console.log('[StoreEngine] Products synced from Firebase (' + data.length + ' products)');
+        }
+      });
+    } catch(e) {
+      console.error('[StoreEngine] Firebase init failed:', e);
+      firebaseReady = false;
+    }
+  }
+
   // ── Core Methods ──
   function getProducts() {
+    // If Firebase has data cached, use it
+    if (firebaseProducts && firebaseProducts.length > 0) {
+      return [...firebaseProducts];
+    }
+
     try {
       // Auto-reset if data version has changed (e.g., after pricing update)
       const storedVersion = localStorage.getItem(VERSION_KEY);
@@ -217,10 +255,18 @@ const StoreEngine = (function() {
   }
 
   function saveProducts(products) {
+    // Save to localStorage
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-      return true;
-    } catch(e) { console.error('StoreEngine: Error saving', e); return false; }
+    } catch(e) { console.error('StoreEngine: Error saving to localStorage', e); }
+
+    // Save to Firebase (if connected)
+    if (firebaseReady && firebaseDB) {
+      firebaseDB.ref('products').set(products)
+        .then(function() { console.log('[StoreEngine] Saved to Firebase ✅'); })
+        .catch(function(e) { console.error('[StoreEngine] Firebase save failed:', e); });
+    }
+    return true;
   }
 
   function getProduct(id) {
@@ -253,8 +299,9 @@ const StoreEngine = (function() {
   }
 
   function resetToDefaults() {
-    saveProducts([...DEFAULT_PRODUCTS]);
-    return DEFAULT_PRODUCTS;
+    const defaults = [...DEFAULT_PRODUCTS];
+    saveProducts(defaults);
+    return defaults;
   }
 
   function exportJSON() {
@@ -293,11 +340,23 @@ const StoreEngine = (function() {
     sessionStorage.removeItem(ADMIN_KEY);
   }
 
+  function isFirebaseConnected() {
+    return firebaseReady;
+  }
+
+  // Auto-init Firebase when script loads
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFirebase);
+  } else {
+    initFirebase();
+  }
+
   return {
     getProducts, saveProducts, getProduct,
     addProduct, updateProduct, deleteProduct,
     resetToDefaults, exportJSON, importJSON,
     generateId, isAuthenticated, login, logout,
+    isFirebaseConnected, initFirebase,
     DEFAULT_PRODUCTS
   };
 })();

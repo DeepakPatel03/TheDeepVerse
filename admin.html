@@ -60,13 +60,9 @@
         </div>
       </div>
 
-      <!-- localStorage Warning Banner -->
-      <div style="background: linear-gradient(135deg, rgba(255,165,0,0.12), rgba(255,100,0,0.06)); border: 1px solid rgba(255,165,0,0.3); border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 12px;">
-        <span style="font-size: 1.4rem; flex-shrink: 0;">⚠️</span>
-        <div>
-          <div style="font-weight: 600; color: #ffa500; font-size: 0.9rem; margin-bottom: 4px;">Browser Storage Only</div>
-          <div style="font-size: 0.8rem; color: var(--admin-text-2); line-height: 1.5;">Changes made here are saved to your <strong>browser's localStorage</strong> — they will NOT appear on the live Netlify website. To apply pricing or product changes to production, use <strong>Import/Export</strong> to update the <code style="color:var(--admin-accent)">js/store-data.js</code> file and push to GitHub.</div>
-        </div>
+      <!-- Database Status Banner (updates dynamically) -->
+      <div id="dbStatusBanner" style="border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 12px;">
+        <!-- Content set by updateDBStatus() in JS -->
       </div>
 
       <!-- Stats -->
@@ -380,6 +376,10 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- ── SCRIPTS ── -->
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="js/firebase-config.js"></script>
 <script src="js/store-data.js"></script>
 <script>
 // ═══ AUTH ═══
@@ -409,8 +409,33 @@ if (StoreEngine.isAuthenticated()) {
 
 // ═══ DASHBOARD ═══
 function loadDashboard() {
+  updateDBStatus();
   renderStats();
   renderProducts();
+}
+
+// ── Database Status Banner ──
+function updateDBStatus() {
+  const banner = document.getElementById('dbStatusBanner');
+  if (!banner) return;
+
+  if (typeof StoreEngine !== 'undefined' && StoreEngine.isFirebaseConnected()) {
+    banner.style.background = 'linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.06))';
+    banner.style.border = '1px solid rgba(34,197,94,0.3)';
+    banner.innerHTML = '<span style="font-size:1.4rem;flex-shrink:0">✅</span>' +
+      '<div>' +
+        '<div style="font-weight:600;color:#22c55e;font-size:0.9rem;margin-bottom:4px">Connected to Firebase Database</div>' +
+        '<div style="font-size:0.8rem;color:var(--admin-text-2);line-height:1.5">All changes are saved to <strong>Firebase Realtime Database</strong> and will appear on the live website for all visitors. Your admin panel is fully operational! 🚀</div>' +
+      '</div>';
+  } else {
+    banner.style.background = 'linear-gradient(135deg, rgba(255,165,0,0.12), rgba(255,100,0,0.06))';
+    banner.style.border = '1px solid rgba(255,165,0,0.3)';
+    banner.innerHTML = '<span style="font-size:1.4rem;flex-shrink:0">⚠️</span>' +
+      '<div>' +
+        '<div style="font-weight:600;color:#ffa500;font-size:0.9rem;margin-bottom:4px">Browser Storage Only — Firebase Not Configured</div>' +
+        '<div style="font-size:0.8rem;color:var(--admin-text-2);line-height:1.5">Changes are saved to <strong>browser localStorage</strong> only — they will NOT appear on the live website. To enable full admin control, set up Firebase in <code style="color:var(--admin-accent)">js/firebase-config.js</code> and push to GitHub.</div>' +
+      '</div>';
+  }
 }
 
 function renderStats() {
