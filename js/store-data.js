@@ -40,9 +40,9 @@ const StoreEngine = (function() {
       category: 'course',
       title: 'Dark Psychology Mastery',
       description: 'The complete guide to understanding manipulation, persuasion, and the dark side of human behavior. 12 chapters, real-world examples, case studies.',
-      price: 499,
-      originalPrice: 999,
-      tag: 'Bestseller',
+      price: 349,
+      originalPrice: 499,
+      tag: '30% OFF',
       tagColor: 'red',
       thumbnail: '',
       emoji: '🕵️',
@@ -58,9 +58,9 @@ const StoreEngine = (function() {
       category: 'course',
       title: 'Cognitive Biases Decoded',
       description: '50+ cognitive biases explained with real-life examples. Learn how your brain tricks you — and how to use this knowledge to your advantage.',
-      price: 399,
-      originalPrice: 799,
-      tag: 'New',
+      price: 279,
+      originalPrice: 399,
+      tag: '30% OFF',
       tagColor: 'purple',
       thumbnail: '',
       emoji: '🧩',
@@ -76,10 +76,10 @@ const StoreEngine = (function() {
       category: 'course',
       title: 'Emotional Intelligence Blueprint',
       description: 'Master your emotions, read others like a book, and build unbreakable relationships. The skill that matters more than IQ.',
-      price: 349,
-      originalPrice: 0,
-      tag: '',
-      tagColor: '',
+      price: 245,
+      originalPrice: 349,
+      tag: '30% OFF',
+      tagColor: 'purple',
       thumbnail: '',
       emoji: '💡',
       features: [],
@@ -94,9 +94,9 @@ const StoreEngine = (function() {
       category: 'notes',
       title: 'Complete Psychology Notes',
       description: '200+ pages of handcrafted notes covering every major psychology concept, bias, and manipulation technique. PDF format, beautifully designed.',
-      price: 199,
-      originalPrice: 499,
-      tag: 'Popular',
+      price: 139,
+      originalPrice: 199,
+      tag: '30% OFF',
       tagColor: 'red',
       thumbnail: '',
       emoji: '📝',
@@ -112,10 +112,10 @@ const StoreEngine = (function() {
       category: 'notes',
       title: 'Dark Psychology Cheat Sheet',
       description: 'Quick-reference guide to all manipulation tactics, persuasion techniques, and defense strategies. Print it. Keep it. Use it.',
-      price: 99,
-      originalPrice: 0,
-      tag: '',
-      tagColor: '',
+      price: 69,
+      originalPrice: 99,
+      tag: '30% OFF',
+      tagColor: 'red',
       thumbnail: '',
       emoji: '📋',
       features: [],
@@ -197,10 +197,19 @@ const StoreEngine = (function() {
       createdAt: Date.now()
     }
   ];
+  // ── Data versioning — bump this when DEFAULT_PRODUCTS prices/data change ──
+  const DATA_VERSION = '2026-07-04-v2'; // Updated: 30% discount on courses/notes
+  const VERSION_KEY = 'tdv_data_version';
 
   // ── Core Methods ──
   function getProducts() {
     try {
+      // Auto-reset if data version has changed (e.g., after pricing update)
+      const storedVersion = localStorage.getItem(VERSION_KEY);
+      if (storedVersion !== DATA_VERSION) {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.setItem(VERSION_KEY, DATA_VERSION);
+      }
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) return JSON.parse(stored);
     } catch(e) { console.error('StoreEngine: Error reading products', e); }

@@ -22,20 +22,13 @@
   var CACHE_EXPIRY = 30 * 60 * 1000;
 
   // ── FALLBACK VIDEOS (always available) ──
+  // Only REAL videos from the channel — no duplicates
   var FALLBACK_VIDEOS = [
     // ── Shorts ──
-    { id: 'iPz96kxqhcI', title: 'You Think It\'s Love... But You\'re Slowly Killing Them. #shorts', published: '2026-07-01T10:12:20Z', isShort: true },
-    { id: 'xK43iBwzr6k', title: 'The Darkest Psychology Trick Ever #shorts', published: '2026-06-28T08:00:00Z', isShort: true },
-    { id: 'E-9hmCi4PTo', title: 'Never Trust Someone Who Does This #shorts', published: '2026-06-25T08:00:00Z', isShort: true },
-    { id: 'tnpOQIu3W8E', title: 'Your Brain Is Lying To You Right Now #shorts', published: '2026-06-22T08:00:00Z', isShort: true },
-    { id: 'Cv4v2QND490', title: '3 Signs You Are Being Manipulated #shorts', published: '2026-06-20T08:00:00Z', isShort: true },
+    { id: 'iPz96kxqhcI', title: 'You Think It\'s Love... But You\'re Slowly Killing Them. #TheDeepVerse #shorts #psychology', published: '2026-07-01T10:12:20Z', isShort: true },
     // ── Regular Videos ──
     { id: 'Tgbay2J7bZk', title: '💰 पैसा आपका जुनून क्यों छीन लेता है? | Deci Effect Psychology', published: '2026-06-30T15:10:36Z', isShort: false },
-    { id: 'IqVC343UJY8', title: 'Why Good People Become Evil? | Moral Disengagement Explained', published: '2026-06-29T16:03:43Z', isShort: false },
-    { id: 'xK43iBwzr6k', title: '5 Psychology Truths That Are Secretly Destroying Your Life', published: '2025-06-01T00:00:00Z', isShort: false },
-    { id: 'E-9hmCi4PTo', title: 'Escape These 4 Mental Traps Before It\'s Too Late', published: '2025-05-10T00:00:00Z', isShort: false },
-    { id: 'tnpOQIu3W8E', title: '3 Psychology Stories That Will Change The Way You See People', published: '2025-05-03T00:00:00Z', isShort: false },
-    { id: 'Cv4v2QND490', title: '10 Mental Traps Jo Aapki Life Barbaad Kar Rahe Hain', published: '2025-04-25T00:00:00Z', isShort: false }
+    { id: 'IqVC343UJY8', title: 'Why Good People Become Evil? | Moral Disengagement Explained', published: '2026-06-29T16:03:43Z', isShort: false }
   ];
 
   // Add thumbnail URLs to fallback
@@ -81,9 +74,18 @@
         if (thumbEl) thumbnail = thumbEl.getAttribute('url');
       }
 
-      if (videoId) {
-        var isShort = title.toLowerCase().includes('#shorts') || title.toLowerCase().includes('#short');
+      // Detect shorts from URL pattern or title
+      var isShort = false;
+      var linkEl = entry.querySelector('link');
+      if (linkEl) {
+        var linkHref = linkEl.getAttribute('href') || '';
+        isShort = linkHref.includes('/shorts/');
+      }
+      if (!isShort) {
+        isShort = title.toLowerCase().includes('#shorts') || title.toLowerCase().includes('#short');
+      }
 
+      if (videoId) {
         videos.push({
           id: videoId,
           title: title,
@@ -116,8 +118,9 @@
   }
 
   // ── Create Video Card HTML ──
+  // NOTE: Do NOT use 'reveal' class — dynamically added elements won't be observed by IntersectionObserver
   function createVideoCard(video, index) {
-    return '<a href="' + video.url + '" target="_blank" rel="noopener noreferrer" class="video-card reveal" data-videoid="' + video.id + '" id="videoCard' + (index + 1) + '" style="text-decoration:none;color:inherit;display:block;">' +
+    return '<a href="' + video.url + '" target="_blank" rel="noopener noreferrer" class="video-card is-visible" data-videoid="' + video.id + '" id="videoCard' + (index + 1) + '" style="text-decoration:none;color:inherit;display:block;opacity:1;transform:none;">' +
       '<div class="video-card__thumbnail">' +
         '<img src="' + video.thumbnail + '" ' +
           'alt="' + video.title.replace(/"/g, '&quot;') + '" ' +
@@ -139,11 +142,12 @@
   }
 
   // ── Create Short Card HTML ──
+  // NOTE: Do NOT use 'reveal' class — same reason as above
   function createShortCard(video, index, isFirst) {
     var cleanTitle = video.title.replace(/#\w+/g, '').replace(/\s+/g, ' ').trim();
     if (cleanTitle.length > 60) cleanTitle = cleanTitle.substring(0, 57) + '...';
 
-    return '<a href="' + video.url + '" target="_blank" rel="noopener noreferrer" class="short-card reveal" id="shortCard' + (index + 1) + '" style="text-decoration:none;color:inherit;">' +
+    return '<a href="' + video.url + '" target="_blank" rel="noopener noreferrer" class="short-card is-visible" id="shortCard' + (index + 1) + '" style="text-decoration:none;color:inherit;opacity:1;transform:none;">' +
       '<div class="short-card__thumbnail" style="background-image:url(https://i.ytimg.com/vi/' + video.id + '/hqdefault.jpg);background-size:cover;background-position:center;">' +
         '<div class="short-card__play">&#9654;</div>' +
         (isFirst ? '<div class="short-card__badge">NEW</div>' : '') +
@@ -239,6 +243,9 @@
 
   // ── Initialize ──
   function init() {
+    // Clear stale cache to ensure fresh fallback/pricing data
+    try { localStorage.removeItem(CACHE_KEY); } catch(e) {}
+
     // Step 1: IMMEDIATELY show fallback videos & shorts (no waiting)
     renderVideos(FALLBACK_VIDEOS);
     console.log('[TheDeepVerse] Fallback videos & shorts loaded instantly');
