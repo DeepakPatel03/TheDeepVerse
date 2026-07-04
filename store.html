@@ -193,6 +193,28 @@
 
   <script src="js/main.js"></script>
   <script src="js/store-data.js"></script>
+
+  <!-- ── PRODUCT DETAIL MODAL ── -->
+  <div class="product-modal-overlay" id="productModal">
+    <div class="product-modal" id="productModalInner">
+      <button class="product-modal__close" id="productModalClose" aria-label="Close modal">✕</button>
+      <div class="product-modal__image" id="modalImage"></div>
+      <div class="product-modal__content">
+        <div class="product-modal__category" id="modalCategory"></div>
+        <h2 class="product-modal__title" id="modalTitle"></h2>
+        <p class="product-modal__desc" id="modalDesc"></p>
+        <div id="modalFeaturesWrap" style="display:none;">
+          <div class="product-modal__section-label">What's Inside</div>
+          <ul class="product-modal__features" id="modalFeatures"></ul>
+        </div>
+        <div class="product-modal__footer">
+          <div class="product-modal__price-block" id="modalPriceBlock"></div>
+          <a href="#" class="product-modal__buy" id="modalBuyBtn">Buy Now →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ═══ DYNAMIC STORE RENDERER ═══
     (function() {
@@ -229,7 +251,7 @@
           : '';
 
         document.getElementById('featuredSection').innerHTML = `
-          <div class="featured-product">
+          <div class="featured-product" style="cursor:pointer" onclick="openProductModal('${featured.id}')">
             <span class="featured-product__badge">${featured.tag ? '🔥 ' + featured.tag : '🔥 Featured'}</span>
             <div class="featured-product__image" style="background:${gradients[0]}">${thumbHtml}</div>
             <div class="featured-product__content">
@@ -239,7 +261,7 @@
               ${featuresHtml ? `<ul class="featured-product__features">${featuresHtml}</ul>` : ''}
               <div class="featured-product__cta">
                 <span class="featured-product__price">₹${featured.price.toLocaleString('en-IN')} ${priceOriginal}</span>
-                <a href="#" class="product-card__buy" onclick="handleBuy('${featured.id}', ${featured.price}, '${featured.downloadUrl || ''}')">Get ${featured.category === 'bundle' ? 'Bundle' : 'Now'} →</a>
+                <a href="#" class="product-card__buy" onclick="event.stopPropagation(); handleBuy('${featured.id}', ${featured.price}, '${featured.downloadUrl || ''}')">Get ${featured.category === 'bundle' ? 'Bundle' : 'Now'} →</a>
               </div>
             </div>
           </div>`;
@@ -262,7 +284,7 @@
         const buyText = p.price === 0 ? 'Download' : 'Buy Now';
 
         return `
-          <div class="product-card reveal" data-category="${p.category}" id="product-${p.id}">
+          <div class="product-card reveal" data-category="${p.category}" id="product-${p.id}" style="cursor:pointer" onclick="openProductModal('${p.id}')">
             <div class="product-card__image">${imageHtml}${tagHtml}</div>
             <div class="product-card__body">
               <span class="product-card__category">${p.category}</span>
@@ -270,7 +292,7 @@
               <p class="product-card__desc">${p.description}</p>
               <div class="product-card__footer">
                 ${priceHtml}
-                <a href="#" class="${buyClass}" onclick="handleBuy('${p.id}', ${p.price}, '${p.downloadUrl || ''}')">${buyText}</a>
+                <a href="#" class="${buyClass}" onclick="event.stopPropagation(); handleBuy('${p.id}', ${p.price}, '${p.downloadUrl || ''}')">${buyText}</a>
               </div>
             </div>
           </div>`;
@@ -297,6 +319,92 @@
       });
     })();
 
+    // ═══ PRODUCT DETAIL MODAL ═══
+    const modalOverlay = document.getElementById('productModal');
+    const modalInner = document.getElementById('productModalInner');
+
+    function openProductModal(productId) {
+      const p = StoreEngine.getProduct(productId);
+      if (!p) return;
+
+      // Image
+      const modalImage = document.getElementById('modalImage');
+      if (p.thumbnail) {
+        modalImage.innerHTML = `<img src="${p.thumbnail}" alt="${p.title}">`;
+      } else {
+        const gradients = [
+          'linear-gradient(135deg, #1a0505 0%, #0a0a1a 100%)',
+          'linear-gradient(135deg, #050510 0%, #0a0f1a 100%)'
+        ];
+        modalImage.style.background = gradients[0];
+        modalImage.innerHTML = `<span>${p.emoji || '📦'}</span>`;
+      }
+
+      // Tag
+      if (p.tag) {
+        const existingTag = modalImage.querySelector('.product-modal__tag');
+        if (existingTag) existingTag.remove();
+        modalImage.insertAdjacentHTML('beforeend', `<span class="product-modal__tag">${p.tag}</span>`);
+      }
+
+      // Content
+      document.getElementById('modalCategory').textContent = p.category;
+      document.getElementById('modalTitle').textContent = p.title;
+      document.getElementById('modalDesc').textContent = p.description;
+
+      // Features
+      const featuresWrap = document.getElementById('modalFeaturesWrap');
+      const featuresList = document.getElementById('modalFeatures');
+      if (p.features && p.features.length > 0) {
+        featuresWrap.style.display = '';
+        featuresList.innerHTML = p.features.map(f => `<li>${f}</li>`).join('');
+      } else {
+        featuresWrap.style.display = 'none';
+      }
+
+      // Price
+      const priceBlock = document.getElementById('modalPriceBlock');
+      if (p.price === 0) {
+        priceBlock.innerHTML = '<span class="product-modal__price-free">Free</span>';
+      } else {
+        const originalHtml = p.originalPrice
+          ? `<span class="product-modal__price-original">₹${p.originalPrice.toLocaleString('en-IN')}</span>`
+          : '';
+        priceBlock.innerHTML = `<span class="product-modal__price">₹${p.price.toLocaleString('en-IN')}</span>${originalHtml}`;
+      }
+
+      // Buy button
+      const buyBtn = document.getElementById('modalBuyBtn');
+      buyBtn.className = p.price === 0 ? 'product-modal__buy product-modal__buy--free' : 'product-modal__buy';
+      buyBtn.textContent = p.price === 0 ? 'Download Free →' : 'Buy Now →';
+      buyBtn.onclick = function(e) {
+        e.preventDefault();
+        handleBuy(p.id, p.price, p.downloadUrl || '');
+      };
+
+      // Open
+      modalOverlay.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeProductModal() {
+      modalOverlay.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    // Close on X button
+    document.getElementById('productModalClose').addEventListener('click', closeProductModal);
+
+    // Close on backdrop click
+    modalOverlay.addEventListener('click', function(e) {
+      if (e.target === modalOverlay) closeProductModal();
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && modalOverlay.classList.contains('is-open')) closeProductModal();
+    });
+
     // ── Razorpay Configuration ──
     const RAZORPAY_CONFIG = {
       key: 'rzp_live_T8fCgJ0kFyrOYl',
@@ -310,7 +418,7 @@
 
     // ── Buy Handler with Razorpay ──
     function handleBuy(productId, price, downloadUrl) {
-      event.preventDefault();
+      if (event) event.preventDefault();
 
       // Free product — direct download
       if (price === 0 && downloadUrl) {
@@ -332,6 +440,9 @@
         showPaymentFallback(productName, price);
         return;
       }
+
+      // Close product modal if open
+      closeProductModal();
 
       // Razorpay Checkout
       const options = {

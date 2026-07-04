@@ -1,8 +1,8 @@
 /* ============================================================
-   THEDEEPVERSE — YOUTUBE VIDEO LOADER
+   THEDEEPVERSE — YOUTUBE VIDEO & SHORTS LOADER
    ============================================================
-   Shows videos from TheDeepVerse YouTube channel.
-   - Hardcoded fallback videos ALWAYS show instantly
+   Shows videos & shorts from TheDeepVerse YouTube channel.
+   - Hardcoded fallback videos & shorts ALWAYS show instantly
    - RSS feed tried in background for fresh updates
    - If RSS works, cache + show new videos
    - If RSS fails, fallback videos still visible
@@ -23,9 +23,16 @@
 
   // ── FALLBACK VIDEOS (always available) ──
   var FALLBACK_VIDEOS = [
+    // ── Shorts ──
+    { id: 'iPz96kxqhcI', title: 'You Think It\'s Love... But You\'re Slowly Killing Them. #shorts', published: '2026-07-01T10:12:20Z', isShort: true },
+    { id: 'xK43iBwzr6k', title: 'The Darkest Psychology Trick Ever #shorts', published: '2026-06-28T08:00:00Z', isShort: true },
+    { id: 'E-9hmCi4PTo', title: 'Never Trust Someone Who Does This #shorts', published: '2026-06-25T08:00:00Z', isShort: true },
+    { id: 'tnpOQIu3W8E', title: 'Your Brain Is Lying To You Right Now #shorts', published: '2026-06-22T08:00:00Z', isShort: true },
+    { id: 'Cv4v2QND490', title: '3 Signs You Are Being Manipulated #shorts', published: '2026-06-20T08:00:00Z', isShort: true },
+    // ── Regular Videos ──
+    { id: 'Tgbay2J7bZk', title: '💰 पैसा आपका जुनून क्यों छीन लेता है? | Deci Effect Psychology', published: '2026-06-30T15:10:36Z', isShort: false },
+    { id: 'IqVC343UJY8', title: 'Why Good People Become Evil? | Moral Disengagement Explained', published: '2026-06-29T16:03:43Z', isShort: false },
     { id: 'xK43iBwzr6k', title: '5 Psychology Truths That Are Secretly Destroying Your Life', published: '2025-06-01T00:00:00Z', isShort: false },
-    { id: 'Tgbay2J7bZk', title: 'पैसा आपका जुनून क्यों छीन लेता है? | Deci Effect Psychology', published: '2025-05-25T00:00:00Z', isShort: false },
-    { id: 'IqVC343UJY8', title: 'Why Good People Become Evil? | Moral Disengagement Explained', published: '2025-05-18T00:00:00Z', isShort: false },
     { id: 'E-9hmCi4PTo', title: 'Escape These 4 Mental Traps Before It\'s Too Late', published: '2025-05-10T00:00:00Z', isShort: false },
     { id: 'tnpOQIu3W8E', title: '3 Psychology Stories That Will Change The Way You See People', published: '2025-05-03T00:00:00Z', isShort: false },
     { id: 'Cv4v2QND490', title: '10 Mental Traps Jo Aapki Life Barbaad Kar Rahe Hain', published: '2025-04-25T00:00:00Z', isShort: false }
@@ -35,7 +42,7 @@
   FALLBACK_VIDEOS.forEach(function(v) {
     v.thumbnail = 'https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg';
     v.maxresThumbnail = 'https://i.ytimg.com/vi/' + v.id + '/maxresdefault.jpg';
-    v.url = 'https://www.youtube.com/watch?v=' + v.id;
+    v.url = v.isShort ? 'https://www.youtube.com/shorts/' + v.id : 'https://www.youtube.com/watch?v=' + v.id;
     v.description = '';
   });
 
@@ -85,7 +92,7 @@
           thumbnail: thumbnail || 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg',
           maxresThumbnail: 'https://i.ytimg.com/vi/' + videoId + '/maxresdefault.jpg',
           isShort: isShort,
-          url: 'https://www.youtube.com/watch?v=' + videoId
+          url: isShort ? 'https://www.youtube.com/shorts/' + videoId : 'https://www.youtube.com/watch?v=' + videoId
         });
       }
     });
@@ -131,9 +138,24 @@
     '</a>';
   }
 
-  // ── Render Videos ──
+  // ── Create Short Card HTML ──
+  function createShortCard(video, index, isFirst) {
+    var cleanTitle = video.title.replace(/#\w+/g, '').replace(/\s+/g, ' ').trim();
+    if (cleanTitle.length > 60) cleanTitle = cleanTitle.substring(0, 57) + '...';
+
+    return '<a href="' + video.url + '" target="_blank" rel="noopener noreferrer" class="short-card reveal" id="shortCard' + (index + 1) + '" style="text-decoration:none;color:inherit;">' +
+      '<div class="short-card__thumbnail" style="background-image:url(https://i.ytimg.com/vi/' + video.id + '/hqdefault.jpg);background-size:cover;background-position:center;">' +
+        '<div class="short-card__play">&#9654;</div>' +
+        (isFirst ? '<div class="short-card__badge">NEW</div>' : '') +
+      '</div>' +
+      '<p class="short-card__title">' + cleanTitle + '</p>' +
+    '</a>';
+  }
+
+  // ── Render Videos & Shorts ──
   function renderVideos(videos) {
     var regularVideos = videos.filter(function(v) { return !v.isShort; });
+    var shortVideos = videos.filter(function(v) { return v.isShort; });
 
     // Homepage latest videos (max 6)
     var videosGrid = document.querySelector('#latestVideos .videos-grid');
@@ -154,6 +176,27 @@
         allHtml += createVideoCard(regularVideos[j], j);
       }
       allVideosGrid.innerHTML = allHtml;
+    }
+
+    // Homepage shorts section
+    var homeShortsGrid = document.querySelector('#latestShorts .shorts-grid');
+    if (homeShortsGrid && shortVideos.length > 0) {
+      var shortsHtml = '';
+      var shortsCount = Math.min(shortVideos.length, 4);
+      for (var s = 0; s < shortsCount; s++) {
+        shortsHtml += createShortCard(shortVideos[s], s, s === 0);
+      }
+      homeShortsGrid.innerHTML = shortsHtml;
+    }
+
+    // Shorts page grid
+    var shortPageGrid = document.querySelector('.shorts-page-grid');
+    if (shortPageGrid && shortVideos.length > 0) {
+      var spHtml = '';
+      for (var sp = 0; sp < shortVideos.length; sp++) {
+        spHtml += createShortCard(shortVideos[sp], sp, sp === 0);
+      }
+      shortPageGrid.innerHTML = spHtml;
     }
   }
 
@@ -196,9 +239,9 @@
 
   // ── Initialize ──
   function init() {
-    // Step 1: IMMEDIATELY show fallback videos (no waiting)
+    // Step 1: IMMEDIATELY show fallback videos & shorts (no waiting)
     renderVideos(FALLBACK_VIDEOS);
-    console.log('[TheDeepVerse] Fallback videos loaded instantly');
+    console.log('[TheDeepVerse] Fallback videos & shorts loaded instantly');
 
     // Step 2: Try RSS in background for fresh data
     tryRSSFeed(function(freshVideos) {
