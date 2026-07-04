@@ -139,7 +139,7 @@ const StoreEngine = (function() {
       features: [],
       featured: false,
       active: true,
-      downloadUrl: '',
+      downloadUrl: 'https://drive.google.com/file/d/1lZSjJrwewEiMNqZLR3eX1czTNhaHeJgq/view?usp=sharing',
       createdAt: Date.now()
     },
     {
