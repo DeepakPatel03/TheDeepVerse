@@ -1,28 +1,19 @@
 /* ═══════════════════════════════════════════════════
    FIREBASE CONFIG — TheDeepVerse
    ═══════════════════════════════════════════════════
-   
-   SETUP INSTRUCTIONS:
-   1. Go to https://console.firebase.google.com
-   2. Click "Add Project" → Name: "thedeepverse" → Create
-   3. Go to Build → Realtime Database → Create Database
-   4. Choose location → Start in TEST MODE → Enable
-   5. Go to Project Settings (gear icon) → General
-   6. Scroll down → "Your apps" → Click Web icon (</>)
-   7. Register app name: "thedeepverse-web"
-   8. Copy the firebaseConfig object and paste below
-   
+   Connected to Firebase Realtime Database.
+   Admin panel changes now persist for ALL visitors.
    ═══════════════════════════════════════════════════ */
 
-// ⚠️ PASTE YOUR FIREBASE CONFIG HERE (from Firebase Console)
 const FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyBnXmrZfVrww5Ka-Hot-vI7FPTp6LcLErw",
+  authDomain: "thedeepverse-9cc85.firebaseapp.com",
+  databaseURL: "https://thedeepverse-9cc85-default-rtdb.firebaseio.com",
+  projectId: "thedeepverse-9cc85",
+  storageBucket: "thedeepverse-9cc85.firebasestorage.app",
+  messagingSenderId: "879010852853",
+  appId: "1:879010852853:web:7658c86ddbc63c97783abc",
+  measurementId: "G-PVYDKFSY16"
 };
 
 // ── Firebase Status ──
