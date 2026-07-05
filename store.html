@@ -255,7 +255,7 @@
           : '';
 
         document.getElementById('featuredSection').innerHTML = `
-          <div class="featured-product" style="cursor:pointer" onclick="openProductModal('${featured.id}')">
+          <div class="featured-product" style="cursor:pointer" onclick="window.location.href='course-detail.html?id=${featured.id}'">
             <span class="featured-product__badge">${featured.tag ? '🔥 ' + featured.tag : '🔥 Featured'}</span>
             <div class="featured-product__image" style="background:${gradients[0]}">${thumbHtml}</div>
             <div class="featured-product__content">
@@ -288,7 +288,7 @@
         const buyText = p.price === 0 ? 'Download' : 'Buy Now';
 
         return `
-          <div class="product-card reveal" data-category="${p.category}" id="product-${p.id}" style="cursor:pointer" onclick="openProductModal('${p.id}')">
+          <div class="product-card reveal" data-category="${p.category}" id="product-${p.id}" style="cursor:pointer" onclick="window.location.href='course-detail.html?id=${p.id}'">
             <div class="product-card__image">${imageHtml}${tagHtml}</div>
             <div class="product-card__body">
               <span class="product-card__category">${p.category}</span>

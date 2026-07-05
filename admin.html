@@ -183,7 +183,71 @@
           <div class="form-group">
             <label>Features (one per line)</label>
             <textarea id="pFeatures" placeholder="12 chapters of content&#10;Real-world case studies&#10;Lifetime access" style="min-height:80px"></textarea>
-            <small>For featured/bundle products — shows as checklist</small>
+            <small>Shows as checklist in product detail page</small>
+          </div>
+
+          <!-- ── COURSE DETAIL PAGE FIELDS ── -->
+          <div style="border-top:1px solid var(--admin-border);margin:20px 0;padding-top:20px">
+            <h3 style="color:var(--admin-text-1);font-size:1rem;margin-bottom:16px">📄 Course Detail Page Fields</h3>
+
+            <div class="form-group">
+              <label>Overview / About</label>
+              <textarea id="pOverview" placeholder="Detailed overview of the course — what the student will learn, why this course matters, what makes it unique..." style="min-height:120px"></textarea>
+              <small>Long description shown on the course detail page</small>
+            </div>
+
+            <div class="form-group">
+              <label>Curriculum / What's Inside (one item per line)</label>
+              <textarea id="pCurriculum" placeholder="Chapter 1: Introduction to Dark Psychology&#10;Chapter 2: The Dark Triad&#10;Chapter 3: Manipulation Tactics" style="min-height:120px"></textarea>
+              <small>Each line = one curriculum item. Will show numbered list on detail page.</small>
+            </div>
+
+            <div class="form-group">
+              <label>Method / How to Use</label>
+              <textarea id="pMethod" placeholder="Step 1: Download the PDF course material.&#10;Step 2: Read one chapter per day.&#10;Step 3: Complete exercises." style="min-height:100px"></textarea>
+              <small>Each line = one step. Shows as numbered steps on detail page.</small>
+            </div>
+
+            <div class="form-group">
+              <label>Gallery Images (one URL per line, max 4)</label>
+              <textarea id="pImages" placeholder="https://example.com/preview1.jpg&#10;https://example.com/preview2.jpg" style="min-height:80px"></textarea>
+              <small>Paste image URLs for course preview gallery. Max 4 images, recommended 1-2MB each.</small>
+            </div>
+
+            <div class="form-group">
+              <label>HD Thumbnail URL</label>
+              <input type="text" id="pThumbnailUrl" placeholder="https://example.com/hero-image.jpg">
+              <small>Hero image for course detail page (different from card thumbnail)</small>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Duration</label>
+                <input type="text" id="pDuration" placeholder="e.g., 12 Chapters, 200+ Pages">
+              </div>
+              <div class="form-group">
+                <label>Language</label>
+                <input type="text" id="pLanguage" placeholder="Hindi + English">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Level</label>
+                <select id="pLevel">
+                  <option value="All Levels">All Levels</option>
+                  <option value="Beginner">Beginner</option>
+                  <option value="Beginner to Intermediate">Beginner to Intermediate</option>
+                  <option value="Beginner to Advanced">Beginner to Advanced</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Students Count</label>
+                <input type="text" id="pStudents" placeholder="e.g., 500+">
+              </div>
+            </div>
           </div>
 
           <div class="form-row">
@@ -519,6 +583,17 @@ function editProduct(id) {
   document.getElementById('pActive').checked = p.active;
   document.getElementById('pFeatured').checked = p.featured;
 
+  // Course detail fields
+  document.getElementById('pOverview').value = p.overview || '';
+  document.getElementById('pCurriculum').value = (p.curriculum || []).join('\n');
+  document.getElementById('pMethod').value = p.method || '';
+  document.getElementById('pImages').value = (p.images || []).join('\n');
+  document.getElementById('pThumbnailUrl').value = p.thumbnailUrl || '';
+  document.getElementById('pDuration').value = p.duration || '';
+  document.getElementById('pLanguage').value = p.language || '';
+  document.getElementById('pLevel').value = p.level || 'All Levels';
+  document.getElementById('pStudents').value = p.students || '';
+
   document.getElementById('formTitle').textContent = 'Edit Product';
   document.getElementById('formSubmitBtn').textContent = '💾 Update Product';
   previewThumb();
@@ -544,7 +619,19 @@ function saveProduct(event) {
     downloadUrl: document.getElementById('pDownloadUrl').value.trim(),
     features: featuresText ? featuresText.split('\n').map(f => f.trim()).filter(f => f) : [],
     active: document.getElementById('pActive').checked,
-    featured: document.getElementById('pFeatured').checked
+    featured: document.getElementById('pFeatured').checked,
+    // Course detail fields
+    overview: document.getElementById('pOverview').value.trim(),
+    curriculum: (function() { var t = document.getElementById('pCurriculum').value.trim(); return t ? t.split('\n').map(function(c) { return c.trim(); }).filter(function(c) { return c; }) : []; })(),
+    method: document.getElementById('pMethod').value.trim(),
+    images: (function() { var t = document.getElementById('pImages').value.trim(); return t ? t.split('\n').map(function(u) { return u.trim(); }).filter(function(u) { return u; }).slice(0, 4) : []; })(),
+    thumbnailUrl: document.getElementById('pThumbnailUrl').value.trim(),
+    duration: document.getElementById('pDuration').value.trim(),
+    language: document.getElementById('pLanguage').value.trim(),
+    level: document.getElementById('pLevel').value,
+    students: document.getElementById('pStudents').value.trim(),
+    instructor: 'Deepak Patel',
+    lastUpdated: new Date().toISOString().split('T')[0]
   };
 
   if (editId) {
@@ -584,6 +671,16 @@ function resetForm() {
   document.getElementById('formSubmitBtn').textContent = '💾 Save Product';
   document.getElementById('thumbPreview').innerHTML = '📦';
   document.getElementById('pActive').checked = true;
+  // Clear course detail fields
+  document.getElementById('pOverview').value = '';
+  document.getElementById('pCurriculum').value = '';
+  document.getElementById('pMethod').value = '';
+  document.getElementById('pImages').value = '';
+  document.getElementById('pThumbnailUrl').value = '';
+  document.getElementById('pDuration').value = '';
+  document.getElementById('pLanguage').value = '';
+  document.getElementById('pLevel').value = 'All Levels';
+  document.getElementById('pStudents').value = '';
 }
 
 function previewThumb() {

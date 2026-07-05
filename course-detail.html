@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Details | TheDeepVerse</title>
+  <meta name="description" content="Premium psychology course by Deepak Patel. Learn what schools never teach you.">
+  <meta name="robots" content="index, follow">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23050505'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-size='18' font-weight='bold' fill='%23F5F5F5'%3ED%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/course-detail.css">
+
+  <!-- Razorpay -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+  <!-- ── Navigation (same as other pages) ── -->
+  <nav class="nav" id="mainNav">
+    <div class="container nav__inner">
+      <a href="index.html" class="nav__logo">TheDeepVerse</a>
+      <div class="nav__links">
+        <a href="index.html" class="nav__link">Home</a>
+        <a href="hub.html" class="nav__link">DeepVerse Hub</a>
+        <a href="videos.html" class="nav__link">Videos</a>
+        <a href="shorts.html" class="nav__link">Shorts</a>
+        <a href="store.html" class="nav__link is-active">Store</a>
+        <a href="about.html" class="nav__link">About</a>
+        <a href="contact.html" class="nav__link">Contact</a>
+      </div>
+      <button class="nav__toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav__mobile">
+      <a href="index.html" class="nav__mobile-link">Home</a>
+      <a href="hub.html" class="nav__mobile-link">DeepVerse Hub</a>
+      <a href="videos.html" class="nav__mobile-link">Videos</a>
+      <a href="shorts.html" class="nav__mobile-link">Shorts</a>
+      <a href="store.html" class="nav__mobile-link">Store</a>
+      <a href="about.html" class="nav__mobile-link">About</a>
+      <a href="contact.html" class="nav__mobile-link">Contact</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb" id="breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="breadcrumb__sep">›</span>
+        <a href="store.html">Store</a>
+        <span class="breadcrumb__sep">›</span>
+        <span class="breadcrumb__current" id="breadcrumbTitle">Loading...</span>
+      </div>
+
+      <!-- Hero Section -->
+      <section class="course-hero" id="courseHero">
+        <div class="course-hero__main" id="heroMain">
+          <!-- Populated by JS -->
+          <div style="text-align:center;padding:60px 0;color:var(--text-muted)">Loading course details...</div>
+        </div>
+        <div id="heroSidebar">
+          <!-- Purchase card populated by JS -->
+        </div>
+      </section>
+
+      <!-- Navigation Tabs -->
+      <nav class="course-nav" id="courseNav" style="display:none">
+        <button class="course-nav__tab is-active" data-target="overview">Overview</button>
+        <button class="course-nav__tab" data-target="gallery">Gallery</button>
+        <button class="course-nav__tab" data-target="curriculum">What's Inside</button>
+        <button class="course-nav__tab" data-target="method">How to Use</button>
+        <button class="course-nav__tab" data-target="instructor">Instructor</button>
+      </nav>
+
+      <!-- Content Sections -->
+      <div class="course-content" id="courseContent" style="display:none">
+        <div class="course-content__main" id="contentMain">
+          <!-- All sections populated by JS -->
+        </div>
+        <div class="course-content__sidebar" id="contentSidebar">
+          <!-- Sticky purchase card (desktop only) -->
+        </div>
+      </div>
+
+      <!-- Related Products -->
+      <section class="course-section" id="relatedSection" style="display:none">
+        <h2 class="course-section__title">
+          <span class="course-section__title-icon">🔗</span>
+          You Might Also Like
+        </h2>
+        <div class="related-grid" id="relatedGrid"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img src="" alt="Preview" id="lightboxImg">
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="footer__logo">TheDeepVerse</div>
+          <p class="footer__tagline">Decode the human mind.</p>
+        </div>
+        <div class="footer__col">
+          <div class="footer__heading">Explore</div>
+          <a href="index.html" class="footer__link">Home</a>
+          <a href="hub.html" class="footer__link">DeepVerse Hub</a>
+          <a href="videos.html" class="footer__link">Videos</a>
+          <a href="articles.html" class="footer__link">Articles</a>
+          <a href="store.html" class="footer__link">Store</a>
+          <a href="about.html" class="footer__link">About</a>
+        </div>
+        <div class="footer__col">
+          <div class="footer__heading">Legal</div>
+          <a href="privacy.html" class="footer__link">Privacy Policy</a>
+          <a href="terms.html" class="footer__link">Terms of Service</a>
+          <a href="refund.html" class="footer__link">Refund</a>
+          <a href="disclaimer.html" class="footer__link">Disclaimer</a>
+          <a href="faq.html" class="footer__link">FAQ</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; 2025 TheDeepVerse. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/store-data.js"></script>
+
+  <script>
+  (function() {
+    'use strict';
+
+    // ── Get product ID from URL ──
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('id');
+
+    if (!productId) {
+      window.location.href = 'store.html';
+      return;
+    }
+
+    // Wait for StoreEngine
+    function init() {
+      const product = StoreEngine.getProduct(productId);
+      if (!product) {
+        document.getElementById('heroMain').innerHTML = '<div style="text-align:center;padding:80px 0"><h2 style="color:var(--text-primary);margin-bottom:12px">Product Not Found</h2><p style="color:var(--text-muted)">This product doesn\'t exist.</p><a href="store.html" style="color:var(--accent-gold)">← Back to Store</a></div>';
+        return;
+      }
+
+      // Update page title
+      document.title = product.title + ' | TheDeepVerse';
+      document.getElementById('breadcrumbTitle').textContent = product.title;
+
+      renderHero(product);
+      renderContent(product);
+      renderRelated(product);
+    }
+
+    // ── Render Hero ──
+    function renderHero(p) {
+      const imageHtml = p.thumbnailUrl
+        ? '<img src="' + p.thumbnailUrl + '" alt="' + p.title + '">'
+        : '<span class="purchase-card__emoji">' + (p.emoji || '📦') + '</span>';
+
+      const tagBadge = p.tag
+        ? '<span class="course-hero__badge course-hero__badge--tag">' + p.tag + '</span>'
+        : '';
+
+      const discount = p.originalPrice && p.originalPrice > p.price
+        ? Math.round((1 - p.price / p.originalPrice) * 100) + '% OFF'
+        : '';
+
+      // Hero main content
+      document.getElementById('heroMain').innerHTML =
+        '<div class="course-hero__badges">' +
+          '<span class="course-hero__badge course-hero__badge--category">' + p.category + '</span>' +
+          tagBadge +
+        '</div>' +
+        '<h1 class="course-hero__title">' + p.title + '</h1>' +
+        '<p class="course-hero__desc">' + p.description + '</p>' +
+        '<div class="course-hero__meta">' +
+          (p.instructor ? '<div class="course-meta-item"><span class="course-meta-item__icon">👨‍🏫</span><span class="course-meta-item__value">' + p.instructor + '</span></div>' : '') +
+          (p.duration ? '<div class="course-meta-item"><span class="course-meta-item__icon">📖</span><span class="course-meta-item__value">' + p.duration + '</span></div>' : '') +
+          (p.language ? '<div class="course-meta-item"><span class="course-meta-item__icon">🌐</span><span class="course-meta-item__value">' + p.language + '</span></div>' : '') +
+          (p.level ? '<div class="course-meta-item"><span class="course-meta-item__icon">📊</span><span class="course-meta-item__value">' + p.level + '</span></div>' : '') +
+          (p.students ? '<div class="course-meta-item"><span class="course-meta-item__icon">👥</span><span class="course-meta-item__value">' + p.students + ' students</span></div>' : '') +
+          (p.lastUpdated ? '<div class="course-meta-item"><span class="course-meta-item__icon">🔄</span><span class="course-meta-item__value">Updated ' + p.lastUpdated + '</span></div>' : '') +
+        '</div>' +
+        '<div style="display:flex;gap:12px;align-items:center">' +
+          '<button class="share-btn" onclick="copyShareLink()">📤 Share</button>' +
+        '</div>';
+
+      // Purchase card (sidebar)
+      const priceHtml = p.price === 0
+        ? '<span class="purchase-card__price-free">Free</span>'
+        : '<span class="purchase-card__price-current">₹' + p.price.toLocaleString('en-IN') + '</span>' +
+          (p.originalPrice ? '<span class="purchase-card__price-original">₹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
+
+      const buyBtnClass = p.price === 0 ? 'purchase-card__buy purchase-card__buy--free' : 'purchase-card__buy purchase-card__buy--primary';
+      const buyBtnText = p.price === 0 ? '🎁 Download Free' : '🛒 Buy Now — ₹' + p.price.toLocaleString('en-IN');
+
+      const featuresHtml = (p.features || []).map(function(f) { return '<li>' + f + '</li>'; }).join('');
+
+      document.getElementById('heroSidebar').innerHTML =
+        '<div class="purchase-card">' +
+          '<div class="purchase-card__image">' + imageHtml + '</div>' +
+          '<div class="purchase-card__price">' + priceHtml + '</div>' +
+          (discount ? '<div class="purchase-card__discount">🔥 ' + discount + '</div>' : '') +
+          '<a href="#" class="' + buyBtnClass + '" onclick="event.preventDefault(); handleBuy(\'' + p.id + '\', ' + p.price + ', \'' + (p.downloadUrl || '') + '\')">' + buyBtnText + '</a>' +
+          (featuresHtml ? '<ul class="purchase-card__features">' + featuresHtml + '</ul>' : '') +
+          '<div class="purchase-card__guarantee">' +
+            '<span class="purchase-card__guarantee-icon">🔒</span>' +
+            'Secure payment via Razorpay. Instant delivery after purchase.' +
+          '</div>' +
+        '</div>';
+    }
+
+    // ── Render Content Sections ──
+    function renderContent(p) {
+      document.getElementById('courseNav').style.display = '';
+      document.getElementById('courseContent').style.display = '';
+
+      var html = '';
+
+      // Overview
+      html += '<section class="course-section" id="section-overview">' +
+        '<h2 class="course-section__title"><span class="course-section__title-icon">📋</span> Overview</h2>' +
+        '<div class="course-overview">' + (p.overview || p.description) + '</div>' +
+      '</section>';
+
+      // Gallery
+      var galleryHtml = '';
+      if (p.images && p.images.length > 0) {
+        galleryHtml = p.images.map(function(img, i) {
+          return '<div class="course-gallery__item" onclick="openLightbox(\'' + img + '\')">' +
+            '<img src="' + img + '" alt="Preview ' + (i+1) + '" loading="lazy">' +
+          '</div>';
+        }).join('');
+      } else {
+        galleryHtml = '<div class="course-gallery__empty">📷 Preview images will be added soon. Check back later!</div>';
+      }
+      html += '<section class="course-section" id="section-gallery">' +
+        '<h2 class="course-section__title"><span class="course-section__title-icon">🖼️</span> Gallery</h2>' +
+        '<div class="course-gallery">' + galleryHtml + '</div>' +
+      '</section>';
+
+      // Curriculum
+      if (p.curriculum && p.curriculum.length > 0) {
+        var currHtml = p.curriculum.map(function(item) {
+          return '<li class="course-curriculum__item">' +
+            '<div class="course-curriculum__num"></div>' +
+            '<div class="course-curriculum__text">' + item + '</div>' +
+          '</li>';
+        }).join('');
+        html += '<section class="course-section" id="section-curriculum">' +
+          '<h2 class="course-section__title"><span class="course-section__title-icon">📚</span> What\'s Inside</h2>' +
+          '<ul class="course-curriculum">' + currHtml + '</ul>' +
+        '</section>';
+      }
+
+      // Method
+      if (p.method) {
+        var steps = p.method.split('\n').filter(function(s) { return s.trim(); });
+        var methodHtml = steps.map(function(step, i) {
+          var text = step.replace(/^Step \d+:\s*/i, '');
+          return '<div class="course-method__step">' +
+            '<div class="course-method__step-num">' + (i+1) + '</div>' +
+            '<div class="course-method__step-text">' + text + '</div>' +
+          '</div>';
+        }).join('');
+        html += '<section class="course-section" id="section-method">' +
+          '<h2 class="course-section__title"><span class="course-section__title-icon">🔧</span> How to Use</h2>' +
+          '<div class="course-method">' + methodHtml + '</div>' +
+        '</section>';
+      }
+
+      // Instructor
+      html += '<section class="course-section" id="section-instructor">' +
+        '<h2 class="course-section__title"><span class="course-section__title-icon">👨‍🏫</span> About the Instructor</h2>' +
+        '<div class="instructor-card">' +
+          '<div class="instructor-card__avatar">DP</div>' +
+          '<div>' +
+            '<div class="instructor-card__name">' + (p.instructor || 'Deepak Patel') + '</div>' +
+            '<div class="instructor-card__role">Creator of TheDeepVerse</div>' +
+            '<div class="instructor-card__bio">Deepak Patel is the creator of TheDeepVerse — a platform dedicated to decoding human psychology through cinematic storytelling. With a passion for understanding the dark side of the human mind, Deepak creates documentary-style content that educates, inspires, and challenges the way people think about human behavior.</div>' +
+          '</div>' +
+        '</div>' +
+      '</section>';
+
+      document.getElementById('contentMain').innerHTML = html;
+
+      // Tab navigation
+      var tabs = document.querySelectorAll('.course-nav__tab');
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          tabs.forEach(function(t) { t.classList.remove('is-active'); });
+          tab.classList.add('is-active');
+          var target = document.getElementById('section-' + tab.dataset.target);
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
+
+    // ── Render Related Products ──
+    function renderRelated(currentProduct) {
+      var products = StoreEngine.getProducts().filter(function(p) {
+        return p.active && p.id !== currentProduct.id;
+      }).slice(0, 3);
+
+      if (products.length === 0) return;
+
+      document.getElementById('relatedSection').style.display = '';
+      var grid = document.getElementById('relatedGrid');
+
+      grid.innerHTML = products.map(function(p) {
+        var priceHtml = p.price === 0
+          ? '<span style="color:#22c55e;font-weight:600">Free</span>'
+          : '<span style="font-weight:600">₹' + p.price.toLocaleString('en-IN') + '</span>' +
+            (p.originalPrice ? ' <span style="text-decoration:line-through;color:var(--text-muted);font-size:0.85em">₹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
+
+        return '<a href="course-detail.html?id=' + p.id + '" style="text-decoration:none;color:inherit">' +
+          '<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;transition:all 0.3s" onmouseover="this.style.borderColor=\'rgba(212,175,55,0.3)\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,0.06)\'">' +
+            '<div style="font-size:2rem;margin-bottom:12px">' + (p.emoji || '📦') + '</div>' +
+            '<div style="font-size:0.7rem;text-transform:uppercase;color:var(--accent-gold);letter-spacing:1px;margin-bottom:6px">' + p.category + '</div>' +
+            '<h3 style="font-size:1rem;color:var(--text-primary);margin-bottom:8px">' + p.title + '</h3>' +
+            '<div>' + priceHtml + '</div>' +
+          '</div>' +
+        '</a>';
+      }).join('');
+    }
+
+    // ── Initialize ──
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() { setTimeout(init, 100); });
+    } else {
+      setTimeout(init, 100);
+    }
+
+    // ── Razorpay Buy Handler ──
+    window.handleBuy = function(productId, price, downloadUrl) {
+      if (price === 0 && downloadUrl) {
+        window.open(downloadUrl, '_blank');
+        return;
+      }
+      if (price === 0) {
+        alert('Download link will be available soon!');
+        return;
+      }
+
+      var options = {
+        key: 'rzp_live_T8fCgJ0kFyrOYl',
+        amount: price * 100,
+        currency: 'INR',
+        name: 'TheDeepVerse',
+        description: 'Purchase: ' + productId,
+        theme: { color: '#d4af37' },
+        handler: function(response) {
+          if (downloadUrl) {
+            window.open(downloadUrl, '_blank');
+          }
+          alert('✅ Payment successful! Payment ID: ' + response.razorpay_payment_id);
+        }
+      };
+
+      var rzp = new Razorpay(options);
+      rzp.open();
+    };
+
+    // ── Share Link ──
+    window.copyShareLink = function() {
+      navigator.clipboard.writeText(window.location.href).then(function() {
+        var btn = document.querySelector('.share-btn');
+        if (btn) { btn.textContent = '✅ Link Copied!'; setTimeout(function() { btn.innerHTML = '📤 Share'; }, 2000); }
+      });
+    };
+
+    // ── Lightbox ──
+    window.openLightbox = function(src) {
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightbox').classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    };
+    window.closeLightbox = function() {
+      document.getElementById('lightbox').classList.remove('is-open');
+      document.body.style.overflow = '';
+    };
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+  })();
+  </script>
+
+</body>
+</html>
