@@ -223,21 +223,19 @@
         : '<span class="purchase-card__price-current">₹' + p.price.toLocaleString('en-IN') + '</span>' +
           (p.originalPrice ? '<span class="purchase-card__price-original">₹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
 
-      // Buy button — depends on whether product is live or coming soon
-      var buyBtnClass, buyBtnText, buyBtnAttrs;
+      // Buy / Download buttons — depends on whether product is live or coming soon
+      var buyButtonsHtml;
       if (!isLive) {
         // Coming soon — not purchasable yet
-        buyBtnClass = 'purchase-card__buy';
-        buyBtnText = '🔜 Coming Soon';
-        buyBtnAttrs = 'style="opacity:0.65;cursor:not-allowed;background:rgba(251,146,60,0.15);color:#fb923c" onclick="event.preventDefault()"';
+        buyButtonsHtml = '<a href="#" class="purchase-card__buy" style="opacity:0.65;cursor:not-allowed;background:rgba(251,146,60,0.15);color:#fb923c" onclick="event.preventDefault()">🔜 Coming Soon</a>';
       } else if (p.price === 0) {
-        buyBtnClass = 'purchase-card__buy purchase-card__buy--free';
-        buyBtnText = '🎁 Download Free';
-        buyBtnAttrs = 'onclick="event.preventDefault(); handleBuy(\'' + p.id + '\', ' + p.price + ', \'' + (p.downloadUrl || '') + '\')"';
+        // Free — download directly
+        buyButtonsHtml = '<a href="#" class="purchase-card__buy purchase-card__buy--free" onclick="event.preventDefault(); handleBuy(\'' + p.id + '\', ' + p.price + ', \'' + (p.downloadUrl || '') + '\')">🎁 Download Free</a>';
       } else {
-        buyBtnClass = 'purchase-card__buy purchase-card__buy--primary';
-        buyBtnText = '🛒 Buy Now — ₹' + p.price.toLocaleString('en-IN');
-        buyBtnAttrs = 'onclick="event.preventDefault(); handleBuy(\'' + p.id + '\', ' + p.price + ', \'' + (p.downloadUrl || '') + '\')"';
+        // Paid + live: show a Download button; clicking it reveals the Buy/payment button
+        buyButtonsHtml =
+          '<a href="#" class="purchase-card__buy purchase-card__buy--primary" id="dlBtn" onclick="event.preventDefault(); revealBuy()">📥 Download File</a>' +
+          '<a href="#" class="purchase-card__buy purchase-card__buy--primary" id="buyBtn" style="display:none" onclick="event.preventDefault(); handleBuy(\'' + p.id + '\', ' + p.price + ', \'' + (p.downloadUrl || '') + '\')">🛒 Buy Now — ₹' + p.price.toLocaleString('en-IN') + '</a>';
       }
 
       const featuresHtml = (p.features || []).map(function(f) { return '<li>' + f + '</li>'; }).join('');
@@ -247,11 +245,11 @@
           '<div class="purchase-card__image">' + imageHtml + '</div>' +
           '<div class="purchase-card__price">' + priceHtml + '</div>' +
           (discount ? '<div class="purchase-card__discount">🔥 ' + discount + '</div>' : '') +
-          '<a href="#" class="' + buyBtnClass + '" ' + buyBtnAttrs + '>' + buyBtnText + '</a>' +
+          buyButtonsHtml +
           (featuresHtml ? '<ul class="purchase-card__features">' + featuresHtml + '</ul>' : '') +
           '<div class="purchase-card__guarantee">' +
             '<span class="purchase-card__guarantee-icon">🔒</span>' +
-            (isLive ? 'Secure payment via Razorpay. Instant delivery after purchase.' : 'This product is launching soon. Stay tuned!') +
+            (isLive ? 'Secure payment via Razorpay. Instant download after purchase.' : 'This product is launching soon. Stay tuned!') +
           '</div>' +
         '</div>';
     }
@@ -376,6 +374,21 @@
     } else {
       setTimeout(init, 100);
     }
+
+    // ── Reveal Buy button when user clicks "Download File" ──
+    window.revealBuy = function() {
+      var dlBtn = document.getElementById('dlBtn');
+      var buyBtn = document.getElementById('buyBtn');
+      if (dlBtn) dlBtn.style.display = 'none';
+      if (buyBtn) {
+        buyBtn.style.display = '';
+        // Gentle hint so the user notices the payment step
+        buyBtn.animate(
+          [{ transform: 'scale(1)' }, { transform: 'scale(1.05)' }, { transform: 'scale(1)' }],
+          { duration: 400 }
+        );
+      }
+    };
 
     // ── Razorpay Buy Handler ──
     window.handleBuy = function(productId, price, downloadUrl) {
