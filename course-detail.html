@@ -206,8 +206,9 @@
           (p.students ? '<div class="course-meta-item"><span class="course-meta-item__icon">👥</span><span class="course-meta-item__value">' + p.students + ' students</span></div>' : '') +
           (p.lastUpdated ? '<div class="course-meta-item"><span class="course-meta-item__icon">🔄</span><span class="course-meta-item__value">Updated ' + p.lastUpdated + '</span></div>' : '') +
         '</div>' +
-        '<div style="display:flex;gap:12px;align-items:center">' +
+        '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">' +
           '<button class="share-btn" onclick="copyShareLink()">📤 Share</button>' +
+          (p.downloadUrl ? '<a href="' + p.downloadUrl + '" target="_blank" rel="noopener" class="share-btn" style="color:#22c55e;border-color:rgba(34,197,94,0.3);text-decoration:none">📥 Download File</a>' : '') +
         '</div>';
 
       // Purchase card (sidebar)
@@ -221,12 +222,19 @@
 
       const featuresHtml = (p.features || []).map(function(f) { return '<li>' + f + '</li>'; }).join('');
 
+      // Download link button (separate from buy)
+      var downloadBtnHtml = '';
+      if (p.downloadUrl) {
+        downloadBtnHtml = '<a href="' + p.downloadUrl + '" target="_blank" rel="noopener" class="purchase-card__buy" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px">📥 Download File</a>';
+      }
+
       document.getElementById('heroSidebar').innerHTML =
         '<div class="purchase-card">' +
           '<div class="purchase-card__image">' + imageHtml + '</div>' +
           '<div class="purchase-card__price">' + priceHtml + '</div>' +
           (discount ? '<div class="purchase-card__discount">🔥 ' + discount + '</div>' : '') +
           '<a href="#" class="' + buyBtnClass + '" onclick="event.preventDefault(); handleBuy(\'' + p.id + '\', ' + p.price + ', \'' + (p.downloadUrl || '') + '\')">' + buyBtnText + '</a>' +
+          downloadBtnHtml +
           (featuresHtml ? '<ul class="purchase-card__features">' + featuresHtml + '</ul>' : '') +
           '<div class="purchase-card__guarantee">' +
             '<span class="purchase-card__guarantee-icon">🔒</span>' +
