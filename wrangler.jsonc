@@ -1,0 +1,10 @@
+{
+  // ── TheDeepVerse — Cloudflare Workers static site config ──
+  // Serves the plain HTML/CSS/JS files in this repo as a static website.
+  // Every push to `main` auto-deploys via the connected Cloudflare build.
+  "name": "thedeepverse",
+  "compatibility_date": "2025-07-01",
+  "assets": {
+    "directory": "./"
+  }
+}

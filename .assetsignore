@@ -1,0 +1,3 @@
+# Files that should NOT be served publicly on the website
+wrangler.jsonc
+*.zip
