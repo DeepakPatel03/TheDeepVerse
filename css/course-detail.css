@@ -493,20 +493,29 @@
     bottom: 0; left: 0; right: 0;
     z-index: 100;
     border-radius: 16px 16px 0 0;
-    padding: 16px 20px;
+    padding: 12px 18px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    justify-content: space-between;
+    gap: 14px;
+    background: rgba(12,12,20,0.98);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.1);
     box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
   }
   .purchase-card__image { display: none; }
   .purchase-card__features { display: none; }
   .purchase-card__guarantee { display: none; }
-  .purchase-card__price { margin-bottom: 0; }
-  .purchase-card__buy { margin-bottom: 0; min-width: 140px; }
-  .purchase-card__discount { margin-bottom: 0; }
+  .purchase-card__price { margin-bottom: 0; white-space: nowrap; }
+  .purchase-card__buy {
+    margin-bottom: 0;
+    min-width: 150px;
+    flex-shrink: 0;
+    padding: 12px 18px;
+  }
+  .purchase-card__discount { display: none; }
   .course-content__sidebar { display: none; }
-  .course-content__main { padding-bottom: 80px; }
+  .course-content__main { padding-bottom: 90px; }
 }
 
 @media (max-width: 600px) {
