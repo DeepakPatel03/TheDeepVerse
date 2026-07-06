@@ -318,39 +318,8 @@
           <a href="store.html" class="btn btn--ghost btn--sm">Visit Store →</a>
         </div>
 
-        <div class="store-preview__grid reveal-stagger">
-          <div class="product-card reveal" style="cursor:pointer" onclick="window.location.href='course-detail.html?id=master-bundle'">
-            <div class="product-card__badge product-card__badge--gold">Launch Offer — 53% OFF</div>
-            <div class="product-card__emoji">&#129504;</div>
-            <h3 class="product-card__title">Master Bundle</h3>
-            <p class="product-card__desc">All courses, notes, prompts &amp; methods — one unbeatable price</p>
-            <div class="product-card__price">&#8377;699 <span style="text-decoration:line-through;color:rgba(255,255,255,0.4);font-size:0.75em;font-weight:400;margin-left:6px;">&#8377;1,499</span></div>
-            <a href="course-detail.html?id=master-bundle" class="btn btn--primary btn--sm">View Details</a>
-          </div>
-          <div class="product-card reveal" style="cursor:pointer" onclick="window.location.href='course-detail.html?id=master-prompt'">
-            <div class="product-card__badge product-card__badge--gold">Exclusive</div>
-            <div class="product-card__emoji">&#9889;</div>
-            <h3 class="product-card__title">Master Prompt</h3>
-            <p class="product-card__desc">TheDeepVerse style AI prompts for images and videos</p>
-            <div class="product-card__price">&#8377;299</div>
-            <a href="course-detail.html?id=master-prompt" class="btn btn--primary btn--sm">View Details</a>
-          </div>
-          <div class="product-card reveal" style="cursor:pointer" onclick="window.location.href='course-detail.html?id=dark-psych-course'">
-            <div class="product-card__badge product-card__badge--red">30% OFF</div>
-            <div class="product-card__emoji">&#128373;</div>
-            <h3 class="product-card__title">Dark Psychology Mastery</h3>
-            <p class="product-card__desc">Complete guide to manipulation, persuasion &amp; dark psychology</p>
-            <div class="product-card__price">&#8377;349 <span style="text-decoration:line-through;color:rgba(255,255,255,0.4);font-size:0.75em;font-weight:400;margin-left:6px;">&#8377;499</span></div>
-            <a href="course-detail.html?id=dark-psych-course" class="btn btn--primary btn--sm">View Details</a>
-          </div>
-          <div class="product-card reveal" style="cursor:pointer" onclick="window.location.href='course-detail.html?id=starter-kit'">
-            <div class="product-card__badge product-card__badge--green">FREE</div>
-            <div class="product-card__emoji">&#128218;</div>
-            <h3 class="product-card__title">Psychology Starter Kit</h3>
-            <p class="product-card__desc">10 must-know psychology concepts — free download</p>
-            <div class="product-card__price product-card__price--free">Free</div>
-            <a href="course-detail.html?id=starter-kit" class="btn btn--primary btn--sm">View Details</a>
-          </div>
+        <div class="store-preview__grid reveal-stagger" id="homeProductsGrid">
+          <!-- Dynamically rendered from StoreEngine -->
         </div>
       </div>
     </section>
@@ -618,7 +587,61 @@
        ============================================================ -->
   <script src="js/main.js"></script>
   <script src="js/youtube-feed.js"></script>
+  <!-- Firebase + Store Data for dynamic product rendering -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/store-data.js"></script>
   <script>
+    // ═══ DYNAMIC HOMEPAGE PRODUCTS ═══
+    (function() {
+      // Wait for StoreEngine to be ready
+      function renderHomeProducts() {
+        if (typeof StoreEngine === 'undefined') { setTimeout(renderHomeProducts, 100); return; }
+        var products = StoreEngine.getProducts().filter(function(p) { return p.active; });
+        // Show first 4 products (featured first, then by order)
+        var featured = products.filter(function(p) { return p.featured; });
+        var regular = products.filter(function(p) { return !p.featured; });
+        var display = featured.concat(regular).slice(0, 4);
+        var grid = document.getElementById('homeProductsGrid');
+        if (!grid || display.length === 0) return;
+
+        var badgeColorMap = { gold: 'product-card__badge--gold', red: 'product-card__badge--red', green: 'product-card__badge--green', purple: 'product-card__badge--purple' };
+
+        grid.innerHTML = display.map(function(p) {
+          var badgeHtml = '';
+          if (p.tag) {
+            var badgeClass = badgeColorMap[p.tagColor] || 'product-card__badge--gold';
+            badgeHtml = '<div class="product-card__badge ' + badgeClass + '">' + p.tag + '</div>';
+          }
+
+          var imageHtml = '';
+          if (p.thumbnail) {
+            imageHtml = '<div class="product-card__emoji" style="padding:0;overflow:hidden"><img src="' + p.thumbnail + '" alt="' + p.title + '" style="width:100%;height:100%;object-fit:cover"></div>';
+          } else {
+            imageHtml = '<div class="product-card__emoji">' + (p.emoji || '📦') + '</div>';
+          }
+
+          var priceHtml = '';
+          if (p.price === 0) {
+            priceHtml = '<div class="product-card__price product-card__price--free">Free</div>';
+          } else {
+            var originalHtml = p.originalPrice ? ' <span style="text-decoration:line-through;color:rgba(255,255,255,0.4);font-size:0.75em;font-weight:400;margin-left:6px">₹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '';
+            priceHtml = '<div class="product-card__price">₹' + p.price.toLocaleString('en-IN') + originalHtml + '</div>';
+          }
+
+          return '<div class="product-card reveal" style="cursor:pointer" onclick="window.location.href=\'course-detail.html?id=' + p.id + '\'">' +
+            badgeHtml + imageHtml +
+            '<h3 class="product-card__title">' + p.title + '</h3>' +
+            '<p class="product-card__desc">' + p.description + '</p>' +
+            priceHtml +
+            '<a href="course-detail.html?id=' + p.id + '" class="btn btn--primary btn--sm">View Details</a>' +
+          '</div>';
+        }).join('');
+      }
+      renderHomeProducts();
+    })();
+
     // Email modal for free downloads
     function openEmailModal() {
       document.getElementById('emailModal').style.display = 'flex';
