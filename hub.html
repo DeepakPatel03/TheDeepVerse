@@ -243,8 +243,8 @@
               <span style="background:rgba(34,197,94,0.15);color:#22c55e;padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:600">✅ AVAILABLE NOW</span>
               <span style="background:rgba(212,175,55,0.15);color:#d4af37;padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:600">⭐ BESTSELLER</span>
             </div>
-            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-              <div style="font-size:2.5rem">⚡</div>
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+              <div id="hubMasterPromptThumb" style="width:80px;height:80px;border-radius:12px;overflow:hidden;background:var(--bg-surface-hover);display:flex;align-items:center;justify-content:center;font-size:2.5rem;flex-shrink:0">⚡</div>
               <div style="flex:1;min-width:200px">
                 <h3 style="font-size:1.2rem;margin-bottom:4px;color:#f5f5f5">TheDeepVerse Master Prompt</h3>
                 <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:8px">The exact AI prompt system that powers all TheDeepVerse images and videos. Create cinematic psychology visuals instantly.</p>
@@ -351,6 +351,11 @@
 
   <button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></button>
   <script src="js/main.js"></script>
+  <!-- Firebase + Store Data for dynamic thumbnails -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/store-data.js"></script>
   <script>
     // Hub tab switching
     document.querySelectorAll('.hub-tab').forEach(function(tab) {
@@ -362,6 +367,22 @@
         if (panel) { panel.style.display = 'block'; panel.classList.add('is-active'); }
       });
     });
+
+    // Load Master Prompt thumbnail dynamically
+    (function() {
+      function loadHubThumbnails() {
+        if (typeof StoreEngine === 'undefined') { setTimeout(loadHubThumbnails, 100); return; }
+        var mp = StoreEngine.getProduct('master-prompt');
+        var thumbEl = document.getElementById('hubMasterPromptThumb');
+        if (mp && thumbEl) {
+          var src = mp.thumbnail || mp.thumbnailUrl || '';
+          if (src) {
+            thumbEl.innerHTML = '<img src="' + src + '" alt="Master Prompt" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\'⚡\'">';
+          }
+        }
+      }
+      loadHubThumbnails();
+    })();
   </script>
 </body>
 </html>
