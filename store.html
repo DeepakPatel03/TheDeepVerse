@@ -284,8 +284,10 @@
         const priceHtml = p.price === 0
           ? '<span class="product-card__price" style="color:#22c55e">Free</span>'
           : `<span class="product-card__price">₹${p.price.toLocaleString('en-IN')}${p.originalPrice ? ` <span class="product-card__price-original">₹${p.originalPrice.toLocaleString('en-IN')}</span>` : ''}</span>`;
+        const isLive = !!(p.downloadUrl && p.downloadUrl.trim());
         const buyClass = p.price === 0 ? 'product-card__buy product-card__buy--free' : 'product-card__buy';
-        const buyText = p.price === 0 ? 'Download' : 'Buy Now';
+        const buyText = !isLive ? '🔜 Coming Soon' : (p.price === 0 ? 'Download' : 'Buy Now');
+        const buyStyle = !isLive ? 'opacity:0.7;background:rgba(251,146,60,0.15);color:#fb923c' : '';
 
         return `
           <div class="product-card reveal" data-category="${p.category}" id="product-${p.id}" style="cursor:pointer" onclick="window.location.href='course-detail.html?id=${p.id}'">
@@ -296,7 +298,7 @@
               <p class="product-card__desc">${p.description}</p>
               <div class="product-card__footer">
                 ${priceHtml}
-                <a href="#" class="${buyClass}" onclick="event.stopPropagation(); handleBuy('${p.id}', ${p.price}, '${p.downloadUrl || ''}')">${buyText}</a>
+                <a href="#" class="${buyClass}" style="${buyStyle}" onclick="event.stopPropagation(); handleBuy('${p.id}', ${p.price}, '${p.downloadUrl || ''}')">${buyText}</a>
               </div>
             </div>
           </div>`;
@@ -424,19 +426,21 @@
     function handleBuy(productId, price, downloadUrl) {
       if (event) event.preventDefault();
 
+      // Get product details
+      const product = StoreEngine.getProduct(productId);
+      const productName = product ? product.title : productId;
+
+      // Coming Soon — product has no download/course link yet. Don't open payment.
+      if (!downloadUrl || !downloadUrl.trim()) {
+        alert('🔜 Coming Soon!\n\n"' + productName + '" abhi launch nahi hua hai.\nJald hi available hoga — stay tuned!');
+        return;
+      }
+
       // Free product — direct download
       if (price === 0 && downloadUrl) {
         window.open(downloadUrl, '_blank');
         return;
       }
-      if (price === 0) {
-        alert('🎁 Free download!\n\nThis product will be available for download once the download link is configured in Admin Dashboard.');
-        return;
-      }
-
-      // Get product details
-      const product = StoreEngine.getProduct(productId);
-      const productName = product ? product.title : productId;
 
       // Check if Razorpay key is configured
       if (!RAZORPAY_CONFIG.key || RAZORPAY_CONFIG.key.includes('XXXXXXXXXX')) {

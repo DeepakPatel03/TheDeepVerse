@@ -88,7 +88,14 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--admin-bg);color:v
 .product-row__status--active{background:var(--admin-success)}
 .product-row__status--inactive{background:var(--admin-text-2)}
 @media(max-width:768px){
-  .products-table th:nth-child(n+4),.products-table td:nth-child(n+4){display:none}
+  /* Hide only Tag (4th) and Status (5th) on mobile — keep Product, Type, Price, and Actions visible */
+  .products-table th:nth-child(4),.products-table td:nth-child(4),
+  .products-table th:nth-child(5),.products-table td:nth-child(5){display:none}
+  /* Compact the table so edit/delete buttons fit */
+  .products-table th,.products-table td{padding:10px 8px;font-size:0.82rem}
+  .product-row__thumb{width:38px;height:38px;font-size:1.2rem}
+  .product-row__actions{display:flex;gap:4px;flex-wrap:nowrap}
+  .products-table .btn-admin--sm{padding:8px 10px;font-size:0.85rem}
 }
 
 /* ── Product Form / Modal ── */

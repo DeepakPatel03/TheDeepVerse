@@ -234,7 +234,7 @@
       } else {
         // Paid + live: show a Download button; clicking it reveals the Buy/payment button
         buyButtonsHtml =
-          '<a href="#" class="purchase-card__buy purchase-card__buy--primary" id="dlBtn" onclick="event.preventDefault(); revealBuy()">📥 Download File</a>' +
+          '<a href="#" class="purchase-card__buy" id="dlBtn" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;box-shadow:0 4px 20px rgba(34,197,94,0.4)" onclick="event.preventDefault(); revealBuy()">📥 Download File</a>' +
           '<a href="#" class="purchase-card__buy purchase-card__buy--primary" id="buyBtn" style="display:none" onclick="event.preventDefault(); handleBuy(\'' + p.id + '\', ' + p.price + ', \'' + (p.downloadUrl || '') + '\')">🛒 Buy Now — ₹' + p.price.toLocaleString('en-IN') + '</a>';
       }
 
