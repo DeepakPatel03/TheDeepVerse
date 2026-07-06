@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /preview.html
 
-Sitemap: https://thedeepverse.netlify.app/sitemap.xml
+Sitemap: https://thedeepverse-yt.pages.dev/sitemap.xml
