@@ -4,6 +4,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--admin-bg:#0a0a0f;--admin-surface:#111118;--admin-surface-2:#1a1a24;--admin-border:#2a2a3a;--admin-accent:#d4af37;--admin-accent-light:#e8c84a;--admin-text:#f5f5f5;--admin-text-2:#a0a0b0;--admin-success:#22c55e;--admin-danger:#ef4444;--admin-warning:#f59e0b;--admin-info:#3b82f6;--admin-radius:10px;--admin-transition:0.2s ease}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--admin-bg);color:var(--admin-text);line-height:1.6;min-height:100vh}
+html{scroll-behavior:smooth}
 
 /* ── Login Screen ── */
 .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}

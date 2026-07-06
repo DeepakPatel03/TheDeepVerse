@@ -159,7 +159,7 @@
           <div class="form-group">
             <label>Thumbnail Image</label>
             <div class="thumb-upload">
-              <div class="thumb-preview" id="thumbPreview">📦</div>
+              <div class="thumb-preview" id="thumbPreview" onclick="if(document.getElementById('pThumbnail').value) openCropModal(0,'thumbnail')" title="Click to crop/adjust" style="cursor:pointer">📦</div>
               <div class="thumb-upload__controls" style="flex:1">
                 <div style="display:flex;gap:8px;margin-bottom:8px;">
                   <label class="btn-admin btn-admin--primary" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin:0;flex-shrink:0;">
@@ -209,15 +209,36 @@
             </div>
 
             <div class="form-group">
-              <label>Gallery Images (one URL per line, max 4)</label>
-              <textarea id="pImages" placeholder="https://example.com/preview1.jpg&#10;https://example.com/preview2.jpg" style="min-height:80px"></textarea>
-              <small>Paste image URLs for course preview gallery. Max 4 images, recommended 1-2MB each.</small>
+              <label>Gallery Images (max 4)</label>
+              <div id="galleryGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-bottom:12px"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+                <label class="btn-admin btn-admin--primary" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin:0">
+                  📁 Upload Images
+                  <input type="file" accept="image/*" multiple onchange="handleGalleryUpload(event)" style="display:none" id="pGalleryFiles">
+                </label>
+                <button type="button" class="btn-admin" onclick="addGalleryUrl()">🔗 Add URL</button>
+                <button type="button" class="btn-admin btn-admin--danger btn-admin--sm" onclick="clearGallery()">🗑️ Clear All</button>
+              </div>
+              <small>Upload from device (HD supported) or add image URLs. Max 4 images. Click any image to crop/adjust.</small>
+              <textarea id="pImages" style="display:none"></textarea>
             </div>
 
             <div class="form-group">
-              <label>HD Thumbnail URL</label>
-              <input type="text" id="pThumbnailUrl" placeholder="https://example.com/hero-image.jpg">
-              <small>Hero image for course detail page (different from card thumbnail)</small>
+              <label>HD Thumbnail (Course Detail Page)</label>
+              <div class="thumb-upload">
+                <div class="thumb-preview" id="hdThumbPreview" onclick="if(document.getElementById('pThumbnailUrl').value) openCropModal(0,'hdthumb')" style="width:120px;height:80px;border-radius:8px;background:var(--admin-surface-2);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:2rem;flex-shrink:0;cursor:pointer" title="Click to crop/adjust">🖼️</div>
+                <div style="flex:1">
+                  <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+                    <label class="btn-admin btn-admin--primary" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin:0;flex-shrink:0">
+                      📁 Upload HD Image
+                      <input type="file" accept="image/*" onchange="handleHdThumbUpload(event)" style="display:none" id="pHdThumbFile">
+                    </label>
+                    <button type="button" class="btn-admin btn-admin--danger btn-admin--sm" onclick="clearHdThumb()" style="flex-shrink:0">✕ Remove</button>
+                  </div>
+                  <input type="text" id="pThumbnailUrl" placeholder="Or paste HD image URL here..." oninput="previewHdThumb()">
+                  <small>Upload from device (recommended, HD quality) or paste URL. Used as hero image on course detail page.</small>
+                </div>
+              </div>
             </div>
 
             <div class="form-row">
@@ -436,6 +457,45 @@
   </main>
 </div>
 
+<!-- ── IMAGE CROP/ADJUST MODAL ── -->
+<div id="cropModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:2000;display:none;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--admin-surface);border:1px solid var(--admin-border);border-radius:16px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--admin-border)">
+      <h3 style="font-size:1.1rem">✂️ Crop & Adjust Image</h3>
+      <button onclick="closeCropModal()" style="background:none;border:none;color:var(--admin-text-2);font-size:1.3rem;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px">
+      <div id="cropCanvasWrap" style="position:relative;width:100%;background:#000;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;max-height:400px">
+        <canvas id="cropCanvas" style="max-width:100%;max-height:400px"></canvas>
+      </div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <label style="font-size:0.8rem;color:var(--admin-text-2);min-width:80px">☀️ Brightness</label>
+          <input type="range" id="cropBrightness" min="50" max="150" value="100" oninput="applyCropAdjust()" style="flex:1;accent-color:var(--admin-accent)">
+          <span id="cropBrightnessVal" style="font-size:0.8rem;color:var(--admin-text-2);min-width:35px">100%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <label style="font-size:0.8rem;color:var(--admin-text-2);min-width:80px">🎨 Contrast</label>
+          <input type="range" id="cropContrast" min="50" max="150" value="100" oninput="applyCropAdjust()" style="flex:1;accent-color:var(--admin-accent)">
+          <span id="cropContrastVal" style="font-size:0.8rem;color:var(--admin-text-2);min-width:35px">100%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <label style="font-size:0.8rem;color:var(--admin-text-2);min-width:80px">🔲 Quality</label>
+          <input type="range" id="cropQuality" min="50" max="100" value="85" oninput="document.getElementById('cropQualityVal').textContent=this.value+'%'" style="flex:1;accent-color:var(--admin-accent)">
+          <span id="cropQualityVal" style="font-size:0.8rem;color:var(--admin-text-2);min-width:35px">85%</span>
+        </div>
+      </div>
+    </div>
+    <div style="padding:16px 20px;border-top:1px solid var(--admin-border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div style="font-size:0.8rem;color:var(--admin-text-2)" id="cropInfo">—</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-admin" onclick="resetCropAdjust()">🔄 Reset</button>
+        <button class="btn-admin btn-admin--primary" onclick="applyCropAndSave()">✅ Apply & Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
@@ -588,6 +648,8 @@ function editProduct(id) {
   document.getElementById('pCurriculum').value = (p.curriculum || []).join('\n');
   document.getElementById('pMethod').value = p.method || '';
   document.getElementById('pImages').value = (p.images || []).join('\n');
+  galleryImages = (p.images || []).slice();
+  renderGalleryGrid();
   document.getElementById('pThumbnailUrl').value = p.thumbnailUrl || '';
   document.getElementById('pDuration').value = p.duration || '';
   document.getElementById('pLanguage').value = p.language || '';
@@ -597,6 +659,7 @@ function editProduct(id) {
   document.getElementById('formTitle').textContent = 'Edit Product';
   document.getElementById('formSubmitBtn').textContent = '💾 Update Product';
   previewThumb();
+  previewHdThumb();
   showSection('add');
 }
 
@@ -624,7 +687,7 @@ function saveProduct(event) {
     overview: document.getElementById('pOverview').value.trim(),
     curriculum: (function() { var t = document.getElementById('pCurriculum').value.trim(); return t ? t.split('\n').map(function(c) { return c.trim(); }).filter(function(c) { return c; }) : []; })(),
     method: document.getElementById('pMethod').value.trim(),
-    images: (function() { var t = document.getElementById('pImages').value.trim(); return t ? t.split('\n').map(function(u) { return u.trim(); }).filter(function(u) { return u; }).slice(0, 4) : []; })(),
+    images: galleryImages.slice(0, 4),
     thumbnailUrl: document.getElementById('pThumbnailUrl').value.trim(),
     duration: document.getElementById('pDuration').value.trim(),
     language: document.getElementById('pLanguage').value.trim(),
@@ -676,7 +739,10 @@ function resetForm() {
   document.getElementById('pCurriculum').value = '';
   document.getElementById('pMethod').value = '';
   document.getElementById('pImages').value = '';
+  galleryImages = [];
+  renderGalleryGrid();
   document.getElementById('pThumbnailUrl').value = '';
+  if (document.getElementById('hdThumbPreview')) document.getElementById('hdThumbPreview').innerHTML = '🖼️';
   document.getElementById('pDuration').value = '';
   document.getElementById('pLanguage').value = '';
   document.getElementById('pLevel').value = 'All Levels';
@@ -710,7 +776,7 @@ function handleImageUpload(event) {
     img.onload = function() {
       // Compress: resize to max 400px, convert to JPEG at 70% quality
       var canvas = document.createElement('canvas');
-      var maxSize = 400;
+      var maxSize = 800;
       var w = img.width;
       var h = img.height;
       if (w > maxSize || h > maxSize) {
@@ -721,7 +787,7 @@ function handleImageUpload(event) {
       canvas.height = h;
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
-      var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
       // Set as thumbnail
       document.getElementById('pThumbnail').value = dataUrl;
@@ -987,6 +1053,236 @@ function showToast(message, type = 'info') {
   container.appendChild(toast);
   setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(40px)'; setTimeout(() => toast.remove(), 300); }, 3000);
 }
+
+// ═══ GALLERY IMAGE UPLOADER ═══
+var galleryImages = [];
+
+function renderGalleryGrid() {
+  var grid = document.getElementById('galleryGrid');
+  if (!grid) return;
+  if (galleryImages.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--admin-text-2);border:2px dashed var(--admin-border);border-radius:8px;font-size:0.85rem">📷 No gallery images yet. Upload images or add URLs.</div>';
+    return;
+  }
+  grid.innerHTML = galleryImages.map(function(img, i) {
+    return '<div style="position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--admin-border);aspect-ratio:4/3;background:var(--admin-surface-2)">' +
+      '<img src="' + img + '" style="width:100%;height:100%;object-fit:cover;cursor:pointer" onclick="openCropModal(' + i + ',\'gallery\')" onerror="this.style.display=\'none\'">' +
+      '<button onclick="removeGalleryImage(' + i + ')" style="position:absolute;top:4px;right:4px;background:rgba(239,68,68,0.9);border:none;color:#fff;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:0.7rem;display:flex;align-items:center;justify-content:center">✕</button>' +
+      '<div style="position:absolute;bottom:0;left:0;right:0;padding:2px 6px;background:rgba(0,0,0,0.7);font-size:0.65rem;color:#ccc;text-align:center">' + (i+1) + '/4 — Click to crop</div>' +
+    '</div>';
+  }).join('');
+  // Sync hidden textarea
+  document.getElementById('pImages').value = galleryImages.join('\n');
+}
+
+function handleGalleryUpload(event) {
+  var files = Array.from(event.target.files);
+  if (galleryImages.length + files.length > 4) {
+    showToast('Max 4 gallery images allowed. You have ' + galleryImages.length + ' already.', 'error');
+    files = files.slice(0, 4 - galleryImages.length);
+  }
+  if (files.length === 0) return;
+  var processed = 0;
+  files.forEach(function(file) {
+    if (!file.type.startsWith('image/')) { processed++; return; }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var canvas = document.createElement('canvas');
+        var maxSize = 1200; // HD quality
+        var w = img.width, h = img.height;
+        if (w > maxSize || h > maxSize) {
+          if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+          else { w = Math.round(w * maxSize / h); h = maxSize; }
+        }
+        canvas.width = w; canvas.height = h;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        galleryImages.push(dataUrl);
+        processed++;
+        if (processed === files.length) {
+          renderGalleryGrid();
+          showToast(files.length + ' image(s) added to gallery!', 'success');
+        }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = ''; // Reset file input
+}
+
+function addGalleryUrl() {
+  if (galleryImages.length >= 4) { showToast('Max 4 images allowed.', 'error'); return; }
+  var url = prompt('Enter image URL:');
+  if (url && url.trim()) {
+    galleryImages.push(url.trim());
+    renderGalleryGrid();
+    showToast('Image URL added!', 'success');
+  }
+}
+
+function removeGalleryImage(index) {
+  galleryImages.splice(index, 1);
+  renderGalleryGrid();
+  showToast('Image removed.', 'info');
+}
+
+function clearGallery() {
+  if (galleryImages.length === 0) return;
+  if (!confirm('Remove all gallery images?')) return;
+  galleryImages = [];
+  renderGalleryGrid();
+  if (document.getElementById('pGalleryFiles')) document.getElementById('pGalleryFiles').value = '';
+  showToast('Gallery cleared.', 'info');
+}
+
+// ═══ HD THUMBNAIL UPLOADER ═══
+function handleHdThumbUpload(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('Please select an image file.', 'error'); return; }
+  document.getElementById('hdThumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">Loading...</div>';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var maxSize = 1200; // HD
+      var w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      document.getElementById('pThumbnailUrl').value = dataUrl;
+      previewHdThumb();
+      showToast('HD thumbnail uploaded! (' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');
+    };
+    img.onerror = function() {
+      showToast('Could not read image.', 'error');
+      document.getElementById('hdThumbPreview').innerHTML = '❌';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewHdThumb() {
+  var url = (document.getElementById('pThumbnailUrl') || {}).value;
+  if (!url) url = '';
+  url = url.trim();
+  var preview = document.getElementById('hdThumbPreview');
+  if (!preview) return;
+  if (url) {
+    preview.innerHTML = '<img src="' + url + '" onerror="this.parentElement.innerHTML=\'❌\'" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">';
+  } else {
+    preview.innerHTML = '🖼️';
+  }
+}
+
+function clearHdThumb() {
+  document.getElementById('pThumbnailUrl').value = '';
+  if (document.getElementById('pHdThumbFile')) document.getElementById('pHdThumbFile').value = '';
+  document.getElementById('hdThumbPreview').innerHTML = '🖼️';
+  showToast('HD thumbnail removed.', 'info');
+}
+
+// ═══ IMAGE CROP/ADJUST MODAL ═══
+var cropState = { img: null, target: '', index: -1, origDataUrl: '' };
+
+function openCropModal(index, target) {
+  var src = '';
+  if (target === 'gallery') {
+    src = galleryImages[index];
+  } else if (target === 'thumbnail') {
+    src = document.getElementById('pThumbnail').value;
+  } else if (target === 'hdthumb') {
+    src = document.getElementById('pThumbnailUrl').value;
+  }
+  if (!src) { showToast('No image to crop.', 'error'); return; }
+  cropState.target = target;
+  cropState.index = index;
+  cropState.origDataUrl = src;
+  var img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function() {
+    cropState.img = img;
+    var canvas = document.getElementById('cropCanvas');
+    var maxW = 650, maxH = 400;
+    var w = img.width, h = img.height;
+    if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+    if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+    canvas.width = w; canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    document.getElementById('cropInfo').textContent = 'Original: ' + img.width + '×' + img.height + 'px';
+    document.getElementById('cropBrightness').value = 100;
+    document.getElementById('cropContrast').value = 100;
+    document.getElementById('cropQuality').value = 85;
+    document.getElementById('cropBrightnessVal').textContent = '100%';
+    document.getElementById('cropContrastVal').textContent = '100%';
+    document.getElementById('cropQualityVal').textContent = '85%';
+    document.getElementById('cropModal').style.display = 'flex';
+  };
+  img.onerror = function() { showToast('Could not load image for editing.', 'error'); };
+  img.src = src;
+}
+
+function applyCropAdjust() {
+  if (!cropState.img) return;
+  var canvas = document.getElementById('cropCanvas');
+  var ctx = canvas.getContext('2d');
+  var brightness = parseInt(document.getElementById('cropBrightness').value);
+  var contrast = parseInt(document.getElementById('cropContrast').value);
+  document.getElementById('cropBrightnessVal').textContent = brightness + '%';
+  document.getElementById('cropContrastVal').textContent = contrast + '%';
+  ctx.filter = 'brightness(' + brightness + '%) contrast(' + contrast + '%)';
+  ctx.drawImage(cropState.img, 0, 0, canvas.width, canvas.height);
+  ctx.filter = 'none';
+}
+
+function resetCropAdjust() {
+  document.getElementById('cropBrightness').value = 100;
+  document.getElementById('cropContrast').value = 100;
+  document.getElementById('cropQuality').value = 85;
+  document.getElementById('cropBrightnessVal').textContent = '100%';
+  document.getElementById('cropContrastVal').textContent = '100%';
+  document.getElementById('cropQualityVal').textContent = '85%';
+  applyCropAdjust();
+}
+
+function applyCropAndSave() {
+  var canvas = document.getElementById('cropCanvas');
+  var quality = parseInt(document.getElementById('cropQuality').value) / 100;
+  var dataUrl = canvas.toDataURL('image/jpeg', quality);
+  if (cropState.target === 'gallery') {
+    galleryImages[cropState.index] = dataUrl;
+    renderGalleryGrid();
+  } else if (cropState.target === 'thumbnail') {
+    document.getElementById('pThumbnail').value = dataUrl;
+    previewThumb();
+  } else if (cropState.target === 'hdthumb') {
+    document.getElementById('pThumbnailUrl').value = dataUrl;
+    previewHdThumb();
+  }
+  showToast('Image adjusted & saved!', 'success');
+  closeCropModal();
+}
+
+function closeCropModal() {
+  document.getElementById('cropModal').style.display = 'none';
+  cropState = { img: null, target: '', index: -1, origDataUrl: '' };
+}
+
+// Initialize gallery grid on page load
+setTimeout(function() { renderGalleryGrid(); }, 100);
+
 </script>
 </body>
 </html>
