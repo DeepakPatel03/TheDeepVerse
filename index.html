@@ -598,11 +598,21 @@
       // Wait for StoreEngine to be ready
       function renderHomeProducts() {
         if (typeof StoreEngine === 'undefined') { setTimeout(renderHomeProducts, 100); return; }
+        // Show these specific 4 products on homepage (in this order)
+        var homeProductIds = ['master-bundle', 'master-prompt', 'dark-psych-course', 'starter-kit'];
         var products = StoreEngine.getProducts().filter(function(p) { return p.active; });
-        // Show first 4 products (featured first, then by order)
-        var featured = products.filter(function(p) { return p.featured; });
-        var regular = products.filter(function(p) { return !p.featured; });
-        var display = featured.concat(regular).slice(0, 4);
+        var display = [];
+        homeProductIds.forEach(function(id) {
+          var found = products.find(function(p) { return p.id === id; });
+          if (found) display.push(found);
+        });
+        // If any missing, fill with other active products
+        if (display.length < 4) {
+          products.forEach(function(p) {
+            if (display.length >= 4) return;
+            if (!display.find(function(d) { return d.id === p.id; })) display.push(p);
+          });
+        }
         var grid = document.getElementById('homeProductsGrid');
         if (!grid || display.length === 0) return;
 

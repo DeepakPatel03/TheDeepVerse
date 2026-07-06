@@ -187,10 +187,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(5, 5, 5, 0.98);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  z-index: var(--z-overlay);
+  background: #050505;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   padding: var(--space-8) var(--space-6);
