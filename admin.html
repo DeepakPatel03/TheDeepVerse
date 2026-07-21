@@ -176,8 +176,23 @@
 
           <div class="form-group">
             <label>Download / Course URL</label>
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+              <label class="btn-admin btn-admin--primary" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin:0">
+                📁 Upload File (PDF/ZIP)
+                <input type="file" onchange="uploadProductFile(event, 'pDownloadUrl')" style="display:none">
+              </label>
+            </div>
             <input type="text" id="pDownloadUrl" placeholder="https://drive.google.com/...">
-            <small>Google Drive link, Gumroad, or any file hosting URL</small>
+            <small>Upload file directly (progress will show) OR paste any file hosting URL.</small>
+          </div>
+
+          <!-- ── VARIANTS / EDITIONS ── -->
+          <div style="border-top:1px solid var(--admin-border);margin:20px 0;padding-top:20px">
+            <h3 style="color:var(--admin-text-1);font-size:1rem;margin-bottom:8px">📚 Variants / Editions (Optional)</h3>
+            <p style="font-size:0.85rem;color:var(--admin-text-2);margin-bottom:16px">Add multiple editions of this product (e.g. Hindi Edition, English Edition, Combo). If you add variants, the main price/download above will be replaced by the user's choice.</p>
+            <div id="variantsContainer" style="display:flex;flex-direction:column;gap:16px;margin-bottom:12px"></div>
+            <button type="button" class="btn-admin" onclick="addVariantField()">+ Add Variant</button>
+            <textarea id="pVariants" style="display:none"></textarea>
           </div>
 
           <div class="form-group">
@@ -503,6 +518,7 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="js/firebase-config.js"></script>
 <script src="js/store-data.js"></script>
 <script>
@@ -643,6 +659,12 @@ function editProduct(id) {
   document.getElementById('pActive').checked = p.active;
   document.getElementById('pFeatured').checked = p.featured;
 
+  // Variants
+  try {
+    currentVariants = p.variants ? JSON.parse(JSON.stringify(p.variants)) : [];
+  } catch(e) { currentVariants = []; }
+  renderVariants();
+
   // Course detail fields
   document.getElementById('pOverview').value = p.overview || '';
   document.getElementById('pCurriculum').value = (p.curriculum || []).join('\n');
@@ -683,6 +705,7 @@ function saveProduct(event) {
     features: featuresText ? featuresText.split('\n').map(f => f.trim()).filter(f => f) : [],
     active: document.getElementById('pActive').checked,
     featured: document.getElementById('pFeatured').checked,
+    variants: currentVariants,
     // Course detail fields
     overview: document.getElementById('pOverview').value.trim(),
     curriculum: (function() { var t = document.getElementById('pCurriculum').value.trim(); return t ? t.split('\n').map(function(c) { return c.trim(); }).filter(function(c) { return c; }) : []; })(),
@@ -747,6 +770,9 @@ function resetForm() {
   document.getElementById('pLanguage').value = '';
   document.getElementById('pLevel').value = 'All Levels';
   document.getElementById('pStudents').value = '';
+
+  currentVariants = [];
+  renderVariants();
 }
 
 function previewThumb() {
@@ -1052,6 +1078,90 @@ function showToast(message, type = 'info') {
   toast.innerHTML = message;
   container.appendChild(toast);
   setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(40px)'; setTimeout(() => toast.remove(), 300); }, 3000);
+}
+
+// ═══ FILE UPLOADS (Firebase Storage) ═══
+function uploadProductFile(event, targetInputId) {
+  var file = event.target.files[0];
+  if (!file) return;
+  if (!firebase.storage) {
+    showToast('Firebase Storage is not enabled. Please paste a URL manually.', 'error');
+    return;
+  }
+  var storageRef = firebase.storage().ref('products/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g,'_'));
+  showToast('Uploading file: ' + file.name + ' (0%)...', 'info');
+  var uploadTask = storageRef.put(file);
+
+  uploadTask.on('state_changed', 
+    function(snapshot) {
+      var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log('Upload is ' + progress + '% done');
+      // Update the input placeholder to show progress
+      var targetInput = document.getElementById(targetInputId);
+      if (targetInput) targetInput.placeholder = 'Uploading... ' + Math.round(progress) + '%';
+    }, 
+    function(error) {
+      console.error(error);
+      showToast('Upload failed: ' + error.message, 'error');
+      var targetInput = document.getElementById(targetInputId);
+      if (targetInput) targetInput.placeholder = 'https://...';
+    }, 
+    function() {
+      uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+        var targetInput = document.getElementById(targetInputId);
+        if (targetInput) {
+          targetInput.value = downloadURL;
+          targetInput.placeholder = 'https://...';
+        }
+        showToast('File uploaded successfully!', 'success');
+      });
+    }
+  );
+}
+
+// ═══ VARIANTS MANAGER ═══
+var currentVariants = [];
+
+function renderVariants() {
+  var container = document.getElementById('variantsContainer');
+  if (!container) return;
+  if (currentVariants.length === 0) {
+    container.innerHTML = '<div style="font-size:0.85rem;color:var(--admin-text-2)">No variants added.</div>';
+    return;
+  }
+  container.innerHTML = currentVariants.map(function(v, i) {
+    return '<div style="background:var(--admin-surface-2);border:1px solid var(--admin-border);padding:12px;border-radius:8px;position:relative">' +
+      '<button type="button" onclick="removeVariant(' + i + ')" style="position:absolute;top:12px;right:12px;background:rgba(239,68,68,0.2);color:#ef4444;border:none;border-radius:4px;cursor:pointer;padding:4px 8px;font-size:0.8rem">Remove</button>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;padding-right:60px">' +
+        '<div><label style="font-size:0.8rem">Variant Name</label><input type="text" value="' + (v.name || '') + '" onchange="updateVariant(' + i + ', \'name\', this.value)" placeholder="e.g. Hindi Edition" style="padding:8px"></div>' +
+        '<div><label style="font-size:0.8rem">Price (₹)</label><input type="number" value="' + (v.price || 0) + '" onchange="updateVariant(' + i + ', \'price\', this.value)" style="padding:8px"></div>' +
+      '</div>' +
+      '<div>' +
+        '<label style="font-size:0.8rem">Download File / URL</label>' +
+        '<div style="display:flex;gap:8px">' +
+          '<input type="text" id="varFile_' + i + '" value="' + (v.downloadUrl || '') + '" onchange="updateVariant(' + i + ', \'downloadUrl\', this.value)" placeholder="https://..." style="padding:8px;flex:1">' +
+          '<label class="btn-admin btn-admin--sm" style="margin:0;cursor:pointer">📁 Upload<input type="file" style="display:none" onchange="uploadProductFile(event, \'varFile_' + i + '\')"></label>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function addVariantField() {
+  currentVariants.push({ id: 'var_' + Date.now(), name: '', price: 0, originalPrice: 0, downloadUrl: '' });
+  renderVariants();
+}
+
+function updateVariant(index, field, value) {
+  if (currentVariants[index]) {
+    if (field === 'price' || field === 'originalPrice') value = parseInt(value) || 0;
+    currentVariants[index][field] = value;
+  }
+}
+
+function removeVariant(index) {
+  currentVariants.splice(index, 1);
+  renderVariants();
 }
 
 // ═══ GALLERY IMAGE UPLOADER ═══

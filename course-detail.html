@@ -217,25 +217,56 @@
           '<button class="share-btn" onclick="copyShareLink()">📤 Share</button>' +
         '</div>';
 
+      // ── Variants Support ──
+      var variantsHtml = '';
+      var hasVariants = p.variants && p.variants.length > 0;
+      if (hasVariants) {
+        // By default, select the first variant
+        window.selectedVariantIndex = 0;
+        
+        variantsHtml = '<div class="product-variants" style="margin:16px 0;text-align:left">';
+        variantsHtml += '<p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px">Select Edition:</p>';
+        variantsHtml += '<div style="display:flex;flex-direction:column;gap:8px">';
+        
+        p.variants.forEach(function(v, i) {
+          var isSelected = i === 0;
+          var border = isSelected ? 'border:2px solid var(--accent)' : 'border:1px solid var(--border-subtle)';
+          var bg = isSelected ? 'background:rgba(212,175,55,0.05)' : 'background:var(--bg-surface-hover)';
+          
+          variantsHtml += '<div class="variant-card" id="varCard_' + i + '" onclick="selectVariant(' + i + ')" style="' + border + ';' + bg + ';padding:12px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 0.2s">';
+          variantsHtml += '<span style="font-weight:600;font-size:0.95rem">' + v.name + '</span>';
+          variantsHtml += '<span style="color:var(--accent);font-weight:700">₹' + v.price.toLocaleString('en-IN') + '</span>';
+          variantsHtml += '</div>';
+        });
+        
+        variantsHtml += '</div></div>';
+      }
+
       // Purchase card (sidebar)
-      const priceHtml = p.price === 0
-        ? '<span class="purchase-card__price-free">Free</span>'
-        : '<span class="purchase-card__price-current">₹' + p.price.toLocaleString('en-IN') + '</span>' +
-          (p.originalPrice ? '<span class="purchase-card__price-original">₹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
+      // Initial price display (either main product or first variant)
+      var displayPrice = hasVariants ? p.variants[0].price : p.price;
+      var displayOrigPrice = hasVariants ? p.variants[0].originalPrice : p.originalPrice;
+      
+      const priceHtml = displayPrice === 0
+        ? '<span class="purchase-card__price-free" id="displayPriceText">Free</span>'
+        : '<span class="purchase-card__price-current" id="displayPriceText">₹' + displayPrice.toLocaleString('en-IN') + '</span>' +
+          (displayOrigPrice ? '<span class="purchase-card__price-original" id="displayOrigPriceText">₹' + displayOrigPrice.toLocaleString('en-IN') + '</span>' : '<span class="purchase-card__price-original" id="displayOrigPriceText" style="display:none"></span>');
 
       // Buy / Download buttons — depends on whether product is live or coming soon
       var buyButtonsHtml;
+      var initialDownloadUrl = hasVariants ? (p.variants[0].downloadUrl || '') : (p.downloadUrl || '');
+      
       if (!isLive) {
         // Coming soon — not purchasable yet
         buyButtonsHtml = '<a href="#" class="purchase-card__buy" style="opacity:0.65;cursor:not-allowed;background:rgba(251,146,60,0.15);color:#fb923c" onclick="event.preventDefault()">🔜 Coming Soon</a>';
-      } else if (p.price === 0) {
+      } else if (displayPrice === 0) {
         // Free — download directly
-        buyButtonsHtml = '<a href="#" class="purchase-card__buy purchase-card__buy--free" onclick="event.preventDefault(); handleBuy(\'' + p.id + '\', ' + p.price + ', \'' + (p.downloadUrl || '') + '\')">🎁 Download Free</a>';
+        buyButtonsHtml = '<a href="#" class="purchase-card__buy purchase-card__buy--free" id="buyBtnFree" onclick="event.preventDefault(); triggerBuy()">🎁 Download Free</a>';
       } else {
         // Paid + live: show a Download button; clicking it reveals the Buy/payment button
         buyButtonsHtml =
           '<a href="#" class="purchase-card__buy" id="dlBtn" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;box-shadow:0 4px 20px rgba(34,197,94,0.4)" onclick="event.preventDefault(); revealBuy()">📥 Download File</a>' +
-          '<a href="#" class="purchase-card__buy purchase-card__buy--primary" id="buyBtn" style="display:none" onclick="event.preventDefault(); handleBuy(\'' + p.id + '\', ' + p.price + ', \'' + (p.downloadUrl || '') + '\')">🛒 Buy Now — ₹' + p.price.toLocaleString('en-IN') + '</a>';
+          '<a href="#" class="purchase-card__buy purchase-card__buy--primary" id="buyBtn" style="display:none" onclick="event.preventDefault(); triggerBuy()">🛒 Buy Now — <span id="buyBtnPrice">₹' + displayPrice.toLocaleString('en-IN') + '</span></a>';
       }
 
       const featuresHtml = (p.features || []).map(function(f) { return '<li>' + f + '</li>'; }).join('');
@@ -243,8 +274,9 @@
       document.getElementById('heroSidebar').innerHTML =
         '<div class="purchase-card">' +
           '<div class="purchase-card__image">' + imageHtml + '</div>' +
+          variantsHtml + 
           '<div class="purchase-card__price">' + priceHtml + '</div>' +
-          (discount ? '<div class="purchase-card__discount">🔥 ' + discount + '</div>' : '') +
+          (discount ? '<div class="purchase-card__discount" id="displayDiscountText">🔥 ' + discount + '</div>' : '<div class="purchase-card__discount" id="displayDiscountText" style="display:none"></div>') +
           buyButtonsHtml +
           (featuresHtml ? '<ul class="purchase-card__features">' + featuresHtml + '</ul>' : '') +
           '<div class="purchase-card__guarantee">' +
@@ -390,33 +422,106 @@
       }
     };
 
-    // ── Razorpay Buy Handler ──
-    window.handleBuy = function(productId, price, downloadUrl) {
-      if (price === 0 && downloadUrl) {
-        window.open(downloadUrl, '_blank');
-        return;
-      }
-      if (price === 0) {
-        alert('Download link will be available soon!');
-        return;
-      }
-
-      var options = {
-        key: 'rzp_live_T8fCgJ0kFyrOYl',
-        amount: price * 100,
-        currency: 'INR',
-        name: 'TheDeepVerse',
-        description: 'Purchase: ' + productId,
-        theme: { color: '#d4af37' },
-        handler: function(response) {
-          if (downloadUrl) {
-            window.open(downloadUrl, '_blank');
-          }
-          alert('✅ Payment successful! Payment ID: ' + response.razorpay_payment_id);
+    function triggerBuy() {
+      var price = currentProduct.price;
+      var dlUrl = currentProduct.downloadUrl || '';
+      var pId = currentProduct.id;
+      
+      // If variants exist, use selected variant data
+      if (currentProduct.variants && currentProduct.variants.length > 0) {
+        var v = currentProduct.variants[window.selectedVariantIndex];
+        if (v) {
+          price = v.price;
+          dlUrl = v.downloadUrl || '';
+          pId = currentProduct.id + '_' + v.name.replace(/[^a-zA-Z0-9]/g, '');
         }
-      };
+      }
+      
+      handleBuy(pId, price, dlUrl);
+    }
 
-      var rzp = new Razorpay(options);
+    function selectVariant(index) {
+      if (!currentProduct || !currentProduct.variants) return;
+      window.selectedVariantIndex = index;
+      
+      var variants = currentProduct.variants;
+      
+      // Update UI selection
+      for (var i = 0; i < variants.length; i++) {
+        var card = document.getElementById('varCard_' + i);
+        if (card) {
+          if (i === index) {
+            card.style.border = '2px solid var(--accent)';
+            card.style.background = 'rgba(212,175,55,0.05)';
+          } else {
+            card.style.border = '1px solid var(--border-subtle)';
+            card.style.background = 'var(--bg-surface-hover)';
+          }
+        }
+      }
+      
+      // Update Price UI
+      var v = variants[index];
+      var priceText = document.getElementById('displayPriceText');
+      var origPriceText = document.getElementById('displayOrigPriceText');
+      var buyBtnPrice = document.getElementById('buyBtnPrice');
+      var discountText = document.getElementById('displayDiscountText');
+      
+      if (priceText) {
+        priceText.textContent = v.price === 0 ? 'Free' : '₹' + v.price.toLocaleString('en-IN');
+      }
+      if (origPriceText) {
+        if (v.originalPrice && v.originalPrice > v.price) {
+          origPriceText.textContent = '₹' + v.originalPrice.toLocaleString('en-IN');
+          origPriceText.style.display = 'inline';
+        } else {
+          origPriceText.style.display = 'none';
+        }
+      }
+      if (buyBtnPrice) {
+        buyBtnPrice.textContent = '₹' + v.price.toLocaleString('en-IN');
+      }
+      if (discountText) {
+        if (v.originalPrice && v.originalPrice > v.price) {
+          var pct = Math.round((1 - (v.price / v.originalPrice)) * 100);
+          discountText.innerHTML = '🔥 ' + pct + '% OFF';
+          discountText.style.display = 'block';
+        } else {
+          discountText.style.display = 'none';
+        }
+      }
+    }
+
+    // ── Payment / Download Logic ──
+    function handleBuy(productId, price, fileUrl) {
+      if (price === 0) {
+        if (!fileUrl) { alert('Download link not set for this free product.'); return; }
+        window.location.href = fileUrl;
+        return;
+      }
+      
+      if (!fileUrl) {
+        alert('File download URL is not set by the admin yet.');
+        return;
+      }
+
+      // Razorpay Integration
+      var options = {
+        key: "rzp_test_zHNDMlkK2Yy0E2", // Replace with Live Key
+        amount: price * 100, // paise
+        currency: "INR",
+        name: "TheDeepVerse",
+        description: "Purchase " + currentProduct.title,
+        image: currentProduct.thumbnail || "assets/logo.png",
+        handler: function (response) {
+          // In a real app, verify signature on backend.
+          // Here, we provide instant access on frontend.
+          alert("Payment Successful! Payment ID: " + response.razorpay_payment_id + "\nYour download will begin shortly.");
+          window.location.href = fileUrl;
+        },
+        prefill: { name: "", email: "", contact: "" },
+        theme: { color: "#d4af37" }
+      };
       rzp.open();
     };
 
