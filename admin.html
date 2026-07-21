@@ -176,14 +176,8 @@
 
           <div class="form-group">
             <label>Download / Course URL</label>
-            <div style="display:flex;gap:8px;margin-bottom:8px">
-              <label class="btn-admin btn-admin--primary" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin:0">
-                📁 Upload File (PDF/ZIP)
-                <input type="file" onchange="uploadProductFile(event, 'pDownloadUrl')" style="display:none">
-              </label>
-            </div>
             <input type="text" id="pDownloadUrl" placeholder="https://drive.google.com/...">
-            <small>Upload file directly (progress will show) OR paste any file hosting URL.</small>
+            <small>📌 Google Drive pe file upload karo → Share link copy karo → yahan paste karo. <a href="https://drive.google.com" target="_blank" style="color:var(--admin-accent)">Open Google Drive ↗</a></small>
           </div>
 
           <!-- ── VARIANTS / EDITIONS ── -->
@@ -518,7 +512,6 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="js/firebase-config.js"></script>
 <script src="js/store-data.js"></script>
 <script>
@@ -793,50 +786,28 @@ function handleImageUpload(event) {
     showToast('Please select an image file.', 'error');
     return;
   }
-  document.getElementById('thumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">Uploading...</div>';
+  document.getElementById('thumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">Processing...</div>';
 
-  // Try Firebase Storage first for full HD quality
-  if (typeof firebase !== 'undefined' && firebase.storage) {
-    var storageRef = firebase.storage().ref('thumbnails/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_'));
-    var uploadTask = storageRef.put(file);
-    uploadTask.on('state_changed',
-      function(snapshot) {
-        var progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        document.getElementById('thumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">' + progress + '%</div>';
-      },
-      function(error) {
-        console.error('Firebase thumb upload failed, falling back to base64:', error);
-        showToast('Firebase upload failed, using local quality. ' + error.message, 'error');
-        fallbackThumbUpload(file);
-      },
-      function() {
-        uploadTask.snapshot.ref.getDownloadURL().then(function(url) {
-          document.getElementById('pThumbnail').value = url;
-          previewThumb();
-          showToast('HD Thumbnail uploaded to cloud!', 'success');
-        });
-      }
-    );
-  } else {
-    fallbackThumbUpload(file);
-  }
-}
-
-function fallbackThumbUpload(file) {
   var reader = new FileReader();
   reader.onload = function(e) {
     var img = new Image();
     img.onload = function() {
-      // Keep original resolution, use PNG for lossless quality
+      // High quality: max 2000px, JPEG 95% — excellent quality, reasonable size
       var canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
+      var maxSize = 2000;
+      var w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      canvas.width = w;
+      canvas.height = h;
       var ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      var dataUrl = canvas.toDataURL('image/png');
+      ctx.drawImage(img, 0, 0, w, h);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.95);
       document.getElementById('pThumbnail').value = dataUrl;
       previewThumb();
-      showToast('Image loaded at full quality (' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');
+      showToast('✅ HD Image loaded! (' + w + 'x' + h + ', ' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');
     };
     img.onerror = function() {
       showToast('Could not read image.', 'error');
@@ -1098,64 +1069,12 @@ function showToast(message, type = 'info') {
   setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(40px)'; setTimeout(() => toast.remove(), 300); }, 3000);
 }
 
-// ═══ FILE UPLOADS (Firebase Storage) ═══
+// ═══ FILE UPLOAD NOTE ═══
+// Firebase Storage requires Blaze (paid) plan.
+// Instead, use Google Drive: upload file → get share link → paste URL.
+// This function is kept as a no-op placeholder for future use.
 function uploadProductFile(event, targetInputId) {
-  var file = event.target.files[0];
-  if (!file) return;
-
-  // Make sure Firebase is initialized
-  if (typeof firebase === 'undefined') {
-    showToast('Firebase not loaded. Please paste a URL manually.', 'error');
-    return;
-  }
-  try {
-    if (!firebase.apps.length && typeof FIREBASE_CONFIG !== 'undefined') {
-      firebase.initializeApp(FIREBASE_CONFIG);
-    }
-  } catch(e) { /* already initialized */ }
-
-  if (!firebase.storage) {
-    showToast('Firebase Storage SDK not loaded. Please paste a URL manually.', 'error');
-    return;
-  }
-
-  var storageRef;
-  try {
-    storageRef = firebase.storage().ref('products/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_'));
-  } catch(e) {
-    showToast('Firebase Storage error: ' + e.message, 'error');
-    return;
-  }
-
-  var targetInput = document.getElementById(targetInputId);
-  if (targetInput) targetInput.placeholder = 'Uploading... 0%';
-  showToast('📤 Uploading: ' + file.name + ' (' + Math.round(file.size / 1024) + ' KB)...', 'info');
-
-  var uploadTask = storageRef.put(file);
-
-  uploadTask.on('state_changed', 
-    function(snapshot) {
-      var progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-      if (targetInput) targetInput.placeholder = 'Uploading... ' + progress + '%';
-    }, 
-    function(error) {
-      console.error('File upload error:', error);
-      var msg = error.code === 'storage/unauthorized' 
-        ? 'Upload failed: Firebase Storage rules do not allow uploads. Please enable Storage in your Firebase console and set rules to allow writes.'
-        : 'Upload failed: ' + (error.message || error.code);
-      showToast(msg, 'error');
-      if (targetInput) targetInput.placeholder = 'https://...';
-    }, 
-    function() {
-      uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
-        if (targetInput) {
-          targetInput.value = downloadURL;
-          targetInput.placeholder = 'https://...';
-        }
-        showToast('✅ File uploaded successfully!', 'success');
-      });
-    }
-  );
+  showToast('📌 PDF/ZIP files ko Google Drive pe upload karo, phir share link yahan paste karo.', 'info');
 }
 
 // ═══ VARIANTS MANAGER ═══
@@ -1176,11 +1095,9 @@ function renderVariants() {
         '<div><label style="font-size:0.8rem">Price (₹)</label><input type="number" value="' + (v.price || 0) + '" onchange="updateVariant(' + i + ', \'price\', this.value)" style="padding:8px"></div>' +
       '</div>' +
       '<div>' +
-        '<label style="font-size:0.8rem">Download File / URL</label>' +
-        '<div style="display:flex;gap:8px">' +
-          '<input type="text" id="varFile_' + i + '" value="' + (v.downloadUrl || '') + '" onchange="updateVariant(' + i + ', \'downloadUrl\', this.value)" placeholder="https://..." style="padding:8px;flex:1">' +
-          '<label class="btn-admin btn-admin--sm" style="margin:0;cursor:pointer">📁 Upload<input type="file" style="display:none" onchange="uploadProductFile(event, \'varFile_' + i + '\')"></label>' +
-        '</div>' +
+        '<label style="font-size:0.8rem">Download Link (Google Drive)</label>' +
+        '<input type="text" id="varFile_' + i + '" value="' + (v.downloadUrl || '') + '" onchange="updateVariant(' + i + ', \'downloadUrl\', this.value)" placeholder="https://drive.google.com/..." style="padding:8px">' +
+        '<small style="font-size:0.75rem;color:var(--admin-text-2)">Drive pe file upload karo → Share link paste karo</small>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -1236,59 +1153,33 @@ function handleGalleryUpload(event) {
 
   files.forEach(function(file) {
     if (!file.type.startsWith('image/')) { processed++; return; }
-
-    // Try Firebase Storage first
-    if (typeof firebase !== 'undefined' && firebase.storage) {
-      var storageRef = firebase.storage().ref('gallery/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_'));
-      storageRef.put(file).then(function(snapshot) {
-        return snapshot.ref.getDownloadURL();
-      }).then(function(url) {
-        galleryImages.push(url);
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var canvas = document.createElement('canvas');
+        var maxSize = 2000;
+        var w = img.width, h = img.height;
+        if (w > maxSize || h > maxSize) {
+          if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+          else { w = Math.round(w * maxSize / h); h = maxSize; }
+        }
+        canvas.width = w; canvas.height = h;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+        galleryImages.push(dataUrl);
         processed++;
         if (processed === total) {
           renderGalleryGrid();
-          showToast(total + ' HD image(s) uploaded to cloud!', 'success');
+          showToast('✅ ' + total + ' HD image(s) added to gallery!', 'success');
         }
-      }).catch(function(error) {
-        console.error('Gallery Firebase upload failed, using base64:', error);
-        fallbackGalleryUpload(file, function() {
-          processed++;
-          if (processed === total) {
-            renderGalleryGrid();
-            showToast(total + ' image(s) added to gallery.', 'success');
-          }
-        });
-      });
-    } else {
-      fallbackGalleryUpload(file, function() {
-        processed++;
-        if (processed === total) {
-          renderGalleryGrid();
-          showToast(total + ' image(s) added to gallery.', 'success');
-        }
-      });
-    }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   });
   event.target.value = '';
-}
-
-function fallbackGalleryUpload(file, callback) {
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var img = new Image();
-    img.onload = function() {
-      var canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      var ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      var dataUrl = canvas.toDataURL('image/png');
-      galleryImages.push(dataUrl);
-      if (callback) callback();
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
 }
 
 function addGalleryUrl() {
@@ -1321,49 +1212,26 @@ function handleHdThumbUpload(event) {
   var file = event.target.files[0];
   if (!file) return;
   if (!file.type.startsWith('image/')) { showToast('Please select an image file.', 'error'); return; }
-  document.getElementById('hdThumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">Uploading...</div>';
+  document.getElementById('hdThumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">Processing...</div>';
 
-  // Try Firebase Storage first for full HD
-  if (typeof firebase !== 'undefined' && firebase.storage) {
-    var storageRef = firebase.storage().ref('hd_thumbnails/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_'));
-    var uploadTask = storageRef.put(file);
-    uploadTask.on('state_changed',
-      function(snapshot) {
-        var progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        document.getElementById('hdThumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">' + progress + '%</div>';
-      },
-      function(error) {
-        console.error('Firebase HD thumb upload failed, falling back to base64:', error);
-        showToast('Firebase upload failed, using local. ' + error.message, 'error');
-        fallbackHdThumbUpload(file);
-      },
-      function() {
-        uploadTask.snapshot.ref.getDownloadURL().then(function(url) {
-          document.getElementById('pThumbnailUrl').value = url;
-          previewHdThumb();
-          showToast('HD thumbnail uploaded to cloud at full quality!', 'success');
-        });
-      }
-    );
-  } else {
-    fallbackHdThumbUpload(file);
-  }
-}
-
-function fallbackHdThumbUpload(file) {
   var reader = new FileReader();
   reader.onload = function(e) {
     var img = new Image();
     img.onload = function() {
       var canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
+      var maxSize = 2000;
+      var w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      canvas.width = w; canvas.height = h;
       var ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      var dataUrl = canvas.toDataURL('image/png');
+      ctx.drawImage(img, 0, 0, w, h);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.95);
       document.getElementById('pThumbnailUrl').value = dataUrl;
       previewHdThumb();
-      showToast('HD thumbnail loaded at full quality (' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');
+      showToast('✅ HD thumbnail loaded! (' + w + 'x' + h + ', ' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');
     };
     img.onerror = function() {
       showToast('Could not read image.', 'error');
