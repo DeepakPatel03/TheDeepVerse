@@ -793,32 +793,50 @@ function handleImageUpload(event) {
     showToast('Please select an image file.', 'error');
     return;
   }
-  // Show loading
-  document.getElementById('thumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">Loading...</div>';
+  document.getElementById('thumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">Uploading...</div>';
 
+  // Try Firebase Storage first for full HD quality
+  if (typeof firebase !== 'undefined' && firebase.storage) {
+    var storageRef = firebase.storage().ref('thumbnails/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_'));
+    var uploadTask = storageRef.put(file);
+    uploadTask.on('state_changed',
+      function(snapshot) {
+        var progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        document.getElementById('thumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">' + progress + '%</div>';
+      },
+      function(error) {
+        console.error('Firebase thumb upload failed, falling back to base64:', error);
+        showToast('Firebase upload failed, using local quality. ' + error.message, 'error');
+        fallbackThumbUpload(file);
+      },
+      function() {
+        uploadTask.snapshot.ref.getDownloadURL().then(function(url) {
+          document.getElementById('pThumbnail').value = url;
+          previewThumb();
+          showToast('HD Thumbnail uploaded to cloud!', 'success');
+        });
+      }
+    );
+  } else {
+    fallbackThumbUpload(file);
+  }
+}
+
+function fallbackThumbUpload(file) {
   var reader = new FileReader();
   reader.onload = function(e) {
     var img = new Image();
     img.onload = function() {
-      // Compress: resize to max 400px, convert to JPEG at 70% quality
+      // Keep original resolution, use PNG for lossless quality
       var canvas = document.createElement('canvas');
-      var maxSize = 800;
-      var w = img.width;
-      var h = img.height;
-      if (w > maxSize || h > maxSize) {
-        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
-        else { w = Math.round(w * maxSize / h); h = maxSize; }
-      }
-      canvas.width = w;
-      canvas.height = h;
+      canvas.width = img.width;
+      canvas.height = img.height;
       var ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-
-      // Set as thumbnail
+      ctx.drawImage(img, 0, 0);
+      var dataUrl = canvas.toDataURL('image/png');
       document.getElementById('pThumbnail').value = dataUrl;
       previewThumb();
-      showToast('Image uploaded! (' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');
+      showToast('Image loaded at full quality (' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');
     };
     img.onerror = function() {
       showToast('Could not read image.', 'error');
@@ -1084,36 +1102,57 @@ function showToast(message, type = 'info') {
 function uploadProductFile(event, targetInputId) {
   var file = event.target.files[0];
   if (!file) return;
-  if (!firebase.storage) {
-    showToast('Firebase Storage is not enabled. Please paste a URL manually.', 'error');
+
+  // Make sure Firebase is initialized
+  if (typeof firebase === 'undefined') {
+    showToast('Firebase not loaded. Please paste a URL manually.', 'error');
     return;
   }
-  var storageRef = firebase.storage().ref('products/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g,'_'));
-  showToast('Uploading file: ' + file.name + ' (0%)...', 'info');
+  try {
+    if (!firebase.apps.length && typeof FIREBASE_CONFIG !== 'undefined') {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
+  } catch(e) { /* already initialized */ }
+
+  if (!firebase.storage) {
+    showToast('Firebase Storage SDK not loaded. Please paste a URL manually.', 'error');
+    return;
+  }
+
+  var storageRef;
+  try {
+    storageRef = firebase.storage().ref('products/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_'));
+  } catch(e) {
+    showToast('Firebase Storage error: ' + e.message, 'error');
+    return;
+  }
+
+  var targetInput = document.getElementById(targetInputId);
+  if (targetInput) targetInput.placeholder = 'Uploading... 0%';
+  showToast('📤 Uploading: ' + file.name + ' (' + Math.round(file.size / 1024) + ' KB)...', 'info');
+
   var uploadTask = storageRef.put(file);
 
   uploadTask.on('state_changed', 
     function(snapshot) {
-      var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      console.log('Upload is ' + progress + '% done');
-      // Update the input placeholder to show progress
-      var targetInput = document.getElementById(targetInputId);
-      if (targetInput) targetInput.placeholder = 'Uploading... ' + Math.round(progress) + '%';
+      var progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+      if (targetInput) targetInput.placeholder = 'Uploading... ' + progress + '%';
     }, 
     function(error) {
-      console.error(error);
-      showToast('Upload failed: ' + error.message, 'error');
-      var targetInput = document.getElementById(targetInputId);
+      console.error('File upload error:', error);
+      var msg = error.code === 'storage/unauthorized' 
+        ? 'Upload failed: Firebase Storage rules do not allow uploads. Please enable Storage in your Firebase console and set rules to allow writes.'
+        : 'Upload failed: ' + (error.message || error.code);
+      showToast(msg, 'error');
       if (targetInput) targetInput.placeholder = 'https://...';
     }, 
     function() {
       uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
-        var targetInput = document.getElementById(targetInputId);
         if (targetInput) {
           targetInput.value = downloadURL;
           targetInput.placeholder = 'https://...';
         }
-        showToast('File uploaded successfully!', 'success');
+        showToast('✅ File uploaded successfully!', 'success');
       });
     }
   );
@@ -1193,35 +1232,63 @@ function handleGalleryUpload(event) {
   }
   if (files.length === 0) return;
   var processed = 0;
+  var total = files.length;
+
   files.forEach(function(file) {
     if (!file.type.startsWith('image/')) { processed++; return; }
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var img = new Image();
-      img.onload = function() {
-        var canvas = document.createElement('canvas');
-        var maxSize = 1200; // HD quality
-        var w = img.width, h = img.height;
-        if (w > maxSize || h > maxSize) {
-          if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
-          else { w = Math.round(w * maxSize / h); h = maxSize; }
-        }
-        canvas.width = w; canvas.height = h;
-        var ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        galleryImages.push(dataUrl);
+
+    // Try Firebase Storage first
+    if (typeof firebase !== 'undefined' && firebase.storage) {
+      var storageRef = firebase.storage().ref('gallery/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_'));
+      storageRef.put(file).then(function(snapshot) {
+        return snapshot.ref.getDownloadURL();
+      }).then(function(url) {
+        galleryImages.push(url);
         processed++;
-        if (processed === files.length) {
+        if (processed === total) {
           renderGalleryGrid();
-          showToast(files.length + ' image(s) added to gallery!', 'success');
+          showToast(total + ' HD image(s) uploaded to cloud!', 'success');
         }
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      }).catch(function(error) {
+        console.error('Gallery Firebase upload failed, using base64:', error);
+        fallbackGalleryUpload(file, function() {
+          processed++;
+          if (processed === total) {
+            renderGalleryGrid();
+            showToast(total + ' image(s) added to gallery.', 'success');
+          }
+        });
+      });
+    } else {
+      fallbackGalleryUpload(file, function() {
+        processed++;
+        if (processed === total) {
+          renderGalleryGrid();
+          showToast(total + ' image(s) added to gallery.', 'success');
+        }
+      });
+    }
   });
-  event.target.value = ''; // Reset file input
+  event.target.value = '';
+}
+
+function fallbackGalleryUpload(file, callback) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      var dataUrl = canvas.toDataURL('image/png');
+      galleryImages.push(dataUrl);
+      if (callback) callback();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 function addGalleryUrl() {
@@ -1254,25 +1321,49 @@ function handleHdThumbUpload(event) {
   var file = event.target.files[0];
   if (!file) return;
   if (!file.type.startsWith('image/')) { showToast('Please select an image file.', 'error'); return; }
-  document.getElementById('hdThumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">Loading...</div>';
+  document.getElementById('hdThumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">Uploading...</div>';
+
+  // Try Firebase Storage first for full HD
+  if (typeof firebase !== 'undefined' && firebase.storage) {
+    var storageRef = firebase.storage().ref('hd_thumbnails/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_'));
+    var uploadTask = storageRef.put(file);
+    uploadTask.on('state_changed',
+      function(snapshot) {
+        var progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        document.getElementById('hdThumbPreview').innerHTML = '<div style="font-size:0.7rem;color:var(--admin-text-2)">' + progress + '%</div>';
+      },
+      function(error) {
+        console.error('Firebase HD thumb upload failed, falling back to base64:', error);
+        showToast('Firebase upload failed, using local. ' + error.message, 'error');
+        fallbackHdThumbUpload(file);
+      },
+      function() {
+        uploadTask.snapshot.ref.getDownloadURL().then(function(url) {
+          document.getElementById('pThumbnailUrl').value = url;
+          previewHdThumb();
+          showToast('HD thumbnail uploaded to cloud at full quality!', 'success');
+        });
+      }
+    );
+  } else {
+    fallbackHdThumbUpload(file);
+  }
+}
+
+function fallbackHdThumbUpload(file) {
   var reader = new FileReader();
   reader.onload = function(e) {
     var img = new Image();
     img.onload = function() {
       var canvas = document.createElement('canvas');
-      var maxSize = 1200; // HD
-      var w = img.width, h = img.height;
-      if (w > maxSize || h > maxSize) {
-        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
-        else { w = Math.round(w * maxSize / h); h = maxSize; }
-      }
-      canvas.width = w; canvas.height = h;
+      canvas.width = img.width;
+      canvas.height = img.height;
       var ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      ctx.drawImage(img, 0, 0);
+      var dataUrl = canvas.toDataURL('image/png');
       document.getElementById('pThumbnailUrl').value = dataUrl;
       previewHdThumb();
-      showToast('HD thumbnail uploaded! (' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');
+      showToast('HD thumbnail loaded at full quality (' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');
     };
     img.onerror = function() {
       showToast('Could not read image.', 'error');
