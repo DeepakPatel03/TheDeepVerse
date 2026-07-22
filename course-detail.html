@@ -461,6 +461,58 @@
       processPayment(currentProduct.id, currentProduct.price, currentProduct.title, [dlUrl]);
     };
 
+    // Convert Google Drive view links to direct download links
+    function toDirectDownload(url) {
+      if (!url) return url;
+      // Match: drive.google.com/file/d/FILE_ID/view...
+      var match = url.match(/drive\.google\.com\/file\/d\/([^\/]+)/);
+      if (match && match[1]) {
+        return 'https://drive.google.com/uc?export=download&id=' + match[1];
+      }
+      // Match: drive.google.com/open?id=FILE_ID
+      var match2 = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+      if (match2 && match2[1]) {
+        return 'https://drive.google.com/uc?export=download&id=' + match2[1];
+      }
+      return url;
+    }
+
+    // Show download section on the page after successful payment
+    function showDownloadSection(paymentId, description, downloadUrls) {
+      // Create download section HTML
+      var dlHtml = '<div id="postPaymentDownload" style="background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(34,197,94,0.03));border:2px solid rgba(34,197,94,0.4);border-radius:16px;padding:24px;margin:24px 0;text-align:center;animation:fadeIn 0.5s ease">';
+      dlHtml += '<div style="font-size:2.5rem;margin-bottom:8px">✅</div>';
+      dlHtml += '<h2 style="color:#22c55e;font-size:1.3rem;margin-bottom:4px">Payment Successful!</h2>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:4px">Payment ID: ' + paymentId + '</p>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">' + description + '</p>';
+      dlHtml += '<div style="display:flex;flex-direction:column;gap:10px;max-width:350px;margin:0 auto">';
+      
+      downloadUrls.forEach(function(url, i) {
+        var directUrl = toDirectDownload(url);
+        var label = downloadUrls.length > 1 ? 'Download File ' + (i + 1) : 'Download Your File';
+        dlHtml += '<a href="' + directUrl + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:14px 20px;border-radius:10px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(34,197,94,0.4);transition:all 0.2s" onmouseover="this.style.transform=\'scale(1.02)\'" onmouseout="this.style.transform=\'scale(1)\'">📥 ' + label + '</a>';
+      });
+
+      dlHtml += '</div>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.8rem;margin-top:12px">⚠️ Link kaam na kare toh button par <strong>right-click → Save Link As</strong> karo</p>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.75rem;margin-top:4px">Koi problem ho toh <a href="contact.html" style="color:var(--accent)">Contact Us</a> par payment ID ke saath message karo</p>';
+      dlHtml += '</div>';
+
+      // Insert after the hero section
+      var heroSidebar = document.getElementById('heroSidebar');
+      if (heroSidebar) {
+        // Replace the purchase card with download section
+        heroSidebar.innerHTML = dlHtml;
+        heroSidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // Also try opening the first link directly (as backup)
+      try {
+        var firstUrl = toDirectDownload(downloadUrls[0]);
+        window.location.href = firstUrl;
+      } catch(e) { /* ignore if blocked */ }
+    }
+
     // Process Razorpay payment and download
     function processPayment(productId, price, description, downloadUrls) {
       try {
@@ -472,22 +524,24 @@
           description: 'Purchase: ' + description,
           image: currentProduct.thumbnail || currentProduct.thumbnailUrl || '',
           handler: function(response) {
-            alert('✅ Payment Successful!\\nPayment ID: ' + response.razorpay_payment_id + '\\n\\nYour download(s) will open now.');
-            // Open all download URLs
-            downloadUrls.forEach(function(url, i) {
-              setTimeout(function() { window.open(url, '_blank'); }, i * 500);
-            });
+            // Show download section on the page — NO popup, NO alert
+            showDownloadSection(response.razorpay_payment_id, description, downloadUrls);
           },
           prefill: { name: '', email: '', contact: '' },
-          theme: { color: '#d4af37' }
+          theme: { color: '#d4af37' },
+          modal: {
+            ondismiss: function() {
+              // User closed Razorpay without paying
+            }
+          }
         };
         var rzp = new Razorpay(options);
         rzp.on('payment.failed', function(response) {
-          alert('❌ Payment failed: ' + response.error.description);
+          alert('❌ Payment failed: ' + response.error.description + '\n\nPlease try again.');
         });
         rzp.open();
       } catch(e) {
-        alert('Razorpay error: ' + e.message + '. Please try again.');
+        alert('Payment error: ' + e.message + '. Please try again or contact us.');
         console.error('Razorpay error:', e);
       }
     }
