@@ -66,6 +66,7 @@
       <!-- Hub Tabs -->
       <div class="hub-tabs reveal">
         <button class="hub-tab is-active" data-hub-tab="psychology">&#129504; Psychology Concepts</button>
+        <button class="hub-tab" data-hub-tab="ebooks">&#128214; eBooks</button>
         <button class="hub-tab" data-hub-tab="prompts">&#9889; AI Prompts</button>
         <button class="hub-tab" data-hub-tab="scripts">&#128221; Scripts</button>
         <button class="hub-tab" data-hub-tab="tools">&#128295; Creator Tools</button>
@@ -230,6 +231,22 @@
         </div>
       </div>
 
+      <!-- Tab: eBooks -->
+      <div class="hub-panel" id="panel-ebooks" style="display:none;">
+        <div class="hub-coming">
+          <div class="hub-coming__icon">&#128214;</div>
+          <h2 class="hub-coming__title">eBooks</h2>
+          <p class="hub-coming__desc">Psychology eBooks by Deepak Patel — Hindi & English editions available. Buy individually or grab the Combo deal!</p>
+
+          <!-- Dynamic eBook Grid -->
+          <div id="hubEbookGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin:24px 0">
+            <!-- JS will populate this -->
+          </div>
+
+          <a href="store.html" class="btn btn--primary btn--md">View All Products in Store &rarr;</a>
+        </div>
+      </div>
+
       <!-- Tab 2: AI Prompts -->
       <div class="hub-panel" id="panel-prompts" style="display:none;">
         <div class="hub-coming">
@@ -378,6 +395,48 @@
           var src = mp.thumbnail || mp.thumbnailUrl || '';
           if (src) {
             thumbEl.innerHTML = '<img src="' + src + '" alt="Master Prompt" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\'⚡\'">';
+          }
+        }
+
+        // Load eBooks dynamically
+        var ebookGrid = document.getElementById('hubEbookGrid');
+        if (ebookGrid) {
+          var products = StoreEngine.getProducts();
+          var ebooks = products.filter(function(p) { return p.category === 'ebook' && p.active; });
+          
+          if (ebooks.length === 0) {
+            ebookGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:rgba(255,255,255,0.5)">No eBooks available yet. Check back soon!</div>';
+          } else {
+            ebookGrid.innerHTML = ebooks.map(function(book) {
+              var thumbSrc = book.thumbnail || book.thumbnailUrl || '';
+              var thumbHtml = thumbSrc
+                ? '<img src="' + thumbSrc + '" alt="' + book.title + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\'📖\'">'
+                : '<span style="font-size:3rem">' + (book.emoji || '📖') + '</span>';
+              
+              var editionBadges = '';
+              if (book.variants && book.variants.length > 0) {
+                editionBadges = book.variants.map(function(v) {
+                  return '<span style="background:rgba(212,175,55,0.15);color:#d4af37;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:600">📖 ' + v.name + ' — ₹' + v.price + '</span>';
+                }).join('');
+                if (book.comboPrice) {
+                  editionBadges += '<span style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:600">📦 Combo — ₹' + book.comboPrice + '</span>';
+                }
+              }
+              
+              return '<div onclick="window.location.href=\'course-detail.html?id=' + book.id + '\'" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;cursor:pointer;transition:all 0.3s" onmouseover="this.style.borderColor=\'rgba(212,175,55,0.3)\';this.style.transform=\'translateY(-4px)\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,0.08)\';this.style.transform=\'translateY(0)\'">' +
+                '<div style="width:100%;height:180px;background:var(--bg-surface-hover);display:flex;align-items:center;justify-content:center;overflow:hidden">' + thumbHtml + '</div>' +
+                '<div style="padding:16px">' +
+                  '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap">' +
+                    '<span style="background:rgba(99,102,241,0.15);color:#818cf8;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:600;text-transform:uppercase">eBook</span>' +
+                    (book.tag ? '<span style="background:rgba(212,175,55,0.15);color:#d4af37;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:600">' + book.tag + '</span>' : '') +
+                  '</div>' +
+                  '<h3 style="font-size:1.1rem;color:var(--text-primary);margin-bottom:6px;font-weight:700">' + book.title + '</h3>' +
+                  '<p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px;line-height:1.5">' + (book.description || '').substring(0, 120) + '...</p>' +
+                  '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px">' + editionBadges + '</div>' +
+                  '<a href="course-detail.html?id=' + book.id + '" class="btn btn--primary btn--sm" onclick="event.stopPropagation()" style="width:100%;justify-content:center">View Details & Buy →</a>' +
+                '</div>' +
+              '</div>';
+            }).join('');
           }
         }
       }
