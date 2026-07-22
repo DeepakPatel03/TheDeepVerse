@@ -412,10 +412,6 @@
           <input type="text" id="socialWhatsapp" placeholder="https://whatsapp.com/channel/...">
         </div>
         <div class="form-group">
-          <label>✈️ Telegram URL</label>
-          <input type="text" id="socialTelegram" placeholder="https://t.me/YourChannel">
-        </div>
-        <div class="form-group">
           <label>📘 Facebook URL</label>
           <input type="text" id="socialFacebook" placeholder="https://www.facebook.com/yourpage">
         </div>
@@ -907,7 +903,6 @@ var DEFAULT_SOCIAL = {
   youtube: 'https://youtube.com/@TheDeepVerse-YT',
   instagram: 'https://www.instagram.com/thedeepverse03/',
   whatsapp: 'https://whatsapp.com/channel/0029VbCOHN0AojYp5TozJ50N',
-  telegram: 'https://t.me/TheDeepVerse',
   facebook: 'https://www.facebook.com/thedeepverse03'
 };
 
@@ -916,7 +911,6 @@ function loadSocialLinks() {
   document.getElementById('socialYoutube').value = links.youtube || '';
   document.getElementById('socialInstagram').value = links.instagram || '';
   document.getElementById('socialWhatsapp').value = links.whatsapp || '';
-  document.getElementById('socialTelegram').value = links.telegram || '';
   document.getElementById('socialFacebook').value = links.facebook || '';
 }
 
@@ -925,7 +919,6 @@ function saveSocialLinks() {
     youtube: document.getElementById('socialYoutube').value.trim(),
     instagram: document.getElementById('socialInstagram').value.trim(),
     whatsapp: document.getElementById('socialWhatsapp').value.trim(),
-    telegram: document.getElementById('socialTelegram').value.trim(),
     facebook: document.getElementById('socialFacebook').value.trim()
   };
   localStorage.setItem('tdv_social_links', JSON.stringify(links));
