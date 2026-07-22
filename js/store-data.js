@@ -413,6 +413,56 @@ const StoreEngine = (function() {
       createdAt: Date.now()
     },
     {
+      id: 'psychology-book',
+      type: 'ebook',
+      category: 'ebook',
+      title: 'The Dangerous Trap of Psychology',
+      description: 'Manovigyan Ka Khatarnak Jal — Available in both Hindi and English. Learn the hidden psychological traps that control human behavior, decision-making, and manipulation.',
+      overview: 'This book exposes the dangerous psychological traps that silently control our thoughts, decisions, and relationships. Written by Deepak Patel, it covers manipulation tactics, cognitive biases, emotional traps, and dark psychology patterns that most people never recognize. Available in both Hindi and English editions — or grab the Combo deal for both at a discounted price.',
+      curriculum: [
+        'Chapter 1: The Psychology of Control',
+        'Chapter 2: Hidden Manipulation Tactics',
+        'Chapter 3: Cognitive Bias Traps',
+        'Chapter 4: Emotional Manipulation Patterns',
+        'Chapter 5: Social Engineering & Influence',
+        'Chapter 6: Dark Psychology in Daily Life',
+        'Chapter 7: How to Defend Your Mind',
+        'Chapter 8: Breaking Free from Psychological Traps'
+      ],
+      method: 'Step 1: Choose your preferred edition (Hindi, English, or Combo).\nStep 2: Complete payment via Razorpay.\nStep 3: Download your PDF instantly after payment.\nStep 4: Read at your own pace — works on any device.',
+      price: 65,
+      originalPrice: 99,
+      tag: 'New Launch',
+      tagColor: 'gold',
+      thumbnail: '',
+      thumbnailUrl: '',
+      emoji: '📖',
+      images: [],
+      features: [
+        'Available in Hindi & English',
+        'PDF format — read on any device',
+        'Combo deal: Both editions for ₹99',
+        'Instant download after payment',
+        'Written by Deepak Patel'
+      ],
+      featured: false,
+      active: true,
+      downloadUrl: 'https://drive.google.com/file/d/1sjbMKaaFCE-lWQd-B-aEmdBj559E_ipm/view?usp=drive_link',
+      variants: [
+        { id: 'eng', name: 'English Edition', price: 65, originalPrice: 99, downloadUrl: 'https://drive.google.com/file/d/1sjbMKaaFCE-lWQd-B-aEmdBj559E_ipm/view?usp=drive_link' },
+        { id: 'hin', name: 'Hindi Edition (Manovigyan Ka Khatarnak Jal)', price: 65, originalPrice: 99, downloadUrl: 'https://drive.google.com/file/d/1L3i0_gV25u9sIeSWI1mtgufKRxwS0V0J/view?usp=drive_link' }
+      ],
+      comboPrice: 99,
+      comboOriginalPrice: 198,
+      instructor: 'Deepak Patel',
+      duration: 'Complete Book',
+      language: 'Hindi + English',
+      level: 'All Levels',
+      students: '100+',
+      lastUpdated: '2026-07-22',
+      createdAt: Date.now()
+    },
+    {
       id: 'starter-kit',
       type: 'free',
       category: 'free',
@@ -456,7 +506,7 @@ const StoreEngine = (function() {
   ];
 
   // ── Data versioning ──
-  const DATA_VERSION = '2026-07-04-v3'; // v3: Added course detail fields
+  const DATA_VERSION = '2026-07-22-v4'; // v4: Added book with variants
   const VERSION_KEY = 'tdv_data_version';
 
   // ── Firebase ──

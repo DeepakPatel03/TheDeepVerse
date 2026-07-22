@@ -106,6 +106,7 @@
               <label>Category *</label>
               <select id="pCategory" required>
                 <option value="course">📚 Course</option>
+                <option value="ebook">📖 eBook</option>
                 <option value="notes">📝 Notes</option>
                 <option value="prompt">⚡ AI Prompt</option>
                 <option value="method">🎬 Method</option>
@@ -180,12 +181,18 @@
             <small>📌 Google Drive pe file upload karo → Share link copy karo → yahan paste karo. <a href="https://drive.google.com" target="_blank" style="color:var(--admin-accent)">Open Google Drive ↗</a></small>
           </div>
 
-          <!-- ── VARIANTS / EDITIONS ── -->
+          <!-- ── EDITIONS (Hindi / English) ── -->
           <div style="border-top:1px solid var(--admin-border);margin:20px 0;padding-top:20px">
-            <h3 style="color:var(--admin-text-1);font-size:1rem;margin-bottom:8px">📚 Variants / Editions (Optional)</h3>
-            <p style="font-size:0.85rem;color:var(--admin-text-2);margin-bottom:16px">Add multiple editions of this product (e.g. Hindi Edition, English Edition, Combo). If you add variants, the main price/download above will be replaced by the user's choice.</p>
+            <h3 style="color:var(--admin-text-1);font-size:1rem;margin-bottom:8px">📚 Book Editions (Optional)</h3>
+            <p style="font-size:0.85rem;color:var(--admin-text-2);margin-bottom:16px">Add Hindi & English editions with Google Drive download links. Leave empty for non-book products.</p>
             <div id="variantsContainer" style="display:flex;flex-direction:column;gap:16px;margin-bottom:12px"></div>
-            <button type="button" class="btn-admin" onclick="addVariantField()">+ Add Variant</button>
+            <button type="button" class="btn-admin" onclick="addVariantField()" id="addVarBtn">+ Add Edition</button>
+
+            <div style="margin-top:16px;padding:12px;background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:8px">
+              <label style="font-size:0.85rem;font-weight:600;color:var(--admin-text-1)">📦 Combo Price (₹) — Both Editions</label>
+              <input type="number" id="pComboPrice" placeholder="99" style="padding:8px;margin-top:4px">
+              <small style="color:var(--admin-text-2)">Leave 0 or empty to hide combo option on product page.</small>
+            </div>
             <textarea id="pVariants" style="display:none"></textarea>
           </div>
 
@@ -657,6 +664,7 @@ function editProduct(id) {
     currentVariants = p.variants ? JSON.parse(JSON.stringify(p.variants)) : [];
   } catch(e) { currentVariants = []; }
   renderVariants();
+  document.getElementById('pComboPrice').value = p.comboPrice || '';
 
   // Course detail fields
   document.getElementById('pOverview').value = p.overview || '';
@@ -699,6 +707,8 @@ function saveProduct(event) {
     active: document.getElementById('pActive').checked,
     featured: document.getElementById('pFeatured').checked,
     variants: currentVariants,
+    comboPrice: parseInt(document.getElementById('pComboPrice').value) || 0,
+    comboOriginalPrice: (currentVariants.length >= 2) ? (currentVariants.reduce(function(sum, v) { return sum + (v.price || 0); }, 0)) : 0,
     // Course detail fields
     overview: document.getElementById('pOverview').value.trim(),
     curriculum: (function() { var t = document.getElementById('pCurriculum').value.trim(); return t ? t.split('\n').map(function(c) { return c.trim(); }).filter(function(c) { return c; }) : []; })(),
@@ -766,6 +776,9 @@ function resetForm() {
 
   currentVariants = [];
   renderVariants();
+  document.getElementById('pComboPrice').value = '';
+  var addBtn = document.getElementById('addVarBtn');
+  if (addBtn) addBtn.style.display = 'inline-block';
 }
 
 function previewThumb() {
@@ -1101,10 +1114,18 @@ function renderVariants() {
       '</div>' +
     '</div>';
   }).join('');
+  
+  var addBtn = document.getElementById('addVarBtn');
+  if (addBtn) addBtn.style.display = currentVariants.length >= 2 ? 'none' : 'inline-block';
 }
 
 function addVariantField() {
-  currentVariants.push({ id: 'var_' + Date.now(), name: '', price: 0, originalPrice: 0, downloadUrl: '' });
+  if (currentVariants.length >= 2) {
+    showToast('Maximum 2 editions allowed (Hindi & English).', 'error');
+    return;
+  }
+  var defaultName = currentVariants.length === 0 ? 'English Edition' : 'Hindi Edition';
+  currentVariants.push({ id: 'var_' + Date.now(), name: defaultName, price: 65, originalPrice: 0, downloadUrl: '' });
   renderVariants();
 }
 

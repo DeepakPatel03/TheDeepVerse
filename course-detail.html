@@ -222,73 +222,74 @@
           '<button class="share-btn" onclick="copyShareLink()">📤 Share</button>' +
         '</div>';
 
-      // ── Variants Support ──
-      var variantsHtml = '';
+      // ── Purchase Card (Sidebar) ──
       var hasVariants = p.variants && p.variants.length > 0;
-      if (hasVariants) {
-        // By default, select the first variant
-        window.selectedVariantIndex = 0;
-        
-        variantsHtml = '<div class="product-variants" style="margin:16px 0;text-align:left">';
-        variantsHtml += '<p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px">Select Edition:</p>';
-        variantsHtml += '<div style="display:flex;flex-direction:column;gap:8px">';
-        
+      var sidebarHtml = '<div class="purchase-card">';
+      sidebarHtml += '<div class="purchase-card__image">' + imageHtml + '</div>';
+
+      if (hasVariants && isLive) {
+        // ── EDITION-BASED LAYOUT ──
+        sidebarHtml += '<div style="padding:4px 0">';
+        sidebarHtml += '<div style="text-align:center;margin-bottom:16px"><span style="background:rgba(212,175,55,0.15);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;letter-spacing:0.5px">📚 CHOOSE YOUR EDITION</span></div>';
+
+        // Each variant as its own section
         p.variants.forEach(function(v, i) {
-          var isSelected = i === 0;
-          var border = isSelected ? 'border:2px solid var(--accent)' : 'border:1px solid var(--border-subtle)';
-          var bg = isSelected ? 'background:rgba(212,175,55,0.05)' : 'background:var(--bg-surface-hover)';
-          
-          variantsHtml += '<div class="variant-card" id="varCard_' + i + '" onclick="selectVariant(' + i + ')" style="' + border + ';' + bg + ';padding:12px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 0.2s">';
-          variantsHtml += '<span style="font-weight:600;font-size:0.95rem">' + v.name + '</span>';
-          variantsHtml += '<span style="color:var(--accent);font-weight:700">₹' + v.price.toLocaleString('en-IN') + '</span>';
-          variantsHtml += '</div>';
+          sidebarHtml += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:12px">';
+          sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+          sidebarHtml += '<div><div style="font-weight:700;font-size:1rem;color:var(--text-primary)">' + v.name + '</div>';
+          sidebarHtml += '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">PDF eBook</div></div>';
+          sidebarHtml += '<div style="text-align:right"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + v.price + '</div>';
+          if (v.originalPrice && v.originalPrice > v.price) {
+            sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + v.originalPrice + '</div>';
+          }
+          sidebarHtml += '</div></div>';
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyEdition(' + i + ')" style="display:block;text-align:center;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:12px;border-radius:8px;text-decoration:none;font-size:0.95rem;box-shadow:0 4px 15px rgba(34,197,94,0.3);transition:all 0.2s">🛒 Buy & Download — ₹' + v.price + '</a>';
+          sidebarHtml += '</div>';
         });
-        
-        variantsHtml += '</div></div>';
-      }
 
-      // Purchase card (sidebar)
-      // Initial price display (either main product or first variant)
-      var displayPrice = hasVariants ? p.variants[0].price : p.price;
-      var displayOrigPrice = hasVariants ? p.variants[0].originalPrice : p.originalPrice;
-      
-      const priceHtml = displayPrice === 0
-        ? '<span class="purchase-card__price-free" id="displayPriceText">Free</span>'
-        : '<span class="purchase-card__price-current" id="displayPriceText">₹' + displayPrice.toLocaleString('en-IN') + '</span>' +
-          (displayOrigPrice ? '<span class="purchase-card__price-original" id="displayOrigPriceText">₹' + displayOrigPrice.toLocaleString('en-IN') + '</span>' : '<span class="purchase-card__price-original" id="displayOrigPriceText" style="display:none"></span>');
+        // Combo Deal Section
+        if (p.comboPrice) {
+          sidebarHtml += '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.02));border:2px solid rgba(212,175,55,0.3);border-radius:12px;padding:16px;margin-bottom:12px;position:relative">';
+          sidebarHtml += '<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:2px 12px;border-radius:10px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px">🔥 BEST DEAL</div>';
+          sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;margin-top:4px">';
+          sidebarHtml += '<div><div style="font-weight:700;font-size:1rem;color:var(--text-primary)">📦 Combo — Both Editions</div>';
+          sidebarHtml += '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">Hindi + English PDF</div></div>';
+          sidebarHtml += '<div style="text-align:right"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + p.comboPrice + '</div>';
+          if (p.comboOriginalPrice && p.comboOriginalPrice > p.comboPrice) {
+            var savePct = Math.round((1 - p.comboPrice / p.comboOriginalPrice) * 100);
+            sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + p.comboOriginalPrice + '</div>';
+          }
+          sidebarHtml += '</div></div>';
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyCombo()" style="display:block;text-align:center;background:linear-gradient(135deg,#d4af37,#b8962e);color:#000;font-weight:800;padding:12px;border-radius:8px;text-decoration:none;font-size:0.95rem;box-shadow:0 4px 15px rgba(212,175,55,0.4);transition:all 0.2s">🛒 Buy Combo — ₹' + p.comboPrice + ' (Save ' + savePct + '%)</a>';
+          sidebarHtml += '</div>';
+        }
 
-      // Buy / Download buttons — depends on whether product is live or coming soon
-      var buyButtonsHtml;
-      var initialDownloadUrl = hasVariants ? (p.variants[0].downloadUrl || '') : (p.downloadUrl || '');
-      
-      if (!isLive) {
-        // Coming soon — not purchasable yet
-        buyButtonsHtml = '<a href="#" class="purchase-card__buy" style="opacity:0.65;cursor:not-allowed;background:rgba(251,146,60,0.15);color:#fb923c" onclick="event.preventDefault()">🔜 Coming Soon</a>';
-      } else if (displayPrice === 0) {
-        // Free — download directly
-        buyButtonsHtml = '<a href="#" class="purchase-card__buy purchase-card__buy--free" id="buyBtnFree" onclick="event.preventDefault(); triggerBuy()">🎁 Download Free</a>';
+        sidebarHtml += '</div>';
+      } else if (isLive) {
+        // ── SIMPLE PRODUCT (no variants) ──
+        var priceH = p.price === 0
+          ? '<span class="purchase-card__price-free">Free</span>'
+          : '<span class="purchase-card__price-current">₹' + p.price.toLocaleString('en-IN') + '</span>' +
+            (p.originalPrice ? '<span class="purchase-card__price-original">₹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
+        sidebarHtml += '<div class="purchase-card__price">' + priceH + '</div>';
+        if (discount) sidebarHtml += '<div class="purchase-card__discount">🔥 ' + discount + '</div>';
+        if (p.price === 0) {
+          sidebarHtml += '<a href="#" class="purchase-card__buy purchase-card__buy--free" onclick="event.preventDefault(); buySimple()">🎁 Download Free</a>';
+        } else {
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buySimple()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;box-shadow:0 4px 20px rgba(34,197,94,0.4)">🛒 Buy Now — ₹' + p.price.toLocaleString('en-IN') + '</a>';
+        }
       } else {
-        // Paid + live: show a Download button; clicking it reveals the Buy/payment button
-        buyButtonsHtml =
-          '<a href="#" class="purchase-card__buy" id="dlBtn" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;box-shadow:0 4px 20px rgba(34,197,94,0.4)" onclick="event.preventDefault(); revealBuy()">📥 Download File</a>' +
-          '<a href="#" class="purchase-card__buy purchase-card__buy--primary" id="buyBtn" style="display:none" onclick="event.preventDefault(); triggerBuy()">🛒 Buy Now — <span id="buyBtnPrice">₹' + displayPrice.toLocaleString('en-IN') + '</span></a>';
+        // ── COMING SOON ──
+        sidebarHtml += '<a href="#" class="purchase-card__buy" style="opacity:0.65;cursor:not-allowed;background:rgba(251,146,60,0.15);color:#fb923c" onclick="event.preventDefault()">🔜 Coming Soon</a>';
       }
 
-      const featuresHtml = (p.features || []).map(function(f) { return '<li>' + f + '</li>'; }).join('');
+      // Features
+      var featuresHtml = (p.features || []).map(function(f) { return '<li>' + f + '</li>'; }).join('');
+      if (featuresHtml) sidebarHtml += '<ul class="purchase-card__features">' + featuresHtml + '</ul>';
+      sidebarHtml += '<div class="purchase-card__guarantee"><span class="purchase-card__guarantee-icon">🔒</span>' + (isLive ? 'Secure payment via Razorpay. Instant download after purchase.' : 'This product is launching soon. Stay tuned!') + '</div>';
+      sidebarHtml += '</div>';
 
-      document.getElementById('heroSidebar').innerHTML =
-        '<div class="purchase-card">' +
-          '<div class="purchase-card__image">' + imageHtml + '</div>' +
-          variantsHtml + 
-          '<div class="purchase-card__price">' + priceHtml + '</div>' +
-          (discount ? '<div class="purchase-card__discount" id="displayDiscountText">🔥 ' + discount + '</div>' : '<div class="purchase-card__discount" id="displayDiscountText" style="display:none"></div>') +
-          buyButtonsHtml +
-          (featuresHtml ? '<ul class="purchase-card__features">' + featuresHtml + '</ul>' : '') +
-          '<div class="purchase-card__guarantee">' +
-            '<span class="purchase-card__guarantee-icon">🔒</span>' +
-            (isLive ? 'Secure payment via Razorpay. Instant download after purchase.' : 'This product is launching soon. Stay tuned!') +
-          '</div>' +
-        '</div>';
+      document.getElementById('heroSidebar').innerHTML = sidebarHtml;
     }
 
     // ── Render Content Sections ──
@@ -412,128 +413,84 @@
       setTimeout(init, 100);
     }
 
-    // ── Reveal Buy button when user clicks "Download File" ──
-    window.revealBuy = function() {
-      var dlBtn = document.getElementById('dlBtn');
-      var buyBtn = document.getElementById('buyBtn');
-      if (dlBtn) dlBtn.style.display = 'none';
-      if (buyBtn) {
-        buyBtn.style.display = '';
-        // Gentle hint so the user notices the payment step
-        buyBtn.animate(
-          [{ transform: 'scale(1)' }, { transform: 'scale(1.05)' }, { transform: 'scale(1)' }],
-          { duration: 400 }
-        );
-      }
-    };
-
-    function triggerBuy() {
-      var price = currentProduct.price;
-      var dlUrl = currentProduct.downloadUrl || '';
-      var pId = currentProduct.id;
-      
-      // If variants exist, use selected variant data
-      if (currentProduct.variants && currentProduct.variants.length > 0) {
-        var v = currentProduct.variants[window.selectedVariantIndex];
-        if (v) {
-          price = v.price;
-          dlUrl = v.downloadUrl || '';
-          pId = currentProduct.id + '_' + v.name.replace(/[^a-zA-Z0-9]/g, '');
-        }
-      }
-      
-      handleBuy(pId, price, dlUrl);
-    }
-
-    function selectVariant(index) {
-      if (!currentProduct || !currentProduct.variants) return;
-      window.selectedVariantIndex = index;
-      
-      var variants = currentProduct.variants;
-      
-      // Update UI selection
-      for (var i = 0; i < variants.length; i++) {
-        var card = document.getElementById('varCard_' + i);
-        if (card) {
-          if (i === index) {
-            card.style.border = '2px solid var(--accent)';
-            card.style.background = 'rgba(212,175,55,0.05)';
-          } else {
-            card.style.border = '1px solid var(--border-subtle)';
-            card.style.background = 'var(--bg-surface-hover)';
-          }
-        }
-      }
-      
-      // Update Price UI
-      var v = variants[index];
-      var priceText = document.getElementById('displayPriceText');
-      var origPriceText = document.getElementById('displayOrigPriceText');
-      var buyBtnPrice = document.getElementById('buyBtnPrice');
-      var discountText = document.getElementById('displayDiscountText');
-      
-      if (priceText) {
-        priceText.textContent = v.price === 0 ? 'Free' : '₹' + v.price.toLocaleString('en-IN');
-      }
-      if (origPriceText) {
-        if (v.originalPrice && v.originalPrice > v.price) {
-          origPriceText.textContent = '₹' + v.originalPrice.toLocaleString('en-IN');
-          origPriceText.style.display = 'inline';
-        } else {
-          origPriceText.style.display = 'none';
-        }
-      }
-      if (buyBtnPrice) {
-        buyBtnPrice.textContent = '₹' + v.price.toLocaleString('en-IN');
-      }
-      if (discountText) {
-        if (v.originalPrice && v.originalPrice > v.price) {
-          var pct = Math.round((1 - (v.price / v.originalPrice)) * 100);
-          discountText.innerHTML = '🔥 ' + pct + '% OFF';
-          discountText.style.display = 'block';
-        } else {
-          discountText.style.display = 'none';
-        }
-      }
-    }
-
-    // ── Payment / Download Logic ──
-    function handleBuy(productId, price, fileUrl) {
-      if (price === 0) {
-        if (!fileUrl) { alert('Download link not set for this free product.'); return; }
-        window.location.href = fileUrl;
-        return;
-      }
-      
-      if (!fileUrl) {
-        alert('File download URL is not set by the admin yet.');
-        return;
-      }
-
-      // Razorpay Integration
+    // ── Buy Functions ──
+    // Get Razorpay key
+    function getRazorpayKey() {
       var savedSettings = {};
       try { savedSettings = JSON.parse(localStorage.getItem('tdv_settings') || '{}'); } catch(e) {}
-      var razorpayKey = savedSettings.razorpayKey || 'rzp_live_T8fCgJ0kFyrOYl';
+      return savedSettings.razorpayKey || 'rzp_live_T8fCgJ0kFyrOYl';
+    }
+
+    // Buy a specific edition (variant)
+    window.buyEdition = function(index) {
+      if (!currentProduct || !currentProduct.variants || !currentProduct.variants[index]) {
+        alert('Edition not found. Please refresh the page.');
+        return;
+      }
+      var v = currentProduct.variants[index];
+      var dlUrl = v.downloadUrl || '';
+      if (!dlUrl) { alert('Download link not set yet.'); return; }
       
-      var options = {
-        key: razorpayKey,
-        amount: price * 100, // paise
-        currency: "INR",
-        name: "TheDeepVerse",
-        description: "Purchase " + currentProduct.title,
-        image: currentProduct.thumbnail || "assets/logo.png",
-        handler: function (response) {
-          // In a real app, verify signature on backend.
-          // Here, we provide instant access on frontend.
-          alert("Payment Successful! Payment ID: " + response.razorpay_payment_id + "\nYour download will begin shortly.");
-          window.location.href = fileUrl;
-        },
-        prefill: { name: "", email: "", contact: "" },
-        theme: { color: "#d4af37" }
-      };
-      var rzp1 = new Razorpay(options);
-      rzp1.open();
+      if (v.price === 0) {
+        window.open(dlUrl, '_blank');
+        return;
+      }
+      processPayment(currentProduct.id + '_' + (v.id || v.name.replace(/[^a-zA-Z0-9]/g, '')), v.price, v.name, [dlUrl]);
     };
+
+    // Buy combo (all editions)
+    window.buyCombo = function() {
+      if (!currentProduct || !currentProduct.variants) return;
+      var allUrls = currentProduct.variants.map(function(v) { return v.downloadUrl; }).filter(Boolean);
+      if (allUrls.length === 0) { alert('Download links not set yet.'); return; }
+      
+      processPayment(currentProduct.id + '_combo', currentProduct.comboPrice || 99, 'Combo — Both Editions', allUrls);
+    };
+
+    // Buy simple product (no variants)
+    window.buySimple = function() {
+      if (!currentProduct) return;
+      var dlUrl = currentProduct.downloadUrl || '';
+      if (!dlUrl && currentProduct.price > 0) { alert('Download link not set yet.'); return; }
+      
+      if (currentProduct.price === 0) {
+        if (dlUrl) window.open(dlUrl, '_blank');
+        else alert('Download link not set for this free product.');
+        return;
+      }
+      processPayment(currentProduct.id, currentProduct.price, currentProduct.title, [dlUrl]);
+    };
+
+    // Process Razorpay payment and download
+    function processPayment(productId, price, description, downloadUrls) {
+      try {
+        var options = {
+          key: getRazorpayKey(),
+          amount: price * 100, // paise
+          currency: 'INR',
+          name: 'TheDeepVerse',
+          description: 'Purchase: ' + description,
+          image: currentProduct.thumbnail || currentProduct.thumbnailUrl || '',
+          handler: function(response) {
+            alert('✅ Payment Successful!\\nPayment ID: ' + response.razorpay_payment_id + '\\n\\nYour download(s) will open now.');
+            // Open all download URLs
+            downloadUrls.forEach(function(url, i) {
+              setTimeout(function() { window.open(url, '_blank'); }, i * 500);
+            });
+          },
+          prefill: { name: '', email: '', contact: '' },
+          theme: { color: '#d4af37' }
+        };
+        var rzp = new Razorpay(options);
+        rzp.on('payment.failed', function(response) {
+          alert('❌ Payment failed: ' + response.error.description);
+        });
+        rzp.open();
+      } catch(e) {
+        alert('Razorpay error: ' + e.message + '. Please try again.');
+        console.error('Razorpay error:', e);
+      }
+    }
 
     // ── Share Link ──
     window.copyShareLink = function() {
