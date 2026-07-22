@@ -160,12 +160,16 @@
     }
 
     // Wait for StoreEngine
+    var currentProduct = null;
+
     function init() {
       const product = StoreEngine.getProduct(productId);
       if (!product) {
         document.getElementById('heroMain').innerHTML = '<div style="text-align:center;padding:80px 0"><h2 style="color:var(--text-primary);margin-bottom:12px">Product Not Found</h2><p style="color:var(--text-muted)">This product doesn\'t exist.</p><a href="store.html" style="color:var(--accent-gold)">← Back to Store</a></div>';
         return;
       }
+
+      currentProduct = product;
 
       // Update page title
       document.title = product.title + ' | TheDeepVerse';
@@ -190,8 +194,9 @@
         ? Math.round((1 - p.price / p.originalPrice) * 100) + '% OFF'
         : '';
 
-      // Is this product live (has a download/course link) or coming soon?
-      const isLive = !!(p.downloadUrl && p.downloadUrl.trim());
+      // Is this product live? Check main downloadUrl AND variant downloadUrls
+      var hasVariantLinks = p.variants && p.variants.length > 0 && p.variants.some(function(v) { return v.downloadUrl && v.downloadUrl.trim(); });
+      const isLive = !!(p.downloadUrl && p.downloadUrl.trim()) || hasVariantLinks;
       const statusBadge = isLive
         ? '<span class="course-hero__badge" style="background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.4)">● LIVE</span>'
         : '<span class="course-hero__badge" style="background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid rgba(251,146,60,0.4)">🔜 Coming Soon</span>';
@@ -506,8 +511,12 @@
       }
 
       // Razorpay Integration
+      var savedSettings = {};
+      try { savedSettings = JSON.parse(localStorage.getItem('tdv_settings') || '{}'); } catch(e) {}
+      var razorpayKey = savedSettings.razorpayKey || 'rzp_live_T8fCgJ0kFyrOYl';
+      
       var options = {
-        key: "rzp_test_zHNDMlkK2Yy0E2", // Replace with Live Key
+        key: razorpayKey,
         amount: price * 100, // paise
         currency: "INR",
         name: "TheDeepVerse",
@@ -522,7 +531,8 @@
         prefill: { name: "", email: "", contact: "" },
         theme: { color: "#d4af37" }
       };
-      rzp.open();
+      var rzp1 = new Razorpay(options);
+      rzp1.open();
     };
 
     // ── Share Link ──
