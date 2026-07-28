@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading Concept... | TheDeepVerse Hub</title>
+  <meta name="description" content="Decode the human mind through powerful stories. Explore psychology concepts by Deepak Patel — cinematic, book-like deep dives in English & Hindi.">
+  <meta name="author" content="Deepak Patel">
+  <meta name="robots" content="index, follow">
+
+  <!-- Dynamic SEO tags (filled by JS) -->
+  <link rel="canonical" id="canonicalLink" href="https://thedeepverse-yt.pages.dev/concept-detail.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="TheDeepVerse">
+  <meta property="og:title" id="ogTitle" content="TheDeepVerse Hub">
+  <meta property="og:description" id="ogDesc" content="Decode the human mind.">
+  <meta property="og:image" id="ogImage" content="https://thedeepverse-yt.pages.dev/assets/images/og-home.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" id="twTitle" content="TheDeepVerse Hub">
+  <meta name="twitter:description" id="twDesc" content="Decode the human mind.">
+
+  <!-- FAVICON -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23050505'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-size='18' font-weight='bold' fill='%23F5F5F5'%3ED%3C/text%3E%3C/svg%3E">
+
+  <!-- FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <!-- Article structured data (filled by JS) -->
+  <script type="application/ld+json" id="articleSchema"></script>
+
+  <style>
+    :root { --accent-c: #C0A062; --bg-deep: #050505; }
+    body { background-color: var(--bg-deep); color: #d8d8d8; line-height: 1.85; }
+
+    /* ── READING PROGRESS BAR ── */
+    .read-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: linear-gradient(90deg, var(--accent-c), #E0CFA0); z-index: 9999; transition: width 0.1s linear; }
+
+    /* ── HINDI TEXT ── */
+    .hi-text { font-family: 'Noto Sans Devanagari', 'Inter', sans-serif; line-height: 2; }
+
+    /* ── LANGUAGE TOGGLE ── */
+    .lang-toolbar { margin-top: 64px; position: sticky; top: 64px; z-index: 999; display: flex; justify-content: center; gap: 8px; padding: 10px 12px; background: rgba(5,5,5,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; }
+    @media (max-width: 767px) { .lang-toolbar { margin-top: 56px; top: 56px; gap: 6px; padding: 8px 10px; } }
+    .lang-btn { padding: 8px 20px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; color: #aaa; border: 1px solid rgba(255,255,255,0.12); background: transparent; transition: all 0.25s; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; min-height: 44px; }
+    .lang-btn.is-active { background: var(--accent-c); color: #050505; border-color: var(--accent-c); }
+    .lang-btn:hover:not(.is-active) { color: #fff; border-color: var(--accent-c); }
+
+    /* Language visibility states on <body> */
+    body[data-lang="en"] .hi-block { display: none !important; }
+    body[data-lang="hi"] .en-block { display: none !important; }
+    /* both = show all */
+
+    /* ── HERO ── */
+    .concept-hero { padding: 40px 0 50px; position: relative; overflow: hidden; text-align: center; }
+    .concept-hero__bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(192,160,98,0.10), transparent 60%); pointer-events: none; }
+    .concept-cat { color: var(--accent-c); font-weight: 700; text-transform: uppercase; letter-spacing: 3px; font-size: 0.8rem; margin-bottom: 18px; display: block; }
+    .concept-title { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 7vw, 4rem); line-height: 1.1; margin-bottom: 16px; color: #fff; }
+    .concept-subtitle { font-size: 1.15rem; color: var(--accent-c); font-style: italic; max-width: 640px; margin: 0 auto 22px; }
+    .concept-meta { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; font-size: 0.8rem; color: #888; }
+    .concept-meta span { background: rgba(255,255,255,0.04); padding: 5px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.07); }
+
+    .concept-hero__img { max-width: 860px; margin: 30px auto 0; padding: 0 20px; }
+    .concept-hero__img img { width: 100%; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+
+    /* ── ARTICLE BODY ── */
+    .article-wrap { max-width: 760px; margin: 0 auto; padding: 20px 22px 60px; }
+
+    .sec { margin: 54px 0; scroll-margin-top: 80px; }
+    .sec__head { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+    .sec__icon { font-size: 1.7rem; flex-shrink: 0; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; background: rgba(192,160,98,0.08); border: 1px solid var(--accent-c); border-radius: 14px; }
+    .sec__title { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 4vw, 2rem); color: #fff; line-height: 1.2; }
+    .sec__title-hi { font-family: 'Noto Sans Devanagari', serif; }
+
+    .sec__body { font-size: 1.08rem; color: #cfcfcf; }
+    .sec__body p { margin-bottom: 18px; color: #cfcfcf; }
+    .sec__body strong { color: #fff; }
+    .sec__body em { color: var(--accent-c); font-style: italic; }
+
+    /* Language block wrappers inside a section */
+    .en-block { }
+    .hi-block { }
+    body[data-lang="both"] .hi-block { margin-top: 26px; padding-top: 24px; border-top: 1px dashed rgba(192,160,98,0.25); }
+    .lang-label { display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent-c); margin-bottom: 12px; opacity: 0.75; }
+    body:not([data-lang="both"]) .lang-label { display: none; }
+
+    /* Story emphasis */
+    .sec--story .sec__body { font-size: 1.14rem; }
+    .sec--story .sec__body p:first-of-type::first-letter { font-family: 'Playfair Display', serif; font-size: 3.4rem; float: left; line-height: 0.8; padding: 6px 10px 0 0; color: var(--accent-c); }
+    body[data-lang="hi"] .sec--story .sec__body p:first-of-type::first-letter { float: none; font-size: inherit; padding: 0; color: inherit; }
+
+    /* Pull quote */
+    .pullquote { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.5rem; color: #fff; text-align: center; margin: 40px 0; padding: 24px 30px; border-top: 1px solid rgba(192,160,98,0.3); border-bottom: 1px solid rgba(192,160,98,0.3); }
+
+    /* Section image */
+    .sec__figure { margin: 26px 0; }
+    .sec__figure img { width: 100%; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); }
+    .sec__figure figcaption { font-size: 0.82rem; color: #888; text-align: center; margin-top: 10px; font-style: italic; }
+    .img-placeholder { width: 100%; aspect-ratio: 16/9; border-radius: 14px; border: 1px dashed rgba(192,160,98,0.35); background: rgba(192,160,98,0.03); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7a6a45; gap: 8px; text-align: center; padding: 20px; }
+    .img-placeholder svg { width: 42px; height: 42px; opacity: 0.6; }
+    .img-placeholder small { font-size: 0.72rem; }
+
+    /* Key facts box */
+    .fact-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-left: 4px solid var(--accent-c); border-radius: 12px; padding: 22px 26px; margin: 26px 0; }
+    .fact-box h4 { color: var(--accent-c); font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
+    .fact-box ul { list-style: none; }
+    .fact-box li { position: relative; padding-left: 22px; margin-bottom: 10px; color: #cfcfcf; font-size: 0.98rem; }
+    .fact-box li::before { content: '◆'; position: absolute; left: 0; color: var(--accent-c); font-size: 0.7rem; top: 4px; }
+
+    /* Analogy cards */
+    .analogy-card { display: flex; gap: 20px; align-items: flex-start; background: rgba(192,160,98,0.04); padding: 22px; border-radius: 14px; border-left: 4px solid var(--accent-c); margin-bottom: 16px; }
+    .analogy-card__icon { font-size: 2rem; flex-shrink: 0; }
+    .analogy-card__body strong { color: #fff; }
+
+    /* Takeaway */
+    .takeaway-box { text-align: center; padding: 54px 30px; margin: 60px 0 0; border-top: 1px solid rgba(255,255,255,0.1); }
+    .takeaway-box__label { color: var(--accent-c); font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+    .takeaway-box__text { font-family: 'Playfair Display', serif; font-size: 1.55rem; color: #fff; font-style: italic; line-height: 1.5; max-width: 620px; margin: 0 auto 20px; }
+    .takeaway-box__text-hi { font-family: 'Noto Sans Devanagari', serif; }
+
+    /* CTA */
+    .cta-box { background: linear-gradient(135deg, #141414, #050505); padding: 46px 30px; border-radius: 24px; text-align: center; border: 1px solid var(--accent-c); margin: 50px 0; }
+    .cta-box h3 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #fff; margin-bottom: 10px; }
+    .cta-box p { color: #aaa; margin-bottom: 22px; }
+
+    /* Related / share */
+    .share-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 30px 0; }
+    .share-btn { padding: 9px 18px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.12); color: #ccc; background: transparent; transition: all 0.2s; }
+    .share-btn:hover { border-color: var(--accent-c); color: #fff; }
+
+    .related-section { max-width: 760px; margin: 0 auto; padding: 20px 22px 80px; }
+    .related-section h3 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #fff; margin-bottom: 20px; text-align: center; }
+    .related-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    @media (min-width: 600px) { .related-grid { grid-template-columns: repeat(2, 1fr); } }
+    .related-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px 20px; transition: all 0.25s; }
+    .related-card:hover { border-color: var(--accent-c); transform: translateY(-3px); }
+    .related-card span { font-size: 0.7rem; color: var(--accent-c); text-transform: uppercase; letter-spacing: 1px; }
+    .related-card h4 { color: #fff; font-size: 1.05rem; margin: 6px 0; }
+    .related-card p { font-size: 0.85rem; color: #999; }
+
+    @media (max-width: 600px) {
+      .sec__icon { width: 44px; height: 44px; font-size: 1.4rem; }
+      .analogy-card { flex-direction: column; gap: 12px; }
+    }
+  </style>
+</head>
+<body data-lang="both">
+
+  <div class="read-progress" id="readProgress"></div>
+
+  <nav class="nav">
+    <div class="nav__inner container">
+      <a href="index.html" class="nav__logo">TheDeepVerse</a>
+      <div class="nav__links">
+        <a href="hub.html" class="nav__link">← Back to Hub</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Language toggle -->
+  <div class="lang-toolbar">
+    <button class="lang-btn" data-set-lang="en">English</button>
+    <button class="lang-btn is-active" data-set-lang="both">English + हिंदी</button>
+    <button class="lang-btn" data-set-lang="hi">हिंदी</button>
+  </div>
+
+  <main id="concept-page">
+    <div class="concept-hero">
+      <div class="concept-hero__bg"></div>
+      <div class="container">
+        <span class="concept-cat" id="conceptCat">Psychology Concept</span>
+        <h1 class="concept-title" id="conceptTitle">Loading...</h1>
+        <p class="concept-subtitle" id="conceptSubtitle"></p>
+        <div class="concept-meta" id="conceptMeta"></div>
+      </div>
+      <div class="concept-hero__img" id="heroImgWrap" style="display:none;"></div>
+    </div>
+
+    <article class="article-wrap" id="articleBody">
+      <!-- Sections injected by JS -->
+    </article>
+
+    <div class="article-wrap" style="padding-top:0;">
+      <div class="share-row" id="shareRow"></div>
+      <div class="cta-box">
+        <h3 id="ctaTitle">Master Your Mind.</h3>
+        <p id="ctaText">Aisi hi aur cinematic psychology stories ke liye — subscribe karo.</p>
+        <a href="https://youtube.com/@TheDeepVerse-YT" target="_blank" rel="noopener" class="btn btn--primary btn--md">Subscribe to TheDeepVerse</a>
+      </div>
+    </div>
+
+    <section class="related-section">
+      <h3>Explore More Concepts</h3>
+      <div class="related-grid" id="relatedGrid"></div>
+    </section>
+  </main>
+
+  <script src="js/concepts-data.js"></script>
+  <script>
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const conceptId = params.get('id');
+
+    /* ---------- Language toggle ---------- */
+    function setLang(lang) {
+      document.body.setAttribute('data-lang', lang);
+      document.querySelectorAll('[data-set-lang]').forEach(function (b) {
+        b.classList.toggle('is-active', b.getAttribute('data-set-lang') === lang);
+      });
+    }
+    document.querySelectorAll('[data-set-lang]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        setLang(btn.getAttribute('data-set-lang'));
+      });
+    });
+
+    /* ---------- Reading progress ---------- */
+    window.addEventListener('scroll', function () {
+      const h = document.documentElement;
+      const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+      document.getElementById('readProgress').style.width = scrolled + '%';
+    });
+
+    /* ---------- Helpers ---------- */
+    function esc(t) { return (t || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function figureHTML(img) {
+      if (!img) return '';
+      if (img.src) {
+        return '<figure class="sec__figure"><img src="' + img.src + '" alt="' + esc(img.alt || '') + '" loading="lazy">' +
+          (img.caption ? '<figcaption>' + esc(img.caption) + '</figcaption>' : '') + '</figure>';
+      }
+      // Placeholder so Deepak can drop an image later
+      return '<figure class="sec__figure"><div class="img-placeholder">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>' +
+        '<span>Image slot' + (img.hint ? ': ' + esc(img.hint) : '') + '</span>' +
+        '<small>Add image path in concepts-data.js → image.src</small></div>' +
+        (img.caption ? '<figcaption>' + esc(img.caption) + '</figcaption>' : '') + '</figure>';
+    }
+
+    function langBlocks(sec) {
+      let html = '';
+      if (sec.en) {
+        html += '<div class="en-block"><span class="lang-label">English</span>' + sec.en + '</div>';
+      }
+      if (sec.hi) {
+        html += '<div class="hi-block hi-text"><span class="lang-label">हिंदी</span>' + sec.hi + '</div>';
+      }
+      return html;
+    }
+
+    function renderSection(sec) {
+      const modifier = sec.variant ? ' sec--' + sec.variant : '';
+      let inner = '<section class="sec' + modifier + '" id="sec-' + esc(sec.key || '') + '">';
+      inner += '<div class="sec__head"><div class="sec__icon">' + (sec.icon || '📖') + '</div>';
+      inner += '<div><h2 class="sec__title">' + esc(sec.heading || '') + '</h2>';
+      if (sec.headingHi) inner += '<div class="sec__title sec__title-hi" style="font-size:1.1rem;color:var(--accent-c);margin-top:2px;">' + esc(sec.headingHi) + '</div>';
+      inner += '</div></div>';
+      // top image
+      if (sec.image && sec.imagePosition !== 'bottom') inner += figureHTML(sec.image);
+      inner += '<div class="sec__body">' + langBlocks(sec) + '</div>';
+      // bottom image
+      if (sec.image && sec.imagePosition === 'bottom') inner += figureHTML(sec.image);
+      // pull quote
+      if (sec.quote) inner += '<blockquote class="pullquote">' + esc(sec.quote) + '</blockquote>';
+      // fact box
+      if (sec.facts && sec.facts.length) {
+        inner += '<div class="fact-box"><h4>' + esc(sec.factsTitle || 'Key Facts') + '</h4><ul>' +
+          sec.facts.map(function (f) { return '<li>' + f + '</li>'; }).join('') + '</ul></div>';
+      }
+      // analogies inside a section
+      if (sec.analogies && sec.analogies.length) {
+        inner += sec.analogies.map(function (a) {
+          return '<div class="analogy-card"><div class="analogy-card__icon">' + (a.emoji || '•') + '</div>' +
+            '<div class="analogy-card__body"><strong>' + esc(a.title) + ':</strong> ' +
+            (a.en ? a.en : '') +
+            (a.hi ? '<div class="hi-block hi-text" style="margin-top:8px;">' + a.hi + '</div>' : '') +
+            '</div></div>';
+        }).join('');
+      }
+      inner += '</section>';
+      return inner;
+    }
+
+    /* ---------- Backward-compatible adapter (old schema) ---------- */
+    function adaptLegacy(data) {
+      const sections = [];
+      if (data.story) sections.push({ key: 'story', variant: 'story', icon: '🎬', heading: 'The Story', headingHi: 'कहानी', en: data.story });
+      if (data.effectDesc) sections.push({ key: 'effect', icon: data.emoji || '🧠', heading: data.effectName || 'The Effect', en: data.effectDesc });
+      if (data.analogies) sections.push({ key: 'daily', icon: '🌍', heading: 'In Real Life', headingHi: 'असल ज़िंदगी में', analogies: data.analogies.map(function (a) { return { emoji: a.emoji, title: a.title, en: a.text }; }) });
+      return {
+        title: data.title, category: data.category, emoji: data.emoji,
+        subtitle: data.effectName, sections: sections,
+        takeaway: { en: data.takeaway }
+      };
+    }
+
+    function init() {
+      if (typeof ConceptData === 'undefined') { setTimeout(init, 100); return; }
+      let data = ConceptData[conceptId];
+      if (!data) {
+        document.getElementById('concept-page').innerHTML = '<div class="container" style="padding:120px 0; text-align:center;"><h2>Concept Not Found</h2><p style="color:#888;margin:14px 0 24px;">Ye story abhi likhi jaani baaki hai.</p><a href="hub.html" class="btn btn--primary btn--sm">← Back to Hub</a></div>';
+        return;
+      }
+
+      // Detect schema: new = has "sections" array
+      const isNew = Array.isArray(data.sections);
+      const doc = isNew ? data : adaptLegacy(data);
+
+      // Default language: new cards → both; if a card is English-only, still fine
+      document.body.setAttribute('data-lang', data.defaultLang || 'both');
+      document.querySelectorAll('[data-set-lang]').forEach(function (b) {
+        b.classList.toggle('is-active', b.getAttribute('data-set-lang') === (data.defaultLang || 'both'));
+      });
+
+      /* Header */
+      document.title = (doc.title || 'Concept') + ' | TheDeepVerse Hub';
+      document.getElementById('conceptCat').textContent = doc.category || 'Psychology';
+      document.getElementById('conceptTitle').textContent = doc.title || '';
+      const subEl = document.getElementById('conceptSubtitle');
+      if (doc.subtitle) subEl.textContent = doc.subtitle; else subEl.style.display = 'none';
+
+      /* Meta chips */
+      const meta = [];
+      if (doc.readTime || data.readTime) meta.push('⏱ ' + (doc.readTime || data.readTime));
+      if (doc.level || data.level) meta.push('📊 ' + (doc.level || data.level));
+      if (data.discoveredBy) meta.push('🔬 ' + data.discoveredBy);
+      document.getElementById('conceptMeta').innerHTML = meta.map(function (m) { return '<span>' + esc(m) + '</span>'; }).join('');
+
+      /* Hero image */
+      if (data.heroImage) {
+        const w = document.getElementById('heroImgWrap');
+        w.style.display = 'block';
+        w.innerHTML = data.heroImage.src
+          ? '<img src="' + data.heroImage.src + '" alt="' + esc(data.heroImage.alt || doc.title) + '">'
+          : '<div class="img-placeholder" style="aspect-ratio:21/9;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>Hero image slot' + (data.heroImage.hint ? ': ' + esc(data.heroImage.hint) : '') + '</span><small>Add path in heroImage.src</small></div>';
+      }
+
+      /* Sections */
+      document.getElementById('articleBody').innerHTML = doc.sections.map(renderSection).join('');
+
+      /* Takeaway */
+      if (doc.takeaway && (doc.takeaway.en || doc.takeaway.hi)) {
+        const t = '<div class="takeaway-box"><div class="takeaway-box__label">The Bottom Line · निचोड़</div>' +
+          (doc.takeaway.en ? '<p class="takeaway-box__text en-block">' + esc(doc.takeaway.en) + '</p>' : '') +
+          (doc.takeaway.hi ? '<p class="takeaway-box__text takeaway-box__text-hi hi-block">' + esc(doc.takeaway.hi) + '</p>' : '') +
+          '</div>';
+        document.getElementById('articleBody').insertAdjacentHTML('beforeend', t);
+      }
+
+      /* Share buttons */
+      const url = encodeURIComponent(window.location.href);
+      const shareTitle = encodeURIComponent(doc.title + ' — TheDeepVerse');
+      document.getElementById('shareRow').innerHTML =
+        '<a class="share-btn" target="_blank" rel="noopener" href="https://wa.me/?text=' + shareTitle + '%20' + url + '">Share on WhatsApp</a>' +
+        '<a class="share-btn" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=' + shareTitle + '&url=' + url + '">Share on X</a>' +
+        '<button class="share-btn" onclick="navigator.clipboard.writeText(window.location.href);this.textContent=\'Link Copied ✓\'">Copy Link</button>';
+
+      /* CTA custom */
+      if (data.cta) {
+        if (data.cta.title) document.getElementById('ctaTitle').textContent = data.cta.title;
+        if (data.cta.text) document.getElementById('ctaText').textContent = data.cta.text;
+      }
+
+      /* SEO tags */
+      const desc = (data.metaDescription || doc.subtitle || doc.title || '').substring(0, 300);
+      const pageUrl = 'https://thedeepverse-yt.pages.dev/concept-detail.html?id=' + conceptId;
+      document.getElementById('canonicalLink').setAttribute('href', pageUrl);
+      document.getElementById('ogTitle').setAttribute('content', doc.title + ' | TheDeepVerse');
+      document.getElementById('twTitle').setAttribute('content', doc.title + ' | TheDeepVerse');
+      document.getElementById('ogDesc').setAttribute('content', desc);
+      document.getElementById('twDesc').setAttribute('content', desc);
+      if (data.heroImage && data.heroImage.src) {
+        document.getElementById('ogImage').setAttribute('content', data.heroImage.src);
+      }
+      document.querySelector('meta[name="description"]').setAttribute('content', desc);
+
+      /* Article schema */
+      document.getElementById('articleSchema').textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": doc.title,
+        "description": desc,
+        "author": { "@type": "Person", "name": "Deepak Patel" },
+        "publisher": { "@type": "Organization", "name": "TheDeepVerse" },
+        "mainEntityOfPage": pageUrl,
+        "keywords": (data.keywords || []).join(', ')
+      });
+
+      /* Related concepts */
+      const relatedIds = data.related || Object.keys(ConceptData).filter(function (k) { return k !== conceptId; }).slice(0, 4);
+      document.getElementById('relatedGrid').innerHTML = relatedIds.slice(0, 4).map(function (rid) {
+        const r = ConceptData[rid];
+        if (!r) return '';
+        const rTitle = r.title || rid;
+        const rCat = r.category || 'Psychology';
+        const rDesc = (r.metaDescription || (r.subtitle) || (r.effectName) || '').substring(0, 90);
+        return '<a class="related-card" href="concept-detail.html?id=' + rid + '"><span>' + esc(rCat) + '</span><h4>' + esc(rTitle) + '</h4><p>' + esc(rDesc) + '…</p></a>';
+      }).join('');
+    }
+
+    init();
+  })();
+  </script>
+</body>
+</html>

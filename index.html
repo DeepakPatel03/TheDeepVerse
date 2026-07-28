@@ -329,7 +329,51 @@
     <div class="container"><div class="section-divider" aria-hidden="true"><div class="section-divider__line"></div><div class="section-divider__icon"></div><div class="section-divider__line"></div></div></div>
 
 
-    <!-- ========== 7. FREE RESOURCES ========== -->
+    <!-- ========== 7. QUIZ + EMAIL SIGNUP ========== -->
+    <section style="padding:60px 0;background:rgba(192,160,98,0.04);border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);" id="quizSection">
+      <div class="container" style="max-width:700px;margin:0 auto;padding:0 22px;">
+        <div class="reveal" style="text-align:center;margin-bottom:48px;">
+          <span style="color:#C0A062;font-weight:700;text-transform:uppercase;letter-spacing:3px;font-size:0.8rem;">Quick Test</span>
+          <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.2rem);color:#fff;margin:12px 0 8px;">Are You Being Manipulated?</h2>
+          <p style="color:#888;margin-bottom:28px;">Answer 1 question. Find out which bias controls you most.</p>
+          <div id="quizBox" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;">
+            <p id="quizQ" style="color:#e0e0e0;font-size:1.05rem;margin-bottom:20px;font-weight:500;">You read a news article that confirms your existing belief. What do you do?</p>
+            <div style="display:flex;flex-direction:column;gap:10px;" id="quizOptions">
+              <button onclick="quizAnswer('A')" class="quiz-opt">A) Share it immediately — finally, proof!</button>
+              <button onclick="quizAnswer('B')" class="quiz-opt">B) Read carefully, then look for counter-evidence too.</button>
+              <button onclick="quizAnswer('C')" class="quiz-opt">C) Save it for later but don't really question it.</button>
+            </div>
+            <div id="quizResult" style="display:none;margin-top:20px;padding:16px;background:rgba(192,160,98,0.08);border:1px solid rgba(192,160,98,0.3);border-radius:10px;color:#C0A062;font-weight:600;"></div>
+          </div>
+        </div>
+        <div class="reveal" style="text-align:center;">
+          <span style="color:#C0A062;font-weight:700;text-transform:uppercase;letter-spacing:3px;font-size:0.8rem;">Free Newsletter</span>
+          <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.2rem);color:#fff;margin:12px 0 8px;">One Psychology Insight. Every Week.</h2>
+          <p style="color:#888;margin-bottom:24px;">Join readers who decode human behavior with TheDeepVerse.</p>
+          <form onsubmit="handleEmailSignup(event)" style="display:flex;gap:10px;max-width:460px;margin:0 auto;flex-wrap:wrap;justify-content:center;">
+            <input type="email" id="emailInput" placeholder="your@email.com" required style="flex:1;min-width:220px;padding:13px 18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#fff;font-size:0.95rem;outline:none;" onfocus="this.style.borderColor='#C0A062'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'">
+            <button type="submit" style="padding:13px 24px;background:#C0A062;color:#050505;font-weight:700;border:none;border-radius:10px;cursor:pointer;font-size:0.95rem;">Get Insights →</button>
+          </form>
+          <p id="emailMsg" style="margin-top:12px;font-size:0.85rem;color:#C0A062;display:none;">✓ You're in! Check your inbox.</p>
+          <p style="margin-top:10px;font-size:0.78rem;color:#555;">No spam. Unsubscribe anytime.</p>
+        </div>
+      </div>
+    </section>
+    <style>
+      .quiz-opt{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#ccc;padding:12px 18px;border-radius:10px;text-align:left;cursor:pointer;transition:border-color 0.2s;}
+      .quiz-opt:hover{border-color:#C0A062;}
+    </style>
+    <script>
+      function quizAnswer(c){
+        var r={A:"🔴 Confirmation Bias — You seek proof, not truth. <a href='concept-detail.html?c=confirmation-bias' style='color:#C0A062'>Read the deep dive →</a>",B:"🟢 Strong critical thinker! You actively fight your biases.",C:"🟡 Mild Confirmation Bias — You're aware but still selective. <a href='concept-detail.html?c=confirmation-bias' style='color:#C0A062'>Learn more →</a>"};
+        document.getElementById('quizResult').innerHTML=r[c];
+        document.getElementById('quizResult').style.display='block';
+        document.querySelectorAll('.quiz-opt').forEach(function(b){b.disabled=true;});
+      }
+      function handleEmailSignup(e){e.preventDefault();document.getElementById('emailMsg').style.display='block';document.getElementById('emailInput').value='';}
+    </script>
+
+    <!-- ========== 8. FREE RESOURCES ========== -->
     <section class="free-resources" id="freeResources" aria-label="Free Resources">
       <div class="container">
         <div class="section-header reveal">
