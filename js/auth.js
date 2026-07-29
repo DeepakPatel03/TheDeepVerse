@@ -2,7 +2,7 @@
    AUTHENTICATION — TheDeepVerse
    ═══════════════════════════════════════════════════
    Handles: Google Sign-In, Email/Password Auth,
-   Auth State Observer, Login Modal, User Profile UI
+   Phone Number Auth, Auth State Observer, Login Modal, User Profile UI
    ═══════════════════════════════════════════════════ */
 
 (function () {
@@ -13,6 +13,8 @@
   let googleProvider = null;
   let currentUser = null;
   let modalOpen = false;
+  let phoneVerificationInProgress = false;
+  let confirmationResult = null;
 
   // ── DOM Elements ──
   let loginBtn = null;
@@ -23,9 +25,14 @@
   let authModalClose = null;
   let tabSignIn = null;
   let tabSignUp = null;
+  let tabPhone = null;
   let formSignIn = null;
   let formSignUp = null;
+  let formPhone = null;
   let googleSignInBtn = null;
+  let phoneSignInBtn = null;
+  let verifyPhoneBtn = null;
+  let resendCodeBtn = null;
   let authError = null;
   let authLoading = null;
 
@@ -71,9 +78,14 @@
     authModalClose = document.getElementById('authModalClose');
     tabSignIn = document.getElementById('tabSignIn');
     tabSignUp = document.getElementById('tabSignUp');
+    tabPhone = document.getElementById('tabPhone');
     formSignIn = document.getElementById('formSignIn');
     formSignUp = document.getElementById('formSignUp');
+    formPhone = document.getElementById('formPhone');
     googleSignInBtn = document.getElementById('googleSignInBtn');
+    phoneSignInBtn = document.getElementById('phoneSignInBtn');
+    verifyPhoneBtn = document.getElementById('verifyPhoneBtn');
+    resendCodeBtn = document.getElementById('resendCodeBtn');
     authError = document.getElementById('authError');
     authLoading = document.getElementById('authLoading');
   }
@@ -99,6 +111,9 @@
     if (tabSignUp) {
       tabSignUp.addEventListener('click', () => switchTab('signup'));
     }
+    if (tabPhone) {
+      tabPhone.addEventListener('click', () => switchTab('phone'));
+    }
 
     // Forms
     if (formSignIn) {
@@ -107,10 +122,25 @@
     if (formSignUp) {
       formSignUp.addEventListener('submit', handleSignUp);
     }
+    if (formPhone) {
+      formPhone.addEventListener('submit', handlePhoneSignIn);
+    }
 
     // Google Sign-In
     if (googleSignInBtn) {
       googleSignInBtn.addEventListener('click', handleGoogleSignIn);
+    }
+
+    // Phone Sign-In
+    const sendCodeBtn = document.getElementById('sendCodeBtn');
+    if (sendCodeBtn) {
+      sendCodeBtn.addEventListener('click', handlePhoneSignInStart);
+    }
+    if (verifyPhoneBtn) {
+      verifyPhoneBtn.addEventListener('click', handleVerifyPhone);
+    }
+    if (resendCodeBtn) {
+      resendCodeBtn.addEventListener('click', handleResendCode);
     }
 
     // User dropdown toggle
@@ -185,6 +215,7 @@
     // Reset to sign-in tab
     switchTab('signin');
     clearError();
+    resetForms();
 
     // Focus email input
     setTimeout(() => {
@@ -201,19 +232,32 @@
     document.body.style.overflow = '';
     clearError();
     resetForms();
+    phoneVerificationInProgress = false;
+    confirmationResult = null;
   }
 
   function switchTab(tab) {
     if (tab === 'signin') {
       if (tabSignIn) tabSignIn.classList.add('is-active');
       if (tabSignUp) tabSignUp.classList.remove('is-active');
+      if (tabPhone) tabPhone.classList.remove('is-active');
       if (formSignIn) formSignIn.style.display = 'block';
       if (formSignUp) formSignUp.style.display = 'none';
-    } else {
+      if (formPhone) formPhone.style.display = 'none';
+    } else if (tab === 'signup') {
       if (tabSignIn) tabSignIn.classList.remove('is-active');
       if (tabSignUp) tabSignUp.classList.add('is-active');
+      if (tabPhone) tabPhone.classList.remove('is-active');
       if (formSignIn) formSignIn.style.display = 'none';
       if (formSignUp) formSignUp.style.display = 'block';
+      if (formPhone) formPhone.style.display = 'none';
+    } else if (tab === 'phone') {
+      if (tabSignIn) tabSignIn.classList.remove('is-active');
+      if (tabSignUp) tabSignUp.classList.remove('is-active');
+      if (tabPhone) tabPhone.classList.add('is-active');
+      if (formSignIn) formSignIn.style.display = 'none';
+      if (formSignUp) formSignUp.style.display = 'none';
+      if (formPhone) formPhone.style.display = 'block';
     }
     clearError();
   }
@@ -239,13 +283,17 @@
     if (googleSignInBtn) {
       googleSignInBtn.disabled = loading;
     }
-    const submitBtns = document.querySelectorAll('#formSignIn button[type="submit"], #formSignUp button[type="submit"]');
+    if (phoneSignInBtn) {
+      phoneSignInBtn.disabled = loading;
+    }
+    const submitBtns = document.querySelectorAll('#formSignIn button[type="submit"], #formSignUp button[type="submit"], #formPhone button[type="submit"]');
     submitBtns.forEach(btn => btn.disabled = loading);
   }
 
   function resetForms() {
     if (formSignIn) formSignIn.reset();
     if (formSignUp) formSignUp.reset();
+    if (formPhone) formPhone.reset();
   }
 
   // ── Authentication Handlers ──
@@ -360,6 +408,121 @@
         message = 'Invalid email address.';
       } else if (error.code === 'auth/weak-password') {
         message = 'Password is too weak. Use at least 6 characters.';
+      }
+      showError(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Phone Authentication Handlers
+  async function handlePhoneSignInStart() {
+    if (!auth) return;
+
+    const phoneNumberInput = document.getElementById('phoneNumber');
+    const phoneNumber = phoneNumberInput.value.trim();
+
+    if (!phoneNumber) {
+      showError('Please enter your phone number.');
+      return;
+    }
+
+    // Basic phone number validation
+    if (!/^\+?[\d\s\-\(\)]+$/.test(phoneNumber) || phoneNumber.replace(/[\s\-\(\)]/g, '').length < 10) {
+      showError('Please enter a valid phone number.');
+      return;
+    }
+
+    setLoading(true);
+    clearError();
+
+    try {
+      // Send verification code
+      confirmationResult = await auth.signInWithPhoneNumber(phoneNumber);
+      phoneVerificationInProgress = true;
+
+      // Show verification code input
+      const verificationCodeInput = document.getElementById('verificationCode');
+      if (verificationCodeInput) {
+        verificationCodeInput.disabled = false;
+        verificationCodeInput.focus();
+      }
+
+      // Hide phone number input, show verification inputs
+      const phoneNumberSection = document.getElementById('phoneNumberSection');
+      const verificationSection = document.getElementById('verificationSection');
+      if (phoneNumberSection) phoneNumberSection.style.display = 'none';
+      if (verificationSection) verificationSection.style.display = 'block';
+
+      showError('Verification code sent. Please check your phone.');
+    } catch (error) {
+      console.error('[Auth] Phone Sign-In error:', error);
+      let message = 'Failed to send verification code.';
+      if (error.code === 'auth/invalid-phone-number') {
+        message = 'Invalid phone number format.';
+      } else if (error.code === 'auth/missing-phone-number') {
+        message = 'Please enter a phone number.';
+      } else if (error.code === 'auth/quota-exceeded') {
+        message = 'SMS quota exceeded. Please try again later.';
+      } else if (error.code === 'auth/unauthorized-domain') {
+        message = 'This domain is not authorized for phone authentication.';
+      }
+      showError(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleVerifyPhone() {
+    if (!auth || !phoneVerificationInProgress || !confirmationResult) return;
+
+    const verificationCodeInput = document.getElementById('verificationCode');
+    const verificationCode = verificationCodeInput.value.trim();
+
+    if (!verificationCode) {
+      showError('Please enter the verification code.');
+      return;
+    }
+
+    setLoading(true);
+    clearError();
+
+    try {
+      // Verify the code
+      await confirmationResult.confirm(verificationCode);
+      closeAuthModal();
+      showToast('Welcome to TheDeepVerse! 📱', 'success');
+    } catch (error) {
+      console.error('[Auth] Phone Verification error:', error);
+      let message = 'Invalid verification code.';
+      if (error.code === 'auth/invalid-verification-code') {
+        message = 'Invalid verification code. Please try again.';
+      } else if (error.code === 'auth/code-expired') {
+        message = 'Verification code has expired. Please request a new code.';
+      } else if (error.code === 'auth/missing-verification-code') {
+        message = 'Please enter the verification code.';
+      }
+      showError(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResendCode() {
+    if (!auth || !phoneVerificationInProgress || !confirmationResult) return;
+
+    setLoading(true);
+    clearError();
+
+    try {
+      // Resend the code
+      await confirmationResult.verifyPhoneNumber();
+      showError('Verification code resent. Please check your phone.');
+    } catch (error) {
+      console.error('[Auth] Resend Code error:', error);
+      let message = 'Failed to resend verification code.';
+      if (error.code === 'auth/quota-exceeded') {
+        message = 'SMS quota exceeded. Please try again later.';
       }
       showError(message);
     } finally {

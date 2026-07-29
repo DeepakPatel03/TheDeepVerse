@@ -749,6 +749,7 @@
       <div class="auth-modal__tabs">
         <button class="auth-tab is-active" id="tabSignIn">Sign In</button>
         <button class="auth-tab" id="tabSignUp">Sign Up</button>
+        <button class="auth-tab" id="tabPhone">Phone</button>
       </div>
 
       <form class="auth-form" id="formSignIn">
@@ -790,6 +791,38 @@
         </button>
         <p class="auth-form__footer">
           Already have an account? <span class="auth-switch-tab" data-tab="signin">Sign In</span>
+        </p>
+      </form>
+
+      <form class="auth-form" id="formPhone" style="display:none;">
+        <div id="phoneNumberSection">
+          <div class="auth-form__group">
+            <label class="auth-form__label" for="phoneNumber">Phone Number</label>
+            <input type="tel" class="auth-form__input" id="phoneNumber" placeholder="+1 (555) 123-4567" required>
+          </div>
+          <div class="auth-form__group">
+            <button type="button" class="btn btn--primary btn--md auth-form__submit" id="sendCodeBtn" style="width:100%;margin-top:8px;">
+              Send Verification Code
+            </button>
+          </div>
+        </div>
+        <div id="verificationCodeGroup" style="display:none;">
+          <div class="auth-form__group">
+            <label class="auth-form__label" for="verificationCode">Verification Code</label>
+            <input type="text" class="auth-form__input" id="verificationCode" placeholder="Enter 6-digit code" required>
+          </div>
+          <div class="auth-form__group" id="resendCodeGroup" style="display:none;margin-top:8px;text-align:center;">
+            <button type="button" class="btn btn--link btn--sm" id="resendCodeBtn">
+              Didn't receive the code? Resend
+            </button>
+            <span id="countdownTimer" style="display:none;margin-left:8px;color:var(--text-muted);font-size:var(--text-xs);"></span>
+          </div>
+        </div>
+        <button type="submit" class="btn btn--primary btn--md auth-form__submit" id="verifyPhoneBtn" style="width:100%;margin-top:16px;">
+          Verify & Sign In
+        </button>
+        <p class="auth-form__footer">
+          Or sign in with <span class="auth-switch-tab" data-tab="signin">Email</span> instead
         </p>
       </form>
 
@@ -948,7 +981,7 @@
       justify-content: center;
       gap: var(--space-3);
       background: transparent;
-      border: 1px solid var(--border-subtle);
+      border: 1px solid var(--border-subtle(--border-subtle));
       color: var(--text-primary);
       font-size: var(--text-sm);
       font-weight: var(--weight-medium);
