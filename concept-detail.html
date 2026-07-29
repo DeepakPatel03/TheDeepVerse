@@ -122,15 +122,40 @@
     .takeaway-box__text { font-family: 'Playfair Display', serif; font-size: 1.55rem; color: #fff; font-style: italic; line-height: 1.5; max-width: 620px; margin: 0 auto 20px; }
     .takeaway-box__text-hi { font-family: 'Noto Sans Devanagari', serif; }
 
+    /* EBOOK PROMO */
+    .ebook-promo { margin: 50px 0; padding: 36px 28px; background: linear-gradient(135deg, rgba(192,160,98,0.08), rgba(192,160,98,0.02)); border: 1px solid rgba(192,160,98,0.25); border-radius: 20px; text-align: center; position: relative; overflow: hidden; }
+    .ebook-promo::before { content: ''; position: absolute; top: -60px; right: -60px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(192,160,98,0.12), transparent 70%); pointer-events: none; }
+    .ebook-promo__badge { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #050505; background: var(--accent-c); padding: 4px 14px; border-radius: 999px; margin-bottom: 14px; }
+    .ebook-promo__title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #fff; margin-bottom: 10px; line-height: 1.3; }
+    .ebook-promo__desc { font-size: 0.95rem; color: #bbb; max-width: 520px; margin: 0 auto 8px; line-height: 1.7; }
+    .ebook-promo__desc-hi { font-family: 'Noto Sans Devanagari', sans-serif; }
+    .ebook-promo__tags { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 14px 0; }
+    .ebook-promo__tag { font-size: 0.72rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; border: 1px solid rgba(192,160,98,0.3); color: var(--accent-c); }
+    .ebook-promo__price { font-size: 1.6rem; font-weight: 800; color: #fff; margin: 12px 0 6px; }
+    .ebook-promo__price s { color: #666; font-size: 1rem; font-weight: 400; margin-right: 6px; }
+    .ebook-promo__btn { display: inline-block; margin-top: 14px; padding: 12px 32px; background: var(--accent-c); color: #050505; font-weight: 700; font-size: 0.95rem; border-radius: 999px; border: none; cursor: pointer; transition: all 0.25s; text-decoration: none; }
+    .ebook-promo__btn:hover { background: #E0CFA0; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(192,160,98,0.3); }
+
     /* CTA */
     .cta-box { background: linear-gradient(135deg, #141414, #050505); padding: 46px 30px; border-radius: 24px; text-align: center; border: 1px solid var(--accent-c); margin: 50px 0; }
     .cta-box h3 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #fff; margin-bottom: 10px; }
     .cta-box p { color: #aaa; margin-bottom: 22px; }
 
     /* Related / share */
-    .share-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 30px 0; }
-    .share-btn { padding: 9px 18px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.12); color: #ccc; background: transparent; transition: all 0.2s; }
+    .share-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 30px 0; }
+    .share-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.12); color: #ccc; background: transparent; transition: all 0.2s; text-decoration: none; cursor: pointer; min-height: 40px; }
     .share-btn:hover { border-color: var(--accent-c); color: #fff; }
+    .share-btn--wa { border-color: rgba(37,211,102,0.3); color: #25D366; }
+    .share-btn--wa:hover { background: rgba(37,211,102,0.1); border-color: #25D366; }
+    .share-btn--tg { border-color: rgba(38,165,222,0.3); color: #26A5DE; }
+    .share-btn--tg:hover { background: rgba(38,165,222,0.1); border-color: #26A5DE; }
+    .share-btn--fb { border-color: rgba(24,119,242,0.3); color: #1877F2; }
+    .share-btn--fb:hover { background: rgba(24,119,242,0.1); border-color: #1877F2; }
+    .share-btn--tw { border-color: rgba(255,255,255,0.15); }
+    .share-btn--li { border-color: rgba(10,102,194,0.3); color: #0A66C2; }
+    .share-btn--li:hover { background: rgba(10,102,194,0.1); border-color: #0A66C2; }
+    .share-btn--rd { border-color: rgba(255,69,0,0.3); color: #FF4500; }
+    .share-btn--rd:hover { background: rgba(255,69,0,0.1); border-color: #FF4500; }
 
     .related-section { max-width: 760px; margin: 0 auto; padding: 20px 22px 80px; }
     .related-section h3 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #fff; margin-bottom: 20px; text-align: center; }
@@ -185,6 +210,24 @@
     </article>
 
     <div class="article-wrap" style="padding-top:0;">
+
+      <!-- EBOOK PROMO -->
+      <div class="ebook-promo" id="ebookPromo">
+        <div class="ebook-promo__badge">📖 eBook Available</div>
+        <h3 class="ebook-promo__title en-block">Want to go deeper?<br>Get 50+ Psychology Concepts in one book.</h3>
+        <h3 class="ebook-promo__title hi-block" style="font-family:'Noto Sans Devanagari',serif;">और गहराई से समझना है?<br>50+ Psychology Concepts एक किताब में पाइए।</h3>
+        <p class="ebook-promo__desc en-block">This article is just one concept. Our eBook — <strong style="color:#fff;">"The Dangerous Trap of Psychology"</strong> — covers 50+ effects, biases, and manipulation tactics with the same cinematic depth. No fluff, no filler — just pure, deep psychological knowledge you can use every day.</p>
+        <p class="ebook-promo__desc ebook-promo__desc-hi hi-block">ये article सिर्फ़ एक concept है। हमारी eBook — <strong style="color:#fff;">"Manovigyan Ka Khatarnak Jal"</strong> — में 50+ ऐसे ही effects, biases, और manipulation tactics उसी cinematic गहराई के साथ हैं। कोई फ़ालतू बात नहीं — सिर्फ़ वो psychological knowledge जो आप रोज़ इस्तेमाल कर सकें।</p>
+        <div class="ebook-promo__tags">
+          <span class="ebook-promo__tag">📘 English Edition</span>
+          <span class="ebook-promo__tag">📕 Hindi Edition</span>
+          <span class="ebook-promo__tag">📦 Combo Deal</span>
+          <span class="ebook-promo__tag">⚡ Instant PDF Download</span>
+        </div>
+        <div class="ebook-promo__price"><s>₹99</s> ₹65 per edition</div>
+        <a href="course-detail.html?id=psychology-book" class="ebook-promo__btn">Get The eBook Now →</a>
+      </div>
+
       <div class="share-row" id="shareRow"></div>
       <div class="cta-box">
         <h3 id="ctaTitle">Master Your Mind.</h3>
@@ -353,13 +396,18 @@
         document.getElementById('articleBody').insertAdjacentHTML('beforeend', t);
       }
 
-      /* Share buttons */
+      /* Share buttons — expanded */
       const url = encodeURIComponent(window.location.href);
       const shareTitle = encodeURIComponent(doc.title + ' — TheDeepVerse');
+      const shareText = encodeURIComponent(doc.title + ' — ' + (doc.subtitle || 'Decode the human mind') + ' | TheDeepVerse');
       document.getElementById('shareRow').innerHTML =
-        '<a class="share-btn" target="_blank" rel="noopener" href="https://wa.me/?text=' + shareTitle + '%20' + url + '">Share on WhatsApp</a>' +
-        '<a class="share-btn" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=' + shareTitle + '&url=' + url + '">Share on X</a>' +
-        '<button class="share-btn" onclick="navigator.clipboard.writeText(window.location.href);this.textContent=\'Link Copied ✓\'">Copy Link</button>';
+        '<a class="share-btn share-btn--wa" target="_blank" rel="noopener" href="https://wa.me/?text=' + shareText + '%20' + url + '">WhatsApp</a>' +
+        '<a class="share-btn share-btn--tg" target="_blank" rel="noopener" href="https://t.me/share/url?url=' + url + '&text=' + shareTitle + '">Telegram</a>' +
+        '<a class="share-btn share-btn--fb" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + url + '">Facebook</a>' +
+        '<a class="share-btn share-btn--tw" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=' + shareTitle + '&url=' + url + '">X (Twitter)</a>' +
+        '<a class="share-btn share-btn--li" target="_blank" rel="noopener" href="https://www.linkedin.com/sharing/share-offsite/?url=' + url + '">LinkedIn</a>' +
+        '<a class="share-btn share-btn--rd" target="_blank" rel="noopener" href="https://reddit.com/submit?url=' + url + '&title=' + shareTitle + '">Reddit</a>' +
+        '<button class="share-btn" onclick="navigator.clipboard.writeText(window.location.href);this.textContent=\'Copied ✓\'">📋 Copy Link</button>';
 
       /* CTA custom */
       if (data.cta) {

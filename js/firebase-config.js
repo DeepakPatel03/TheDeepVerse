@@ -3,6 +3,7 @@
    ═══════════════════════════════════════════════════
    Connected to Firebase Realtime Database.
    Admin panel changes now persist for ALL visitors.
+   Firebase Auth enabled for user authentication.
    ═══════════════════════════════════════════════════ */
 
 const FIREBASE_CONFIG = {
@@ -18,3 +19,24 @@ const FIREBASE_CONFIG = {
 
 // ── Firebase Status ──
 const FIREBASE_ENABLED = FIREBASE_CONFIG.apiKey !== "" && FIREBASE_CONFIG.databaseURL !== "";
+
+// ── Initialize Firebase App ──
+let firebaseApp = null;
+let firebaseAuth = null;
+let firebaseDatabase = null;
+
+if (FIREBASE_ENABLED && typeof firebase !== 'undefined') {
+  try {
+    firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+    firebaseAuth = firebaseApp.auth();
+    firebaseDatabase = firebaseApp.database();
+    console.log('[Firebase] Initialized successfully');
+  } catch (e) {
+    console.error('[Firebase] Initialization error:', e);
+  }
+}
+
+// ── Export for global use ──
+window.FirebaseAuth = firebaseAuth;
+window.FirebaseDatabase = firebaseDatabase;
+window.FirebaseApp = firebaseApp;

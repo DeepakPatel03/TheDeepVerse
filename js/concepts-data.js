@@ -186,26 +186,180 @@ const ConceptData = {
     category: "Cognitive Biases",
     title: "Confirmation Bias",
     emoji: "🔍",
-    effectName: "The Filter Bubble of the Brain",
-    story: `In 2004, a famous experiment was conducted during the US Presidential Election. Researchers put passionate Democrats and Republicans into fMRI brain scanners and showed them blatant self-contradictory statements made by their favorite candidates. <br><br>
-    When faced with evidence that their candidate had lied, the reasoning areas of their brains completely shut down. Instead, the emotional defense circuits lit up. The brain literally treated the conflicting information as a physical threat, like a predator in the bushes. <br><br>
-    But then, the researchers showed them statements that justified or explained away the candidate's lies. Instantly, the pleasure and reward centers of their brains fired up, releasing a massive wave of dopamine. <br><br>
-    The brain didn't want the truth. It wanted to be right. It rewarded itself for finding an excuse to keep believing what it already believed.`,
-    effectDesc: `Confirmation Bias is our subconscious habit of searching for, interpreting, favoring, and recalling information in a way that confirms our preexisting beliefs, while completely ignoring or dismissing contradictory evidence. <br><br>
-    We think we search Google to find the truth. In reality, we search Google to find articles that agree with our opinions. Your brain is not a neutral judge; it is a lawyer defending your current worldview.`,
-    analogies: [
+    subtitle: "Why your brain only sees what it already believes — and how that destroys your growth.",
+    readTime: "16 min read",
+    level: "Beginner → Intermediate",
+    discoveredBy: "Peter Wason, 1960 (term coined by Raymond Nickerson, 1998)",
+    defaultLang: "both",
+    metaDescription: "Confirmation Bias explained through a famous fMRI brain experiment during the 2004 US election. Learn what it is, who discovered it, whether it's really true, how it controls your daily life, and how to escape it — in English and Hindi.",
+    keywords: ["confirmation bias", "confirmation bias in hindi", "cognitive bias", "brain filter bubble", "why we only see what we believe", "psychology effects", "thedeepverse", "echo chamber"],
+    heroImage: { src: "", alt: "Confirmation Bias — the brain's filter bubble", hint: "A brain split in two — one side showing only red facts, the other only blue facts, both convinced they're right" },
+    related: ["dunning-kruger", "availability-heuristic", "bandwagon-effect", "halo-effect"],
+
+    sections: [
       {
-        emoji: "📱",
-        title: "Social Media Algorithms",
-        text: "Your feed is a digital manifestation of confirmation bias. It feeds you exactly what you like, trapping you in an echo chamber where everyone else seems to agree with you, making opposing views seem insane."
+        key: "intro", variant: "intro", icon: "🎯",
+        heading: "The Most Comfortable Lie You Tell Yourself",
+        headingHi: "सबसे आरामदायक झूठ जो आप ख़ुद से बोलते हैं",
+        en: `<p>You think you're a rational person. You think when you form an opinion — about politics, about health, about money, about your relationships — you look at the <strong>facts</strong>, weigh the <strong>evidence</strong>, and <em>then</em> reach a conclusion.</p>
+        <p>You're wrong. And a 2004 brain scan experiment proved it in the most uncomfortable way possible.</p>
+        <p>Here's the hard truth: <strong>Your brain is not a truth-seeking machine. It's a belief-defending machine.</strong> It doesn't ask \"What is true?\" It asks \"What can I find that proves I'm already right?\" Every Google search you do, every article you read, every conversation you have — your brain runs a hidden filter, keeping only what agrees with you and silently deleting the rest.</p>
+        <p>This isn't a character flaw. It's not because you're stupid or stubborn. It's a survival mechanism from 200,000 years ago that's now the single biggest obstacle between you and reality. By the end of this article, you'll see your own mind differently — and you'll have the tools to fight the filter.</p>`,
+        hi: `<p>आप सोचते हैं कि आप एक rational (विवेकशील) इंसान हैं। आप सोचते हैं कि जब आप कोई राय बनाते हैं — राजनीति के बारे में, सेहत के बारे में, पैसों के बारे में, अपने रिश्तों के बारे में — तो आप <strong>facts</strong> देखते हैं, <strong>evidence</strong> तोलते हैं, और <em>फिर</em> नतीजे पर पहुँचते हैं।</p>
+        <p>आप ग़लत हैं। और 2004 के एक brain scan experiment ने इसे सबसे असहज तरीक़े से साबित किया।</p>
+        <p>कठोर सच ये है: <strong>आपका दिमाग़ सच्चाई ढूँढने वाली मशीन नहीं है। ये विश्वास की रक्षा करने वाली मशीन है।</strong> ये नहीं पूछता \"सच क्या है?\" ये पूछता है \"मुझे ऐसा क्या मिले जो साबित करे कि मैं पहले से सही हूँ?\" आप जो भी Google search करते हैं, जो भी article पढ़ते हैं, जो भी बातचीत करते हैं — आपका दिमाग़ एक छुपा हुआ filter चलाता है, सिर्फ़ वही रखता है जो आपसे सहमत हो और बाक़ी सब चुपचाप मिटा देता है।</p>
+        <p>ये कोई character flaw नहीं है। इसलिए नहीं कि आप बेवक़ूफ़ हैं या हठी हैं। ये 2 लाख साल पुराना एक survival mechanism है जो अब आप और हक़ीक़त के बीच सबसे बड़ी दीवार बन चुका है। इस article के ख़त्म होते-होते आप अपने दिमाग़ को अलग नज़र से देखेंगे — और आपके पास उस filter से लड़ने के औज़ार होंगे।</p>`
       },
       {
-        emoji: "💔",
-        title: "The Suspicious Partner",
-        text: "If you secretly believe your partner is cheating, your brain will interpret a late reply, a quiet evening, or a locked phone as absolute proof, while ignoring years of loyalty."
+        key: "story", variant: "story", icon: "🧪",
+        heading: "The Election That Rewrote Neuroscience",
+        headingHi: "वो चुनाव जिसने neuroscience बदल दी",
+        image: { src: "", hint: "People in fMRI machines watching political statements, brain areas lighting up red vs green", caption: "fMRI scans showing emotional centers firing when beliefs are challenged — not reasoning centers." },
+        en: `<p>It was <strong>October 2004</strong>. The US presidential election was weeks away — Bush vs Kerry. Emotions were running at fever pitch. A team of neuroscientists at Emory University led by <strong>Drew Westen</strong> decided to do something no one had done before: put partisan voters inside fMRI machines and show them their own candidate lying.</p>
+        <p>They recruited <strong>15 committed Democrats and 15 committed Republicans</strong> — people who didn't just lean one way, but lived and breathed their party. Inside the scanner, these voters read statements from their favorite candidate, the opposing candidate, and neutral figures. Some statements were straightforward. Others were <em>blatant contradictions</em> — things their candidate had said that directly contradicted things they'd said before.</p>
+        <p>When a Democrat read a contradiction from <em>John Kerry</em>, or a Republican read one from <em>George Bush</em>, something extraordinary happened. The <strong>dorsolateral prefrontal cortex</strong> — the brain's reasoning, logic, cold-analysis center — <strong>went completely dark.</strong> It shut down. But the <strong>amygdala</strong> and <strong>ventromedial prefrontal cortex</strong> — the emotional defense, identity-protection, fight-or-flight circuits — <strong>lit up like Christmas trees.</strong></p>
+        <p>The brain didn't process the contradiction as <em>information</em>. It processed it as a <strong>threat to survival.</strong> As if a predator had stepped out of the bushes.</p>`,
+        hi: `<p>महीना था <strong>अक्टूबर 2004</strong>। US presidential election कुछ हफ़्तों दूर था — Bush vs Kerry। emotions उफान पर थे। Emory University के neuroscientists की एक team, led by <strong>Drew Westen</strong>, ने वो किया जो पहले कभी किसी ने नहीं किया था: कट्टर party supporters को fMRI machines में डालकर, उन्हें उनका अपना candidate झूठ बोलते हुए दिखाया।</p>
+        <p>उन्होंने <strong>15 कट्टर Democrats और 15 कट्टर Republicans</strong> recruit किए — ऐसे लोग जो बस एक तरफ़ झुके नहीं थे, बल्कि अपनी party के लिए जीते-मरते थे। Scanner के अंदर, इन voters ने अपने पसंदीदा candidate के statements पढ़े, विरोधी candidate के, और neutral figures के। कुछ statements सीधे-सादे थे। कुछ थे <em>खुले विरोधाभास (blatant contradictions)</em> — वो बातें जो उनके candidate ने कही थीं और जो उनकी ही पहले की बातों से सीधे टकराती थीं।</p>
+        <p>जब एक Democrat ने <em>John Kerry</em> का contradiction पढ़ा, या एक Republican ने <em>George Bush</em> का, कुछ असाधारण हुआ। <strong>dorsolateral prefrontal cortex</strong> — दिमाग़ का reasoning, logic, ठंडे-विश्लेषण वाला केंद्र — <strong>पूरी तरह बुझ गया।</strong> वो बंद हो गया। लेकिन <strong>amygdala</strong> और <strong>ventromedial prefrontal cortex</strong> — emotional defense, पहचान की रक्षा, fight-or-flight वाले circuits — <strong>क्रिसमस ट्री की तरह जगमगा उठे।</strong></p>
+        <p>दिमाग़ ने contradiction को <em>जानकारी</em> की तरह process नहीं किया। इसने इसे <strong>अस्तित्व के लिए ख़तरा</strong> माना। जैसे झाड़ियों से कोई शिकारी निकल आया हो।</p>`,
+        quote: "\"The brain doesn't want the truth. It wants to be right. And it rewards itself with dopamine for finding an excuse to keep believing what it already believes.\" — Drew Westen"
+      },
+      {
+        key: "story2", variant: "story", icon: "🧠",
+        heading: "The Dopamine Reward for Self-Deception",
+        headingHi: "ख़ुद को धोखा देने का Dopamine इनाम",
+        en: `<p>But the experiment didn't stop there. After the contradiction, the researchers showed the voters <strong>explanations that excused their candidate.</strong> \"He didn't mean it that way.\" \"The context was different.\" \"He was taken out of context.\"</p>
+        <p>Instantly — <strong>instantly</strong> — the <strong>ventral striatum</strong> and <strong>nucleus accumbens</strong> fired. The brain's <strong>reward system</strong>. A massive <strong>dopamine surge</strong>.</p>
+        <p>The brain literally <strong>rewarded the voter for finding a way to keep their belief intact.</strong> It wasn't \"Oh, I was wrong, let me update.\" It was \"Here's an excuse, good job, here's your dopamine hit, belief preserved.\"</p>
+        <p>This is the neural basis of Confirmation Bias. Your brain treats <em>being right</em> (or feeling right) as a survival resource. It will manufacture evidence, twist logic, ignore data, and hallucinate patterns — all to protect the belief, because the belief <em>is</em> the identity. And then it drugs you with dopamine for a job well done.</p>`,
+        hi: `<p>पर experiment यहीं नहीं रुका। Contradiction के बाद researchers ने voters को <strong>ऐसी explanations दिखाईं जो उनके candidate को माफ़ करती थीं।</strong> \"उनका वो मतलब नहीं था।\" \"Context अलग था।\" \"उन्हें context से बाहर दिखाया गया।\"</p>
+        <p>तुरंत — <strong>तुरंत</strong> — <strong>ventral striatum</strong> और <strong>nucleus accumbens</strong> activate हुए। दिमाग़ का <strong>reward system</strong>। एक ज़बरदस्त <strong>dopamine surge</strong>।</p>
+        <p>दिमाग़ ने सच में <strong>voter को इनाम दिया अपनी मान्यता बचाने का रास्ता ढूँढने के लिए।</strong> ये नहीं था \"अरे मैं ग़लत था, मुझे सुधारना चाहिए।\" ये था \"यहाँ एक बहाना है, शाबाश, ये लो dopamine hit, मान्यता सुरक्षित।\"</p>
+        <p>यही Confirmation Bias का neural basis है। आपका दिमाग़ <em>सही होना</em> (या सही महसूस करना) को एक survival resource मानता है। ये सबूत बनाएगा, logic मोड़ेगा, data नज़रअंदाज़ करेगा, patterns की कल्पना करेगा — सिर्फ़ belief बचाने के लिए, क्योंकि belief ही <em>पहचान</em> है। और फिर आपको dopamine से नशा करा देता है एक काम अच्छे से करने का।</p>`
+      },
+      {
+        key: "effect", icon: "🔍",
+        heading: "What Exactly Is Confirmation Bias?",
+        headingHi: "Confirmation Bias आख़िर है क्या?",
+        en: `<p><strong>Confirmation Bias</strong> is the tendency to search for, interpret, favor, and recall information in a way that confirms one's preexisting beliefs or hypotheses — while giving disproportionately less consideration to alternative possibilities.</p>
+        <p>It operates at <strong>three levels</strong>:</p>
+        <p><strong>1. Selective Exposure (Search):</strong> You actively seek sources that agree with you. You follow people who think like you. You watch channels that confirm your worldview. You don't Google \"is climate change real\" — you Google \"climate change hoax evidence\" or \"climate change proof\" depending on which side you're already on.</p>
+        <p><strong>2. Biased Interpretation (Process):</strong> When you <em>do</em> encounter mixed evidence, your brain twists it. Ambiguous data becomes proof for your side. A study with methodology flaws is \"rigorous\" if it supports you, \"junk science\" if it doesn't. The exact same evidence — opposite conclusions.</p>
+        <p><strong>3. Selective Recall (Memory):</strong> You remember the hits, forget the misses. That one time your horoscope was \"weirdly accurate\"? Burned into memory. The 500 times it was vague nonsense? Deleted. Your brain curates your autobiography to make you the hero who was right all along.</p>`,
+        hi: `<p><strong>Confirmation Bias</strong> वो tendency है जिसमें हम जानकारी को इस तरह search करते हैं, interpret करते हैं, favor करते हैं, और recall करते हैं जो हमारी पहले से मौजूद beliefs या hypotheses को confirm करे — जबकि alternative possibilities को disproportionately कम consideration देते हैं।</p>
+        <p>ये <strong>तीन levels</strong> पर काम करता है:</p>
+        <p><strong>1. Selective Exposure (Search):</strong> आप actively उन sources को ढूँढते हैं जो आपसे सहमत हों। आप उन लोगों को follow करते हैं जो आपकी तरह सोचते हैं। आप वो channels देखते हैं जो आपकी worldview confirm करते हैं। आप Google नहीं करते \"क्या climate change असली है\" — आप Google करते हैं \"climate change hoax evidence\" या \"climate change proof\" depending on जो side आप पहले से ले चुके हैं।</p>
+        <p><strong>2. Biased Interpretation (Process):</strong> जब आप mixed evidence का सामना <em>करते भी</em> हैं, तो आपका दिमाग़ उसे मोड़ देता है। Ambiguous data आपके side का सबूत बन जाता है। Methodology flaws वाली study \"rigorous\" है अगर वो आपका साथ देती है, \"junk science\" अगर नहीं देती। वही exact evidence — उल्टे नतीजे।</p>
+        <p><strong>3. Selective Recall (Memory):</strong> आप hits याद रखते हैं, misses भूल जाते हैं। वो एक बार जब आपका horoscope \"अजीब तरह से accurate\" था? याद में जल गया। वो 500 बार जब वो vague बकवास था? डिलीट हो गया। आपका दिमाग़ आपकी autobiography को curate करता है ताकि आप वो hero बनें जो हमेशा सही था।</p>`,
+        facts: [
+          "Affects EVERYONE — including scientists, judges, and intelligence analysts.",
+          "Stronger for emotionally charged topics (politics, religion, identity, morality).",
+          "Gets worse with higher intelligence — smarter people are BETTER at rationalizing.",
+          "Not a bug — an evolutionary feature (tribal cohesion > objective truth)."
+        ],
+        factsTitle: "4 Brutal Truths About Confirmation Bias"
+      },
+      {
+        key: "history", icon: "🔬",
+        heading: "Who Discovered It — And The Famous Experiment",
+        headingHi: "इसकी खोज किसने की — और वो मशहूर experiment",
+        image: { src: "", hint: "Peter Wason in a 1960s lab with the 2-4-6 task cards on a table", caption: "Peter Wason's 2-4-6 Task — the experiment that launched confirmation bias research." },
+        en: `<p>The term \"Confirmation Bias\" was coined in <strong>1998</strong> by psychologist <strong>Raymond Nickerson</strong>, but the phenomenon was first scientifically demonstrated by <strong>Peter Wason</strong> in <strong>1960</strong> at University College London.</p>
+        <p>Wason's experiment was deceptively simple. He gave participants a number sequence: <strong>2-4-6</strong>. He told them: \"This sequence follows a rule. Your job is to discover the rule by proposing other number triples. I'll tell you if each triple fits the rule or not.\"</p>
+        <p>Most people immediately guessed: \"Even numbers increasing by 2.\" They tested <strong>8-10-12</strong> (yes), <strong>14-16-18</strong> (yes), <strong>20-22-24</strong> (yes). They became confident. \"The rule is even numbers ascending by 2!\"</p>
+        <p><strong>They were wrong.</strong> The actual rule was simply: <strong>any three numbers in ascending order.</strong> 1-2-3 fits. 5-10-100 fits. 100-200-300 fits.</p>
+        <p>Why did they fail? Because they <strong>only tested sequences that would confirm their hypothesis.</strong> They never tried 5-3-1 or 2-4-7 or 10-5-1 — sequences that would <em>disprove</em> their guess. They were asking \"Is my guess right?\" instead of \"How could my guess be wrong?\"</p>
+        <p>This is the <strong>2-4-6 Task</strong> — the most famous experiment in the psychology of reasoning. It proved that the human mind doesn't naturally seek falsification. It seeks confirmation.</p>`,
+        hi: `<p>\"Confirmation Bias\" शब्द <strong>1998</strong> में psychologist <strong>Raymond Nickerson</strong> ने दिया था, लेकिन इस phenomenon को पहली बार scientifically demonstrate किया <strong>Peter Wason</strong> ने <strong>1960</strong> में University College London में।</p>
+        <p>Wason का experiment धोखे से सरल था। उन्होंने participants को एक number sequence दी: <strong>2-4-6</strong>। उन्होंने कहा: \"ये sequence एक rule follow करती है। आपका काम है दूसरे number triples propose करके rule discover करना। मैं बताऊँगा कि हर triple rule fit करती है या नहीं।\"</p>
+        <p>ज़्यादातर लोगों ने तुरंत guess किया: \"Even numbers जो 2 से बढ़ रहे हैं।\" उन्होंने test किया <strong>8-10-12</strong> (हाँ), <strong>14-16-18</strong> (हाँ), <strong>20-22-24</strong> (हाँ)। वो confident हो गए। \"Rule है even numbers ascending by 2!\"</p>
+        <p><strong>वो ग़लत थे।</strong> असली rule बस ये था: <strong>कोई भी तीन numbers ascending order में।</strong> 1-2-3 fit होता है। 5-10-100 fit होता है। 100-200-300 fit होता है।</p>
+        <p>वो fail क्यों हुए? क्योंकि उन्होंने <strong>केवल वही sequences test कीं जो उनकी hypothesis confirm करती थीं।</strong> उन्होंने कभी 5-3-1 या 2-4-7 या 10-5-1 try नहीं की — ऐसी sequences जो उनका guess <em>disprove</em> करतीं। वो पूछ रहे थे \"क्या मेरा guess सही है?\" बजाय इसके कि \"मेरा guess कैसे ग़लत हो सकता है?\"</p>
+        <p>यही है <strong>2-4-6 Task</strong> — reasoning की psychology में सबसे मशहूर experiment। इसने साबित किया कि इंसानी दिमाग़ naturally falsification नहीं ढूँढता। ये confirmation ढूँढता है।</p>`
+      },
+      {
+        key: "truth", icon: "⚖️",
+        heading: "Is It Actually True? (The Nuance)",
+        headingHi: "क्या ये सच में सच है? (बारीकी)",
+        en: `<p>Yes, the core phenomenon is one of the most replicated findings in psychology. But there are important nuances the internet gets wrong:</p>
+        <p><strong>It's not that we CAN'T see contrary evidence.</strong> We can. We just <em>discount</em> it, <em>reinterpret</em> it, or <em>forget</em> it faster. The bias is in the <strong>weighting</strong>, not the perception.</p>
+        <p><strong>It's not always irrational.</strong> In a world of infinite information, some filtering is necessary. If you equally weighed every crackpot theory, you'd be paralyzed. The problem is the filter is set to \"agrees with me\" instead of \"is reliable.\"</p>
+        <p><strong>It gets stronger with expertise.</strong> Experts have MORE coherent belief networks, making contradictory evidence feel MORE threatening. A novice changes their mind easily — they don't have much invested. An expert's identity is woven into their beliefs.</p>
+        <p><strong>The \"Backfire Effect\" is mostly a myth.</strong> The famous claim that correcting someone makes them believe the falsehood MORE? Later studies failed to replicate it reliably. Correction usually works — just slowly, and not in the moment.</p>`,
+        hi: `<p>हाँ, core phenomenon psychology के सबसे ज़्यादा replicated findings में से एक है। लेकिन important nuances हैं जो internet ग़लत बताता है:</p>
+        <p><strong>ऐसा नहीं कि हम contrary evidence देख नहीं सकते।</strong> देख सकते हैं। बस हम उसे <em>discount</em> कर देते हैं, <em>reinterpret</em> कर देते हैं, या <em>तेज़ी से भूल</em> जाते हैं। Bias <strong>weighting</strong> में है, perception में नहीं।</p>
+        <p><strong>ये हमेशा irrational नहीं है।</strong> अनंत जानकारी की दुनिया में, कुछ filtering ज़रूरी है। अगर आप हर crackpot theory को बराबर weight देंगे, तो paralyze हो जाएँगे। Problem ये है कि filter set है \"मेरे साथ agree करता है\" पर, न कि \"भरोसेमंद है\" पर।</p>
+        <p><strong>ये expertise के साथ मज़बूत होता है।</strong> Experts के पास MORE coherent belief networks होते हैं, जिससे contradictory evidence ज़्यादा threatening लगती है। Novice आसानी से मन बदल लेता है — उसका ज़्यादा invested नहीं होता। Expert की पहचान उसकी beliefs में बुनी होती है।</p>
+        <p><strong>\"Backfire Effect\" ज़्यादातर myth है।</strong> मशहूर दावा कि किसी को सही करने से वो झूठ पर ज़्यादा यकीन करने लगता है? बाद की studies इसे reliably replicate नहीं कर पार्इं। Correction आमतौर पर काम करता है — बस धीरे-धीरे, और उसी moment में नहीं।</p>`
+      },
+      {
+        key: "daily", icon: "🌍",
+        heading: "Where It Controls Your Life Right Now",
+        headingHi: "अभी आपकी ज़िंदगी में कहाँ-कहाँ राज कर रहा है",
+        analogies: [
+          { emoji: "📱", title: "Your Social Media Feed",
+            en: "Every platform's algorithm is a confirmation bias machine on steroids. It learns what you pause on, what you like, what you share — and feeds you more of exactly that. You're not choosing what to see. The algorithm is choosing what confirms you.",
+            hi: "हर platform का algorithm confirmation bias machine है steroids पर। ये सीखता है कि आप कहाँ रुकते हैं, क्या like करते हैं, क्या share करते हैं — और आपको ठीक वही ज़्यादा देता है। आप नहीं चुन रहे कि क्या देखना है। Algorithm चुन रहा है कि क्या आपको confirm करता है।" },
+          { emoji: "💰", title: "Investment Decisions",
+            en: "You buy a stock. It drops 10%. You search \"why [stock] will recover\" — not \"why [stock] might crash.\" You find bullish articles, feel validated, hold — and lose another 20%. Your portfolio is a museum of confirmed biases.",
+            hi: "आप stock खरीदते हैं। वो 10% गिरता है। आप search करते हैं \"why [stock] will recover\" — नहीं \"why [stock] might crash.\" आपको bullish articles मिलते हैं, आप validated महसूस करते हैं, hold करते हैं — और 20% और खो देते हैं। आपका portfolio confirmed biases का museum है।" },
+          { emoji: "💔", title: "Relationship Conflicts",
+            en: "You believe your partner \"doesn't care.\" A late text = proof. A forgotten chore = proof. A tired silence = proof. The 50 loving things they did this week? Invisible. You're not in a relationship. You're in a courtroom where you're the prosecutor, judge, and jury — and the defense attorney never shows up.",
+            hi: "आप मानते हैं आपका partner \"care नहीं करता।\" Late text = सबूत। भूला हुआ काम = सबूत। थकी चुप्पी = सबूत। वो 50 प्यारी चीज़ें जो उन्होंने इस हफ़्ते की? Invisible। आप relationship में नहीं हैं। आप courtroom में हैं जहाँ आप prosecutor, judge, और jury सब हैं — और defense lawyer कभी आता ही नहीं।" },
+          { emoji: "🏥", title: "Health & Medical Decisions",
+            en: "You read one blog saying \"turmeric cures cancer.\" You want it to be true. You find 5 more blogs saying it. You ignore the 500 clinical trials saying it doesn't. Hope is a powerful bias amplifier. People die from confirmation bias every day — choosing anecdotes over data.",
+            hi: "आप एक blog पढ़ते हैं \"हल्दी cancer ठीक करती है।\" आप चाहते हैं ये सच हो। आपको 5 और blogs मिल जाते हैं। आप उन 500 clinical trials को नज़रअंदाज़ करते हैं जो कहते हैं ये नहीं करती। उम्मीद एक powerful bias amplifier है। लोग रोज़ confirmation bias से मरते हैं — data की जगह anecdotes चुनकर।" }
+        ]
+      },
+      {
+        key: "protect", icon: "🛡️",
+        heading: "How to Break the Filter (Practical Protocol)",
+        headingHi: "Filter कैसे तोड़ें (व्यावहारिक तरीक़ा)",
+        en: `<p>You can't delete a 200,000-year-old survival mechanism. But you <em>can</em> build a mental immune system. Here's the protocol:</p>
+        <p><strong>1. The \"Steel Man\" Practice (Weekly).</strong> Pick a belief you hold strongly. Spend 20 minutes writing the <strong>strongest possible argument AGAINST it</strong> — not a straw man, the actual best case the opposition has. If you can't do it, you don't understand the issue well enough to have an opinion.</p>
+        <p><strong>2. Diversify Your Input Diet (Daily).</strong> Follow 3 thoughtful people who <em>disagree</em> with you on your core issues. Not trolls — the smartest, most reasonable voices on the other side. Read them before you read your side.</p>
+        <p><strong>3. The \"What Would Change My Mind?\" Question (Before Every Opinion).</strong> Before you post, argue, or decide: <em>\"What specific evidence would make me change my mind?\"</em> If the answer is \"nothing,\" you don't have a belief — you have a dogma. Dogmas don't deserve your certainty.</p>
+        <p><strong>4. Bet on Your Beliefs (Monthly).</strong> Put real stakes on it. \"If X happens by date Y, I donate $100 to a charity I hate.\" Skin in the game forces your brain to actually evaluate probabilities instead of protecting ego.</p>
+        <p><strong>5. Separate Identity from Opinion (Always).</strong> Say: \"My current understanding is X\" not \"I am someone who believes X.\" The first is updatable data. The second is a fortress you'll defend to the death.</p>`,
+        hi: `<p>आप 2 लाख साल पुराने survival mechanism को delete नहीं कर सकते। लेकिन आप <em>मानसिक immune system</em> ज़रूर बना सकते हैं। ये रहा protocol:</p>
+        <p><strong>1. \"Steel Man\" Practice (साप्ताहिक)।</strong> एक ऐसा belief चुनें जो आप मज़बूती से मानते हैं। 20 मिनट खर्च करें उसके ख़िलाफ़ <strong>सबसे मज़बूत possible argument लिखने में</strong> — straw man नहीं, opposition का actual best case। अगर आप ये नहीं कर सकते, तो आप issue को इतना नहीं समझते कि उस पर opinion रखें।</p>
+        <p><strong>2. Diversify Your Input Diet (दैनिक)।</strong> 3 thoughtful लोगों को follow करें जो आपके core issues पर <em>असहमत</em> हों। Trolls नहीं — दूसरी तरफ़ के सबसे समझदार, सबसे reasonable voices। उन्हें अपनी side से पहले पढ़ें।</p>
+        <p><strong>3. \"क्या चीज़ मेरा मन बदल देगी?\" सवाल (हर opinion से पहले)।</strong> Post करने, बहस करने, या decide करने से पहले: <em>\"कौन-सा specific evidence मेरा मन बदल देगा?\"</em> अगर जवाब \"कुछ नहीं\" है, तो आपके पास belief नहीं है — dogma है। Dogmas आपके certainty के लायक नहीं।</p>
+        <p><strong>4. Bet on Your Beliefs (मासिक)।</strong> असली stakes लगाएँ। \"अगर X तारीख Y तक होता है, तो मैं $100 उस charity को दूँगा जिससे मैं नफ़रत करता हूँ।\" Skin in the game आपके दिमाग़ को मजबूर करता है probabilities evaluate करने के लिए, ego बचाने के बजाय।</p>
+        <p><strong>5. Separate Identity from Opinion (हमेशा)।</strong> कहें: \"मेरी current understanding X है\" न कि \"मैं वो हूँ जो X मानता हूँ।\" पहला updatable data है। दूसरा एक किला है जिसकी रक्षा आप मरते दम तक करेंगे।</p>`,
+        factsTitle: "One-Line Antidote",
+        facts: [
+          "Before sharing that article that makes you feel smart, ask: \"Did I check if the other side has a point?\""
+        ]
+      },
+      {
+        key: "conclusion", icon: "🌙",
+        heading: "The Courage to Be Wrong",
+        headingHi: "गलत होने की हिम्मत",
+        en: `<p>In 1960, Peter Wason showed that the human mind doesn't naturally ask \"How could I be wrong?\" It asks \"How can I prove I'm right?\" That's not a moral failing. It's factory settings.</p>
+        <p>But factory settings were built for a world of tribes, tigers, and scarcity. You live in a world of nukes, algorithms, climate change, and 8 billion interconnected minds. Factory settings will get you — and all of us — killed.</p>
+        <p>The most radical act in the modern world isn't having strong opinions. Everyone has those. The radical act is <strong>holding your opinions lightly enough to update them when reality disagrees.</strong></p>
+        <p>Every scientific breakthrough in history began with someone saying: \"Wait — what if I'm wrong?\" Every moral advance began with someone asking: \"What if the people I disagree with are human too?\" Every personal transformation began with: \"What if the story I tell myself about myself... isn't true?\"</p>
+        <p>Confirmation Bias makes you comfortable. It makes you feel right. It gives you dopamine. But comfort is the enemy of growth. Dopamine is the enemy of truth. And feeling right is the surest sign you've stopped looking.</p>
+        <p>The world doesn't need more people who are sure. It needs people who are <strong>willing to be wrong</strong> — because that's the only way to ever get it right.</p>`,
+        hi: `<p>1960 में Peter Wason ने दिखाया कि इंसानी दिमाग़ naturally नहीं पूछता \"मैं कैसे ग़लत हो सकता हूँ?\" ये पूछता है \"मैं कैसे साबित करूँ कि मैं सही हूँ?\" ये कोई moral failing नहीं है। ये factory settings हैं।</p>
+        <p>मगर factory settings बनी थीं tribes, tigers, और scarcity की दुनिया के लिए। आप रहते हैं nukes, algorithms, climate change, और 8 अरब interconnected minds की दुनिया में। Factory settings आपको — और हम सबको — मार डालेंगी।</p>
+        <p>आधुनिक दुनिया में सबसे radical act मज़बूत opinions रखना नहीं है। वो तो सबके पास हैं। Radical act है <strong>अपनी opinions को इतने हल्के से पकड़ना कि जब reality असहमत हो, तो आप उन्हें update कर सकें।</strong></p>
+        <p>इतिहास का हर scientific breakthrough किसी के ये कहने से शुरू हुआ: \"रुको — क्या पता मैं ग़लत हूँ?\" हर moral advance किसी के ये पूछने से शुरू हुआ: \"क्या पता जिनसे मैं असहमत हूँ, वो भी इंसान हैं?\" हर personal transformation इससे शुरू हुई: \"क्या पता जो कहानी मैं अपने बारे में बताता हूँ... वो सच नहीं है?\"</p>
+        <p>Confirmation Bias आपको comfortable बनाता है। आपको सही महसूस कराता है। Dopamine देता है। लेकिन comfort growth का दुश्मन है। Dopamine truth का दुश्मन है। और सही महसूस करना इस बात का पक्का सबूत है कि आपने देखना बंद कर दिया है।</p>
+        <p>दुनिया को और लोगों की ज़रूरत नहीं जो sure हैं। इसे उन लोगों की ज़रूरत है जो <strong>गलत होने को तैयार हैं</strong> — क्योंकि वही एक रास्ता है कभी सही होने का।</p>`
       }
     ],
-    takeaway: "To grow, you must actively seek out people who disagree with you. Do not look for evidence that proves you are right; look for evidence that proves you are wrong."
+
+    takeaway: {
+      en: "Your brain is a lawyer, not a judge. It defends what you already believe. To grow, stop looking for proof you're right — start hunting for proof you're wrong.",
+      hi: "आपका दिमाग़ वकील है, जज नहीं। ये वही defend करता है जो आप पहले से मानते हैं। आगे बढ़ने के लिए, ये मत ढूँढो कि आप सही हो — ये ढूँढो कि आप ग़लत हो।"
+    },
+    cta: {
+      title: "Your Brain Is Lying To You.",
+      text: "Aise hi cinematic psychology breakdowns ke liye TheDeepVerse ko subscribe karo — ek naya effect, har hafte."
+    }
   },
 
   "anchoring-effect": {
