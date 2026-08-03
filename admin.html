@@ -349,6 +349,36 @@
       </div>
 
       <div class="data-section">
+        <h3>🎨 Website Logo</h3>
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Upload your website logo. It will appear in the navigation bar and footer on all pages.</p>
+        <div class="form-group">
+          <label>Upload Logo Image</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <label class="btn-admin btn-admin--primary" style="cursor:pointer;margin:0">
+              📁 Choose File
+              <input type="file" accept="image/*" onchange="handleLogoUpload(event)" style="display:none">
+            </label>
+            <span style="color:var(--admin-text-2);font-size:0.8rem">or paste URL below</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Logo URL</label>
+          <input type="text" id="settSiteLogo" placeholder="https://thedeepverse.in/assets/images/logo.png" oninput="previewSiteLogo()">
+          <small>Supports PNG, JPG, WebP. Recommended: transparent background, max 200px height</small>
+        </div>
+        <div id="siteLogoPreview" style="margin-top:12px;padding:16px;background:var(--admin-bg-1);border-radius:8px;display:none">
+          <p style="color:var(--admin-text-2);font-size:0.75rem;margin-bottom:8px">Preview:</p>
+          <div style="display:flex;gap:24px;align-items:center">
+            <div style="background:#0a0a0a;padding:12px 20px;border-radius:8px">
+              <img id="siteLogoImg" src="" alt="Logo" style="max-height:40px;max-width:200px">
+            </div>
+            <button class="btn-admin" onclick="clearSiteLogo()" style="font-size:0.75rem">❌ Remove</button>
+          </div>
+        </div>
+        <button class="btn-admin btn-admin--primary" onclick="saveSiteLogo()" style="margin-top:12px">💾 Save Logo</button>
+      </div>
+
+      <div class="data-section">
         <h3>💳 Razorpay Payment Gateway</h3>
         <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Connect Razorpay to accept payments. Get your API key from <a href="https://dashboard.razorpay.com" target="_blank" style="color:var(--admin-accent)">dashboard.razorpay.com</a></p>
         <div class="form-group">
@@ -1029,6 +1059,10 @@ function loadSettings() {
     document.getElementById('settBusinessName').value = settings.businessName || 'TheDeepVerse';
     document.getElementById('settThemeColor').value = settings.themeColor || '#d4af37';
     document.getElementById('settLogoUrl').value = settings.logoUrl || '';
+    // Load site logo
+    var siteLogoUrl = localStorage.getItem('tdv_site_logo') || '';
+    document.getElementById('settSiteLogo').value = siteLogoUrl;
+    if (siteLogoUrl) previewSiteLogo();
     // Update stats
     var used = 0;
     for (var k in localStorage) { if (localStorage.hasOwnProperty(k)) used += localStorage.getItem(k).length; }
@@ -1064,6 +1098,63 @@ function testRazorpay() {
     var rzp = new Razorpay(options);
     rzp.open();
   } catch(e) { showToast('Razorpay error: ' + e.message, 'error'); }
+}
+
+// ═══ SITE LOGO ═══
+function handleLogoUpload(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('Please select an image file', 'error'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    // Resize for performance
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var maxH = 200;
+      var scale = img.height > maxH ? maxH / img.height : 1;
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      var dataUrl = canvas.toDataURL('image/png', 0.9);
+      document.getElementById('settSiteLogo').value = dataUrl;
+      previewSiteLogo();
+      showToast('Logo uploaded! Click Save Logo to apply.', 'success');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewSiteLogo() {
+  var url = document.getElementById('settSiteLogo').value.trim();
+  var preview = document.getElementById('siteLogoPreview');
+  var img = document.getElementById('siteLogoImg');
+  if (url) {
+    img.src = url;
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+function clearSiteLogo() {
+  document.getElementById('settSiteLogo').value = '';
+  document.getElementById('siteLogoPreview').style.display = 'none';
+  localStorage.removeItem('tdv_site_logo');
+  showToast('Logo removed. Text logo will be used.', 'info');
+}
+
+function saveSiteLogo() {
+  var url = document.getElementById('settSiteLogo').value.trim();
+  if (url) {
+    localStorage.setItem('tdv_site_logo', url);
+    showToast('Logo saved! It will appear on all pages.', 'success');
+  } else {
+    localStorage.removeItem('tdv_site_logo');
+    showToast('Logo cleared. Text logo will be used.', 'info');
+  }
 }
 
 function showToast(message, type = 'info') {

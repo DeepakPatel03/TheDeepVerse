@@ -23,8 +23,30 @@
     initFaqAccordion();
     initFilterTabs();
     initSearchBar();
+    initSiteLogo();
   }
 
+  /* ============================================================
+     0. SITE LOGO — Auto-apply from Admin Settings
+     ============================================================ */
+  function initSiteLogo() {
+    try {
+      var logoUrl = localStorage.getItem('tdv_site_logo');
+      if (!logoUrl) return;
+
+      // Replace nav logo (text → image)
+      var navLogos = document.querySelectorAll('.nav__logo');
+      navLogos.forEach(function(el) {
+        el.innerHTML = '<img src="' + logoUrl + '" alt="TheDeepVerse" style="height:32px;max-width:180px;object-fit:contain;vertical-align:middle">';
+      });
+
+      // Replace footer logo (text → image)
+      var footerLogos = document.querySelectorAll('.footer__logo');
+      footerLogos.forEach(function(el) {
+        el.innerHTML = '<img src="' + logoUrl + '" alt="TheDeepVerse" style="height:36px;max-width:200px;object-fit:contain">';
+      });
+    } catch(e) { console.warn('[Logo] Error applying site logo:', e); }
+  }
 
   /* ============================================================
      1. NAVIGATION — Scroll State (Transparent → Frosted Glass)
