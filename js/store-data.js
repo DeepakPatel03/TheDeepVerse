@@ -610,18 +610,40 @@ const StoreEngine = (function() {
   }
 
   // ── Core Methods ──
-  function getProducts() {
-    if (firebaseProducts && firebaseProducts.length > 0) return [...firebaseProducts];
-    try {
-      const storedVersion = localStorage.getItem(VERSION_KEY);
-      if (storedVersion !== DATA_VERSION) {
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.setItem(VERSION_KEY, DATA_VERSION);
+  function mergeNewDefaults(products) {
+    // If DEFAULT_PRODUCTS has new items not in the cached list, add them
+    var existingIds = {};
+    products.forEach(function(p) { existingIds[p.id] = true; });
+    var added = false;
+    DEFAULT_PRODUCTS.forEach(function(dp) {
+      if (!existingIds[dp.id]) {
+        products.push({...dp});
+        added = true;
       }
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) return JSON.parse(stored);
-    } catch(e) { console.error('StoreEngine: Error reading products', e); }
-    return [...DEFAULT_PRODUCTS];
+    });
+    if (added) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(products)); } catch(e) {}
+    }
+    return products;
+  }
+
+  function getProducts() {
+    var products = null;
+    if (firebaseProducts && firebaseProducts.length > 0) {
+      products = [...firebaseProducts];
+    } else {
+      try {
+        const storedVersion = localStorage.getItem(VERSION_KEY);
+        if (storedVersion !== DATA_VERSION) {
+          localStorage.removeItem(STORAGE_KEY);
+          localStorage.setItem(VERSION_KEY, DATA_VERSION);
+        }
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) products = JSON.parse(stored);
+      } catch(e) { console.error('StoreEngine: Error reading products', e); }
+    }
+    if (!products || products.length === 0) return [...DEFAULT_PRODUCTS];
+    return mergeNewDefaults(products);
   }
 
   function saveProducts(products) {
