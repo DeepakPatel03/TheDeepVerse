@@ -165,7 +165,13 @@
     var currentProduct = null;
 
     function init() {
-      const product = StoreEngine.getProduct(productId);
+      var product = StoreEngine.getProduct(productId);
+
+      // Fallback: if not found in cached/firebase data, check DEFAULT_PRODUCTS directly
+      if (!product && StoreEngine.DEFAULT_PRODUCTS) {
+        product = StoreEngine.DEFAULT_PRODUCTS.find(function(p) { return p.id === productId; });
+      }
+
       if (!product) {
         document.getElementById('heroMain').innerHTML = '<div style="text-align:center;padding:80px 0"><h2 style="color:var(--text-primary);margin-bottom:12px">Product Not Found</h2><p style="color:var(--text-muted)">This product doesn\'t exist.</p><a href="store.html" style="color:var(--accent-gold)">← Back to Store</a></div>';
         return;
