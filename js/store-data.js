@@ -502,11 +502,84 @@ const StoreEngine = (function() {
       students: '1000+',
       lastUpdated: '2026-07-04',
       createdAt: Date.now()
+    },
+    {
+      id: 'ai-masterclass',
+      type: 'video-course',
+      category: 'course',
+      title: 'AI Content Creation Masterclass',
+      description: 'Complete Practical Course — Zero to Hero AI Workflow. Learn Script Writing, AI Image & Video Generation, Voice Generation, Professional Editing & SEO. 2+ Hours of HD Video + 2 FREE Master Prompts.',
+      overview: 'Agar aap AI ki madad se YouTube Videos, Shorts, Instagram Reels ya Documentary Style Content banana chahte hain, to ye Complete Practical Masterclass aapke liye hai. Is course mein aap Step-by-Step seekhenge: Professional Script Writing, Psychology Storytelling, Viral Hooks, Scene Breakdown, AI Image Generation, Character Consistency, AI Video Generation, Google Flow Workflow, Image to Video Prompting, AI Voice Generation, Voice Enhancement, Professional Video Editing, Color Grading, Background Music, Sound Effects, aur Complete AI Content Creation Workflow.',
+      curriculum: [
+        '🎬 First Video Live Practical — Complete Walkthrough',
+        '📋 Master Prompt Copy Paste — AI Setup',
+        '✨ See the Magic of Master Prompt — Live Demo',
+        '📝 Script Writing — Professional AI Scripts',
+        '🎯 Scene Breakdown — Visual Planning',
+        '🖼️ Image + Video Prompt — AI Generation',
+        '🌊 Google Flow — Complete Workflow',
+        '👤 Same Character Idea — Consistency Technique',
+        '🎙️ Voice Generation — ElevenLabs Setup',
+        '🎵 Voice Editing — Enhancement & Mixing',
+        '🔐 VPN Setup — Access Global Tools',
+        '🎥 Video Editing — Professional Editing',
+        '📊 SEO — Optimize for Maximum Reach',
+        '🎬 Second Video Practical — Advanced Workflow'
+      ],
+      videoId: 'SJ0RlWMPCXI',
+      chapters: [
+        { time: 179, title: 'First Video Live Practical', icon: '🎬' },
+        { time: 181, title: 'Master Prompt Copy Paste', icon: '📋' },
+        { time: 312, title: 'See the Magic of Master Prompt', icon: '✨' },
+        { time: 460, title: 'Script Writing', icon: '📝' },
+        { time: 625, title: 'Scene Breakdown', icon: '🎯' },
+        { time: 660, title: 'Image + Video Prompt', icon: '🖼️' },
+        { time: 713, title: 'Google Flow', icon: '🌊' },
+        { time: 1145, title: 'Same Character Idea', icon: '👤' },
+        { time: 1975, title: 'Voice Generation (ElevenLabs)', icon: '🎙️' },
+        { time: 2161, title: 'Voice Editing', icon: '🎵' },
+        { time: 2274, title: 'VPN Setup', icon: '🔐' },
+        { time: 2330, title: 'Video Editing', icon: '🎥' },
+        { time: 3505, title: 'SEO', icon: '📊' },
+        { time: 3660, title: 'Second Video Practical', icon: '🎬' }
+      ],
+      bonuses: [
+        '🖤 Master Prompt 1 — Deep Black & White Cinematic Style, High Contrast Engraving Look, Psychological Documentary Style',
+        '🎨 Master Prompt 2 — Same Engraving & Cinematic Style with Soft Natural Colors, Realistic Cinematic Feel'
+      ],
+      method: 'Step 1: Purchase the course and login to your account.\\nStep 2: Open the Course Player from your Dashboard.\\nStep 3: Follow along with the video — pause and practice each step.\\nStep 4: Use the FREE Master Prompts to generate your own content.\\nStep 5: Create your first AI-powered video using the complete workflow.',
+      price: 175,
+      originalPrice: 499,
+      tag: '65% OFF',
+      tagColor: 'red',
+      thumbnail: '',
+      thumbnailUrl: '',
+      emoji: '🤖',
+      images: [],
+      features: [
+        '2+ Hours HD Video Course',
+        'Complete AI Workflow — Zero to Hero',
+        '2 FREE Premium Master Prompts',
+        'Script Writing + Voice + Editing',
+        'Google Flow + Character Consistency',
+        'SEO Optimization Included',
+        'Lifetime Access'
+      ],
+      featured: true,
+      active: true,
+      downloadUrl: '',
+      instructor: 'Deepak Patel',
+      duration: '2+ Hours Video',
+      language: 'Hindi',
+      level: 'Beginner to Advanced',
+      students: 'New',
+      lastUpdated: '2026-08-06',
+      createdAt: Date.now()
     }
   ];
 
   // ── Data versioning ──
-  const DATA_VERSION = '2026-07-22-v4'; // v4: Added book with variants
+  const DATA_VERSION = '2026-08-06-v5'; // v5: Added AI Masterclass video course
   const VERSION_KEY = 'tdv_data_version';
 
   // ── Firebase ──

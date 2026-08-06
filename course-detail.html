@@ -450,6 +450,19 @@
     // Buy simple product (no variants)
     window.buySimple = function() {
       if (!currentProduct) return;
+
+      // Video courses require login
+      if (currentProduct.type === 'video-course') {
+        if (!window.FirebaseAuth || !window.FirebaseAuth.currentUser) {
+          alert('Please login first to purchase this video course.');
+          if (window.TDVAuth) window.TDVAuth.openAuthModal();
+          else if (document.getElementById('navLoginBtn')) document.getElementById('navLoginBtn').click();
+          return;
+        }
+        processPayment(currentProduct.id, currentProduct.price, currentProduct.title, []);
+        return;
+      }
+
       var dlUrl = currentProduct.downloadUrl || '';
       if (!dlUrl && currentProduct.price > 0) { alert('Download link not set yet.'); return; }
       
@@ -516,6 +529,17 @@
     // Process Razorpay payment and download
     function processPayment(productId, price, description, downloadUrls) {
       try {
+        // Pre-fill user info if logged in
+        var prefill = { name: '', email: '', contact: '' };
+        if (window.FirebaseAuth && window.FirebaseAuth.currentUser) {
+          var user = window.FirebaseAuth.currentUser;
+          prefill.name = user.displayName || '';
+          prefill.email = user.email || '';
+          prefill.contact = user.phoneNumber || '';
+        }
+
+        var isVideoCourse = currentProduct && currentProduct.type === 'video-course';
+
         var options = {
           key: getRazorpayKey(),
           amount: price * 100, // paise
@@ -524,10 +548,15 @@
           description: 'Purchase: ' + description,
           image: currentProduct.thumbnail || currentProduct.thumbnailUrl || '',
           handler: function(response) {
-            // Show download section on the page — NO popup, NO alert
-            showDownloadSection(response.razorpay_payment_id, description, downloadUrls);
+            if (isVideoCourse) {
+              // Save purchase to Firebase and redirect to player
+              savePurchaseToFirebase(currentProduct.id, response.razorpay_payment_id);
+            } else {
+              // Show download section on the page — NO popup, NO alert
+              showDownloadSection(response.razorpay_payment_id, description, downloadUrls);
+            }
           },
-          prefill: { name: '', email: '', contact: '' },
+          prefill: prefill,
           theme: { color: '#d4af37' },
           modal: {
             ondismiss: function() {
@@ -543,6 +572,39 @@
       } catch(e) {
         alert('Payment error: ' + e.message + '. Please try again or contact us.');
         console.error('Razorpay error:', e);
+      }
+    }
+
+    // Save video course purchase to Firebase
+    function savePurchaseToFirebase(courseId, paymentId) {
+      try {
+        var user = window.FirebaseAuth.currentUser;
+        if (!user || !window.FirebaseDatabase) {
+          alert('Purchase successful! Payment ID: ' + paymentId + '. Please login to access your course.');
+          return;
+        }
+
+        var updates = {};
+        updates['users/' + user.uid + '/purchases/' + courseId] = true;
+        updates['users/' + user.uid + '/purchaseDetails/' + courseId] = {
+          paymentId: paymentId,
+          purchasedAt: new Date().toISOString(),
+          email: user.email || '',
+          name: user.displayName || ''
+        };
+
+        window.FirebaseDatabase.ref().update(updates).then(function() {
+          // Redirect to course player
+          window.location.href = 'course-player.html?id=' + courseId;
+        }).catch(function(err) {
+          console.error('[Purchase] Firebase save error:', err);
+          alert('Payment successful (ID: ' + paymentId + ')! Your course access will be available shortly. If not, please contact support.');
+          window.location.href = 'dashboard.html';
+        });
+      } catch(e) {
+        console.error('[Purchase] Error:', e);
+        alert('Payment successful! Please go to your Dashboard to access the course.');
+        window.location.href = 'dashboard.html';
       }
     }
 
