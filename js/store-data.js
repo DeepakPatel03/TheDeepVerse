@@ -43,7 +43,7 @@ const StoreEngine = (function() {
         'Future products — free forever',
         'Priority community access'
       ],
-      featured: true,
+      featured: false,
       active: true,
       downloadUrl: '',
       instructor: 'Deepak Patel',

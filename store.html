@@ -284,7 +284,9 @@
         const priceHtml = p.price === 0
           ? '<span class="product-card__price" style="color:#22c55e">Free</span>'
           : `<span class="product-card__price">₹${p.price.toLocaleString('en-IN')}${p.originalPrice ? ` <span class="product-card__price-original">₹${p.originalPrice.toLocaleString('en-IN')}</span>` : ''}</span>`;
-        const isLive = !!(p.downloadUrl && p.downloadUrl.trim());
+        const hasVariantLinks = p.variants && p.variants.length > 0 && p.variants.some(v => v.downloadUrl && v.downloadUrl.trim());
+        const isVideoCourse = p.type === 'video-course' && p.videoId;
+        const isLive = !!(p.downloadUrl && p.downloadUrl.trim()) || hasVariantLinks || isVideoCourse;
         const buyClass = p.price === 0 ? 'product-card__buy product-card__buy--free' : 'product-card__buy';
         const buyText = !isLive ? '🔜 Coming Soon' : (p.price === 0 ? 'Download' : 'Buy Now');
         const buyStyle = !isLive ? 'opacity:0.7;background:rgba(251,146,60,0.15);color:#fb923c' : '';
