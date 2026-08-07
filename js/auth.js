@@ -155,8 +155,10 @@
     // Cache DOM elements
     cacheElements();
 
-    // Set up event listeners
-    setupEventListeners();
+    // Set up event listeners (skip on course-detail page — has its own inline handler)
+    if (window.location.pathname.indexOf('course-detail') === -1) {
+      setupEventListeners();
+    }
 
     // Auth state observer
     auth.onAuthStateChanged(handleAuthStateChanged);
