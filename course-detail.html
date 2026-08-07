@@ -823,38 +823,59 @@
 
     // Show download section on the page after successful payment
     function showDownloadSection(paymentId, description, downloadUrls) {
+      // Detect if URL is YouTube
+      function isYouTube(url) { return url && (url.indexOf('youtube.com') !== -1 || url.indexOf('youtu.be') !== -1); }
+
       // Create download section HTML
       var dlHtml = '<div id="postPaymentDownload" style="background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(34,197,94,0.03));border:2px solid rgba(34,197,94,0.4);border-radius:16px;padding:24px;margin:24px 0;text-align:center;animation:fadeIn 0.5s ease">';
       dlHtml += '<div style="font-size:2.5rem;margin-bottom:8px">✅</div>';
       dlHtml += '<h2 style="color:#22c55e;font-size:1.3rem;margin-bottom:4px">Payment Successful!</h2>';
       dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:4px">Payment ID: ' + paymentId + '</p>';
       dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">' + description + '</p>';
-      dlHtml += '<div style="display:flex;flex-direction:column;gap:10px;max-width:350px;margin:0 auto">';
-      
+      dlHtml += '<div style="display:flex;flex-direction:column;gap:10px;max-width:400px;margin:0 auto">';
+
+      // Get variant names for labels
+      var variantNames = [];
+      if (currentProduct && currentProduct.variants) {
+        variantNames = currentProduct.variants.map(function(v) { return v.name; });
+      }
+
       downloadUrls.forEach(function(url, i) {
-        var directUrl = toDirectDownload(url);
-        var label = downloadUrls.length > 1 ? 'Download File ' + (i + 1) : 'Download Your File';
-        dlHtml += '<a href="' + directUrl + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:14px 20px;border-radius:10px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(34,197,94,0.4);transition:all 0.2s" onmouseover="this.style.transform=\'scale(1.02)\'" onmouseout="this.style.transform=\'scale(1)\'">📥 ' + label + '</a>';
+        var label = variantNames[i] || (downloadUrls.length > 1 ? 'File ' + (i + 1) : 'Your File');
+        
+        if (isYouTube(url)) {
+          // YouTube video — Watch button + Copy button
+          dlHtml += '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px">';
+          dlHtml += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:8px">🎬 ' + label + '</div>';
+          dlHtml += '<a href="' + url + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:700;padding:14px 20px;border-radius:10px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);margin-bottom:8px">▶️ Watch Video Now</a>';
+          dlHtml += '<button onclick="navigator.clipboard.writeText(\'' + url + '\').then(function(){this.textContent=\'✅ Link Copied!\'}.bind(this))" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary);padding:10px;border-radius:8px;cursor:pointer;font-size:0.85rem">📋 Copy Link (Save for Later)</button>';
+          dlHtml += '<p style="color:#f59e0b;font-size:0.75rem;margin-top:6px">⚠️ Ye link save kar lo — isse UNLIMITED baar video dekh sakte ho!</p>';
+          dlHtml += '</div>';
+        } else {
+          // Regular file — Download button + Copy button
+          var directUrl = toDirectDownload(url);
+          dlHtml += '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px">';
+          dlHtml += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:8px">📄 ' + label + '</div>';
+          dlHtml += '<a href="' + directUrl + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:14px 20px;border-radius:10px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(34,197,94,0.4);margin-bottom:8px">📥 Download Now</a>';
+          dlHtml += '<button onclick="navigator.clipboard.writeText(\'' + url + '\').then(function(){this.textContent=\'✅ Link Copied!\'}.bind(this))" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary);padding:10px;border-radius:8px;cursor:pointer;font-size:0.85rem">📋 Copy Link (Save for Later)</button>';
+          dlHtml += '</div>';
+        }
       });
 
       dlHtml += '</div>';
-      dlHtml += '<p style="color:var(--text-muted);font-size:0.8rem;margin-top:12px">⚠️ Link kaam na kare toh button par <strong>right-click → Save Link As</strong> karo</p>';
-      dlHtml += '<p style="color:var(--text-muted);font-size:0.75rem;margin-top:4px">Koi problem ho toh <a href="contact.html" style="color:var(--accent)">Contact Us</a> par payment ID ke saath message karo</p>';
+      dlHtml += '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:12px;margin-top:16px;max-width:400px;margin-left:auto;margin-right:auto">';
+      dlHtml += '<p style="color:#f59e0b;font-size:0.85rem;font-weight:600;margin-bottom:4px">💡 Important:</p>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.8rem;margin:0">Sab links copy karke safe jagah save kar lo (Notes/WhatsApp). Ye links expire nahi hote — kabhi bhi access kar sakte ho!</p>';
+      dlHtml += '</div>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.75rem;margin-top:12px">Koi problem ho toh <a href="contact.html" style="color:var(--accent)">Contact Us</a> par payment ID ke saath message karo</p>';
       dlHtml += '</div>';
 
       // Insert after the hero section
       var heroSidebar = document.getElementById('heroSidebar');
       if (heroSidebar) {
-        // Replace the purchase card with download section
         heroSidebar.innerHTML = dlHtml;
         heroSidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-
-      // Also try opening the first link directly (as backup)
-      try {
-        var firstUrl = toDirectDownload(downloadUrls[0]);
-        window.location.href = firstUrl;
-      } catch(e) { /* ignore if blocked */ }
     }
 
     // Process Razorpay payment and download
