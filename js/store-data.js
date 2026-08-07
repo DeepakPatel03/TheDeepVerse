@@ -135,7 +135,7 @@ const StoreEngine = (function() {
   ];
 
   // ── Data versioning ──
-  const DATA_VERSION = '2026-08-06-v5'; // v5: Added AI Masterclass video course
+  const DATA_VERSION = '2026-08-07-v1'; // v1: Cleaned up to 2 products only
   const VERSION_KEY = 'tdv_data_version';
 
   // ── Firebase ──
