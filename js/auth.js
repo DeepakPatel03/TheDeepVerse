@@ -18,6 +18,7 @@
 
   // ── DOM Elements ──
   let loginBtn = null;
+  let navUser = null;
   let userProfileBtn = null;
   let userDropdown = null;
   let authModal = null;
@@ -36,6 +37,45 @@
   let authError = null;
   let authLoading = null;
 
+  // ── Inject shared auth modal + styles if the page doesn't already have them ──
+  // This keeps one source of truth: any page that loads auth.js gets a working
+  // login/signup modal, even if its HTML doesn't include the markup.
+  function ensureAuthModal() {
+    if (document.getElementById('authModal')) return;
+
+    const style = document.createElement('style');
+    style.id = 'tdvAuthStyles';
+    style.textContent =
+      '.auth-modal{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;display:flex;align-items:center;justify-content:center}' +
+      '.auth-modal__backdrop{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(5,5,5,0.85);backdrop-filter:blur(4px)}' +
+      '.auth-modal__box{position:relative;background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:16px;width:100%;max-width:420px;margin:0 24px;max-height:90vh;overflow-y:auto}' +
+      '.auth-modal__close{position:absolute;top:12px;right:12px;width:24px;height:24px;background:transparent;border:none;font-size:1.5rem;color:#888;cursor:pointer;line-height:1;padding:0;z-index:1}' +
+      '.auth-modal__close:hover{color:#f5f5f5}' +
+      '.auth-modal__tabs{display:flex;border-bottom:1px solid rgba(255,255,255,0.08)}' +
+      '.auth-tab{flex:1;padding:16px;font-size:0.85rem;font-weight:500;color:#888;background:transparent;border:none;cursor:pointer;text-align:center}' +
+      '.auth-tab.is-active{color:#f5f5f5;border-bottom:2px solid #d4af37}' +
+      '.auth-tab:hover:not(.is-active){color:#aaa}' +
+      '.auth-form{padding:24px}.auth-form__group{margin-bottom:16px}' +
+      '.auth-form__label{display:block;margin-bottom:8px;font-size:0.75rem;font-weight:500;color:#888}' +
+      '.auth-form__input{width:100%;padding:10px 16px;background:#050505;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#f5f5f5;font-size:0.85rem;box-sizing:border-box}' +
+      '.auth-form__input:focus{outline:none;border-color:#d4af37;box-shadow:0 0 0 3px rgba(212,175,55,0.15)}' +
+      '.auth-form__input::placeholder{color:#555}' +
+      '.auth-form__footer{margin-top:16px;text-align:center;font-size:0.75rem;color:#888}' +
+      '.auth-switch-tab{color:#d4af37;cursor:pointer;text-decoration:underline}' +
+      '.auth-divider{display:flex;align-items:center;margin:0 24px;color:#555;font-size:0.75rem}' +
+      ".auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.08)}" +
+      '.auth-divider span{padding:0 16px}' +
+      '.auth-google-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:#f5f5f5;font-size:0.85rem;font-weight:500;border-radius:8px;cursor:pointer;padding:12px;margin:16px 24px 24px;width:calc(100% - 48px)}' +
+      '.auth-google-btn:hover{border-color:#f5f5f5;background:rgba(255,255,255,0.04)}' +
+      '.auth-error{margin:16px 24px;padding:10px 16px;background:rgba(255,69,0,0.1);border:1px solid rgba(255,69,0,0.3);border-radius:8px;color:#ff4500;font-size:0.75rem}' +
+      '@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
+
+    const wrap = document.createElement('div');
+    wrap.innerHTML = AUTH_MODAL_HTML;
+    document.body.appendChild(wrap.firstElementChild);
+  }
+
   // ── Initialize Auth ──
   function initAuth() {
     // Wait for Firebase to be ready
@@ -50,6 +90,9 @@
       console.warn('[Auth] Firebase Auth not available');
       return;
     }
+
+    // Make sure the modal markup exists before we cache/bind elements
+    ensureAuthModal();
 
     // Initialize Google Provider
     if (typeof firebase !== 'undefined' && firebase.auth) {
@@ -71,7 +114,8 @@
 
   function cacheElements() {
     loginBtn = document.getElementById('navLoginBtn');
-    userProfileBtn = document.getElementById('navUserProfileBtn');
+    navUser = document.getElementById('navUser');
+    userProfileBtn = document.getElementById('navUserBtn') || document.getElementById('navUserProfileBtn');
     userDropdown = document.getElementById('navUserDropdown');
     authModal = document.getElementById('authModal');
     authModalBackdrop = document.getElementById('authModalBackdrop');
@@ -114,6 +158,14 @@
     if (tabPhone) {
       tabPhone.addEventListener('click', () => switchTab('phone'));
     }
+
+    // In-form switch links (e.g. "Don't have an account? Sign Up")
+    document.querySelectorAll('.auth-switch-tab').forEach((el) => {
+      el.addEventListener('click', () => {
+        const tab = el.getAttribute('data-tab');
+        if (tab) switchTab(tab);
+      });
+    });
 
     // Forms
     if (formSignIn) {
@@ -176,30 +228,40 @@
   }
 
   function updateNavUI(user) {
+    // The visible user element is the wrapper (#navUser) when present,
+    // otherwise the profile button itself.
+    const userEl = navUser || userProfileBtn;
+
     if (user) {
       // User is signed in
       if (loginBtn) loginBtn.style.display = 'none';
-      if (userProfileBtn) {
-        userProfileBtn.style.display = 'flex';
-        // Update user name/email in dropdown
-        const userNameEl = document.getElementById('navUserName');
-        const userEmailEl = document.getElementById('navUserEmail');
-        const userAvatarEl = document.getElementById('navUserAvatar');
+      if (userEl) userEl.style.display = 'flex';
 
-        if (userNameEl) userNameEl.textContent = user.displayName || 'User';
-        if (userEmailEl) userEmailEl.textContent = user.email || '';
-        if (userAvatarEl) {
-          if (user.photoURL) {
-            userAvatarEl.innerHTML = `<img src="${user.photoURL}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
-          } else {
-            userAvatarEl.textContent = (user.displayName || user.email || 'U')[0].toUpperCase();
-          }
+      // Update user name/email/avatar in dropdown.
+      // Support both naming schemes across pages (navUserName / navUserNameLg).
+      const displayName = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+      const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
+
+      ['navUserName', 'navUserNameLg'].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = displayName;
+      });
+      const userEmailEl = document.getElementById('navUserEmail');
+      if (userEmailEl) userEmailEl.textContent = user.email || '';
+
+      ['navUserAvatar', 'navUserAvatarLg'].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (user.photoURL) {
+          el.innerHTML = `<img src="${user.photoURL}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+        } else {
+          el.textContent = initial;
         }
-      }
+      });
     } else {
       // User is signed out
       if (loginBtn) loginBtn.style.display = 'inline-flex';
-      if (userProfileBtn) userProfileBtn.style.display = 'none';
+      if (userEl) userEl.style.display = 'none';
       if (userDropdown) userDropdown.classList.remove('is-open');
     }
   }
@@ -208,7 +270,7 @@
   function openAuthModal() {
     if (!authModal) return;
     authModal.style.display = 'flex';
-    authModalBackdrop.style.display = 'block';
+    if (authModalBackdrop) authModalBackdrop.style.display = 'block';
     modalOpen = true;
     document.body.style.overflow = 'hidden';
 
@@ -227,7 +289,7 @@
   function closeAuthModal() {
     if (!authModal) return;
     authModal.style.display = 'none';
-    authModalBackdrop.style.display = 'none';
+    if (authModalBackdrop) authModalBackdrop.style.display = 'none';
     modalOpen = false;
     document.body.style.overflow = '';
     clearError();
@@ -582,8 +644,11 @@
   // ── Export for global use ──
   window.TDVAuth = {
     openAuthModal: openAuthModal,
-    closeAuthModal: closeAuthModal
+    closeAuthModal: closeAuthModal,
+    getCurrentUser: function () { return currentUser; }
   };
+  // Convenience global used by some inline handlers
+  window.openAuthModal = openAuthModal;
 
   // ── Initialize ──
   if (document.readyState === 'loading') {

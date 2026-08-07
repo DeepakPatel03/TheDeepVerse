@@ -280,9 +280,13 @@
   <script src="js/store-data.js"></script>
   <script src="js/auth.js"></script>
 
-  <!-- INLINE AUTH HANDLER (backup - guaranteed to work) -->
+  <!-- INLINE AUTH HANDLER — DISABLED -->
+  <!-- Auth is now fully handled by js/auth.js (shared across all pages).
+       This inline block previously duplicated auth.js's listeners, which
+       made the Google popup open twice. It is disabled via an early return. -->
   <script>
   (function() {
+    return; // auth.js handles login/signup/phone/google on every page
     // Wait for Firebase
     function waitForAuth(cb) {
       if (window.FirebaseAuth) { cb(window.FirebaseAuth); return; }
