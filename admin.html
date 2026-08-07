@@ -405,6 +405,13 @@
       </div>
 
       <div class="data-section">
+        <h3>🔄 Force Refresh All Visitors</h3>
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Admin mein changes kiye? Ye button dabao — sabhi visitors ke browser cache automatically clear ho jayega aur fresh data load hoga.</p>
+        <button class="btn-admin btn-admin--primary" onclick="forceRefreshAll()" style="background:linear-gradient(135deg,#f59e0b,#d97706);font-size:1rem;padding:12px 24px">🚀 Force Refresh All Visitors</button>
+        <p id="forceRefreshStatus" style="color:#22c55e;font-size:0.85rem;margin-top:8px;display:none"></p>
+      </div>
+
+      <div class="data-section">
         <h3>🔐 Admin Password</h3>
         <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Current password is set in <code style="color:var(--admin-accent)">js/store-data.js</code> → search for <code style="color:var(--admin-accent)">ADMIN_PASSWORD</code></p>
         <div class="form-group">
@@ -1080,6 +1087,28 @@ function saveSettings() {
   };
   localStorage.setItem('tdv_settings', JSON.stringify(settings));
   showToast('Settings saved!', 'success');
+}
+
+function forceRefreshAll() {
+  try {
+    if (!firebase || !firebase.database) {
+      showToast('Firebase not connected!', 'error');
+      return;
+    }
+    var version = Date.now().toString();
+    firebase.database().ref('cacheVersion').set(version).then(function() {
+      var statusEl = document.getElementById('forceRefreshStatus');
+      if (statusEl) {
+        statusEl.textContent = '✅ Done! All visitors will get fresh data on next visit. (Version: ' + version + ')';
+        statusEl.style.display = 'block';
+      }
+      showToast('Cache refresh triggered! All visitors will see updated data.', 'success');
+    }).catch(function(err) {
+      showToast('Error: ' + err.message, 'error');
+    });
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
 }
 
 function testRazorpay() {

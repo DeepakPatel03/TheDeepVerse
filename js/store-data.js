@@ -159,6 +159,18 @@ const StoreEngine = (function() {
           console.log('[StoreEngine] Products synced from Firebase (' + data.length + ')');
         }
       });
+      // Check cacheVersion — if admin triggered Force Refresh, clear local cache
+      firebaseDB.ref('cacheVersion').on('value', function(snapshot) {
+        var serverVersion = snapshot.val();
+        if (serverVersion) {
+          var localVersion = localStorage.getItem('tdv_cache_version');
+          if (localVersion !== serverVersion) {
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.setItem('tdv_cache_version', serverVersion);
+            console.log('[StoreEngine] Cache cleared by admin Force Refresh');
+          }
+        }
+      });
     } catch(e) {
       console.error('[StoreEngine] Firebase init failed:', e);
       firebaseReady = false;
