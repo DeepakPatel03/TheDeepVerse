@@ -850,7 +850,7 @@ function handleImageUpload(event) {
       canvas.height = h;
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
-      var dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.5);
       document.getElementById('pThumbnail').value = dataUrl;
       previewThumb();
       showToast('✅ HD Image loaded! (' + w + 'x' + h + ', ' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');
@@ -1287,7 +1287,7 @@ function handleGalleryUpload(event) {
       var img = new Image();
       img.onload = function() {
         var canvas = document.createElement('canvas');
-        var maxSize = 2000;
+        var maxSize = 800; // Keep small for Firebase storage
         var w = img.width, h = img.height;
         if (w > maxSize || h > maxSize) {
           if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
@@ -1296,7 +1296,7 @@ function handleGalleryUpload(event) {
         canvas.width = w; canvas.height = h;
         var ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        var dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.5); // Lower quality to keep size small
         galleryImages.push(dataUrl);
         processed++;
         if (processed === total) {
@@ -1348,7 +1348,7 @@ function handleHdThumbUpload(event) {
     var img = new Image();
     img.onload = function() {
       var canvas = document.createElement('canvas');
-      var maxSize = 2000;
+      var maxSize = 800; // Keep small for Firebase
       var w = img.width, h = img.height;
       if (w > maxSize || h > maxSize) {
         if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
@@ -1357,7 +1357,7 @@ function handleHdThumbUpload(event) {
       canvas.width = w; canvas.height = h;
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
-      var dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.5);
       document.getElementById('pThumbnailUrl').value = dataUrl;
       previewHdThumb();
       showToast('✅ HD thumbnail loaded! (' + w + 'x' + h + ', ' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');

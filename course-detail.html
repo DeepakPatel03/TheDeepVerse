@@ -564,9 +564,9 @@
         // Each variant as its own section
         p.variants.forEach(function(v, i) {
           sidebarHtml += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:12px">';
-          sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
-          sidebarHtml += '<div><div style="font-weight:700;font-size:1rem;color:var(--text-primary)">' + v.name + '</div>';
-          sidebarHtml += '<div style="text-align:right"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + v.price + '</div>';
+          sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:12px">';
+          sidebarHtml += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:0.95rem;color:var(--text-primary);word-wrap:break-word;overflow-wrap:break-word">' + v.name + '</div></div>';
+          sidebarHtml += '<div style="text-align:right;flex-shrink:0"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + v.price + '</div>';
           if (v.originalPrice && v.originalPrice > v.price) {
             sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + v.originalPrice + '</div>';
           }
