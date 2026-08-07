@@ -325,7 +325,10 @@
 
   async function handleSignIn(e) {
     e.preventDefault();
-    if (!auth) return;
+    if (!auth) {
+      showError('Authentication not ready. Please refresh the page and try again.');
+      return;
+    }
 
     const email = document.getElementById('signInEmail').value.trim();
     const password = document.getElementById('signInPassword').value;
@@ -362,7 +365,10 @@
 
   async function handleSignUp(e) {
     e.preventDefault();
-    if (!auth) return;
+    if (!auth) {
+      showError('Authentication not ready. Please refresh the page and try again.');
+      return;
+    }
 
     const name = document.getElementById('signUpName').value.trim();
     const email = document.getElementById('signUpEmail').value.trim();

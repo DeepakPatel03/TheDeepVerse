@@ -27,7 +27,12 @@ let firebaseDatabase = null;
 
 if (FIREBASE_ENABLED && typeof firebase !== 'undefined') {
   try {
-    firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+    // Use existing app if already initialized, otherwise create new
+    if (firebase.apps.length > 0) {
+      firebaseApp = firebase.apps[0];
+    } else {
+      firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+    }
     firebaseAuth = firebaseApp.auth();
     firebaseDatabase = firebaseApp.database();
     console.log('[Firebase] Initialized successfully');
