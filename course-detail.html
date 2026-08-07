@@ -280,6 +280,194 @@
   <script src="js/store-data.js"></script>
   <script src="js/auth.js"></script>
 
+  <!-- INLINE AUTH HANDLER (backup - guaranteed to work) -->
+  <script>
+  (function() {
+    // Wait for Firebase
+    function waitForAuth(cb) {
+      if (window.FirebaseAuth) { cb(window.FirebaseAuth); return; }
+      var tries = 0;
+      var interval = setInterval(function() {
+        tries++;
+        if (window.FirebaseAuth) { clearInterval(interval); cb(window.FirebaseAuth); }
+        else if (tries > 50) { clearInterval(interval); }
+      }, 100);
+    }
+
+    function showAuthError(msg) {
+      var el = document.getElementById('authError');
+      if (el) { el.textContent = msg; el.style.display = 'block'; }
+      else { alert(msg); }
+    }
+
+    function clearAuthError() {
+      var el = document.getElementById('authError');
+      if (el) { el.textContent = ''; el.style.display = 'none'; }
+    }
+
+    function closeModal() {
+      var m = document.getElementById('authModal');
+      if (m) m.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    // Tab switching
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('auth-switch-tab')) {
+        var tab = e.target.getAttribute('data-tab');
+        var signIn = document.getElementById('formSignIn');
+        var signUp = document.getElementById('formSignUp');
+        var tabSignIn = document.getElementById('tabSignIn');
+        var tabSignUp = document.getElementById('tabSignUp');
+        if (tab === 'signup') {
+          if (signIn) signIn.style.display = 'none';
+          if (signUp) signUp.style.display = 'block';
+          if (tabSignIn) tabSignIn.classList.remove('is-active');
+          if (tabSignUp) tabSignUp.classList.add('is-active');
+        } else if (tab === 'signin') {
+          if (signIn) signIn.style.display = 'block';
+          if (signUp) signUp.style.display = 'none';
+          if (tabSignIn) tabSignIn.classList.add('is-active');
+          if (tabSignUp) tabSignUp.classList.remove('is-active');
+        }
+      }
+    });
+
+    // Sign Up handler
+    var signUpForm = document.getElementById('formSignUp');
+    if (signUpForm) {
+      signUpForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        clearAuthError();
+        var name = document.getElementById('signUpName').value.trim();
+        var email = document.getElementById('signUpEmail').value.trim();
+        var pass = document.getElementById('signUpPassword').value;
+        var confirmPass = document.getElementById('signUpConfirmPassword').value;
+
+        if (!name || !email || !pass) { showAuthError('Please fill in all fields.'); return; }
+        if (pass.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
+        if (pass !== confirmPass) { showAuthError('Passwords do not match.'); return; }
+
+        waitForAuth(function(auth) {
+          auth.createUserWithEmailAndPassword(email, pass)
+            .then(function(result) {
+              if (result.user && name) {
+                result.user.updateProfile({ displayName: name });
+              }
+              closeModal();
+              alert('Account created! Welcome to TheDeepVerse! 🎉');
+              location.reload();
+            })
+            .catch(function(err) {
+              var msg = 'Sign up failed.';
+              if (err.code === 'auth/email-already-in-use') msg = 'This email is already registered. Try Sign In.';
+              else if (err.code === 'auth/invalid-email') msg = 'Invalid email address.';
+              else if (err.code === 'auth/weak-password') msg = 'Password is too weak.';
+              else msg = err.message;
+              showAuthError(msg);
+            });
+        });
+      });
+    }
+
+    // Sign In handler
+    var signInForm = document.getElementById('formSignIn');
+    if (signInForm) {
+      signInForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        clearAuthError();
+        var email = document.getElementById('signInEmail').value.trim();
+        var pass = document.getElementById('signInPassword').value;
+        if (!email || !pass) { showAuthError('Please enter email and password.'); return; }
+
+        waitForAuth(function(auth) {
+          auth.signInWithEmailAndPassword(email, pass)
+            .then(function() {
+              closeModal();
+              alert('Welcome back! 👋');
+              location.reload();
+            })
+            .catch(function(err) {
+              var msg = 'Sign in failed.';
+              if (err.code === 'auth/user-not-found') msg = 'No account found. Try Sign Up.';
+              else if (err.code === 'auth/wrong-password') msg = 'Wrong password.';
+              else if (err.code === 'auth/invalid-email') msg = 'Invalid email.';
+              else msg = err.message;
+              showAuthError(msg);
+            });
+        });
+      });
+    }
+
+    // Google Sign In handler
+    var googleBtn = document.getElementById('googleSignInBtn');
+    if (googleBtn) {
+      googleBtn.addEventListener('click', function() {
+        clearAuthError();
+        waitForAuth(function(auth) {
+          var provider = new firebase.auth.GoogleAuthProvider();
+          provider.setCustomParameters({ prompt: 'select_account' });
+          auth.signInWithPopup(provider)
+            .then(function() {
+              closeModal();
+              alert('Welcome to TheDeepVerse! 🎉');
+              location.reload();
+            })
+            .catch(function(err) {
+              if (err.code !== 'auth/popup-closed-by-user') {
+                showAuthError(err.message);
+              }
+            });
+        });
+      });
+    }
+
+    // Login button opens modal
+    var loginBtn = document.getElementById('navLoginBtn');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', function() {
+        var modal = document.getElementById('authModal');
+        if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+      });
+    }
+
+    // Close modal
+    var closeBtn = document.getElementById('authModalClose');
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    var backdrop = document.getElementById('authModalBackdrop');
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+
+    // Auth state: show/hide login button
+    waitForAuth(function(auth) {
+      auth.onAuthStateChanged(function(user) {
+        var loginBtn = document.getElementById('navLoginBtn');
+        var navCta = loginBtn ? loginBtn.parentElement : null;
+        var navUser = document.getElementById('navUser');
+        if (user) {
+          if (loginBtn) loginBtn.style.display = 'none';
+          if (navUser) {
+            navUser.style.display = 'flex';
+            var nameEl = document.getElementById('navUserName');
+            var nameLgEl = document.getElementById('navUserNameLg');
+            var emailEl = document.getElementById('navUserEmail');
+            if (nameEl) nameEl.textContent = user.displayName || 'User';
+            if (nameLgEl) nameLgEl.textContent = user.displayName || 'User';
+            if (emailEl) emailEl.textContent = user.email || '';
+          }
+        }
+      });
+    });
+
+    // Logout
+    var logoutBtn = document.getElementById('navLogoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', function() {
+        waitForAuth(function(auth) { auth.signOut().then(function() { location.reload(); }); });
+      });
+    }
+  })();
+  </script>
+
   <script>
   (function() {
     'use strict';
