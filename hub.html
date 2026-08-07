@@ -21,6 +21,25 @@
   <link rel="stylesheet" href="css/design-system.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/vault.css">
+  <!-- User dropdown styles (auth modal styles are injected by auth.js) -->
+  <style>
+    .nav__user{position:relative}
+    .nav__user-btn{display:flex;align-items:center;gap:8px;background:none;border:none;color:#f5f5f5;cursor:pointer;padding:6px 10px;border-radius:8px;transition:background 0.2s}
+    .nav__user-btn:hover{background:rgba(255,255,255,0.05)}
+    .nav__user-avatar,.nav__user-avatar-lg{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#b8962e);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:#000}
+    .nav__user-avatar-lg{width:48px;height:48px;font-size:1rem}
+    .nav__user-name{font-size:0.85rem;font-weight:600}
+    .nav__user-dropdown{display:none;position:absolute;top:100%;right:0;margin-top:8px;background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:12px;min-width:260px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:1000}
+    .nav__user-dropdown.is-open{display:block}
+    .nav__user-info{display:flex;gap:12px;align-items:center;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06)}
+    .nav__user-name-lg{font-weight:700;font-size:0.9rem;display:block;color:#f5f5f5}
+    .nav__user-email{font-size:0.75rem;color:#888;display:block}
+    .nav__user-divider{height:1px;background:rgba(255,255,255,0.06);margin:4px 0}
+    .nav__user-item{display:flex;align-items:center;padding:10px 20px;color:#aaa;text-decoration:none;font-size:0.85rem;width:100%;background:none;border:none;cursor:pointer;text-align:left}
+    .nav__user-item:hover{background:rgba(255,255,255,0.04);color:#f5f5f5}
+    .nav__user-item--danger{color:#ff4444}
+    .nav__user-item--danger:hover{background:rgba(255,0,0,0.06)}
+  </style>
 </head>
 <body>
 
@@ -37,7 +56,32 @@
         <a href="about.html" class="nav__link">About</a>
         <a href="contact.html" class="nav__link">Contact</a>
       </div>
-      <div class="nav__cta"><a href="https://youtube.com/@TheDeepVerse-YT" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--sm">Subscribe</a></div>
+      <div class="nav__cta">
+        <a href="https://youtube.com/@TheDeepVerse-YT" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--sm">Subscribe</a>
+        <button class="btn btn--secondary btn--sm" id="navLoginBtn" style="margin-left: 8px;">Login / Sign Up</button>
+      </div>
+      <!-- User Profile Dropdown (shown after login) -->
+      <div class="nav__user" id="navUser" style="display: none;">
+        <button class="nav__user-btn" id="navUserBtn" aria-label="User menu" aria-expanded="false">
+          <span class="nav__user-avatar" id="navUserAvatar">?</span>
+          <span class="nav__user-name" id="navUserName">User</span>
+          <svg class="nav__user-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav__user-dropdown" id="navUserDropdown">
+          <div class="nav__user-info">
+            <span class="nav__user-avatar-lg" id="navUserAvatarLg">?</span>
+            <div>
+              <span class="nav__user-name-lg" id="navUserNameLg">User</span>
+              <span class="nav__user-email" id="navUserEmail">email@example.com</span>
+            </div>
+          </div>
+          <div class="nav__user-divider"></div>
+          <a href="dashboard.html" class="nav__user-item">📊 My Dashboard</a>
+          <a href="store.html" class="nav__user-item">🛍️ Store</a>
+          <div class="nav__user-divider"></div>
+          <button class="nav__user-item nav__user-item--danger" id="navLogoutBtn">🚪 Logout</button>
+        </div>
+      </div>
       <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false"><div class="nav__toggle-icon"><span></span><span></span><span></span></div></button>
     </div>
     <div class="nav__mobile">
@@ -48,6 +92,7 @@
       <a href="store.html" class="nav__mobile-link">Store</a>
       <a href="about.html" class="nav__mobile-link">About</a>
       <a href="contact.html" class="nav__mobile-link">Contact</a>
+      <a href="dashboard.html" class="nav__mobile-link">Dashboard</a>
       <div class="nav__mobile-footer">
         <a href="https://youtube.com/@TheDeepVerse-YT" target="_blank" rel="noopener noreferrer" class="btn btn--youtube btn--md" style="width:100%;justify-content:center;">Subscribe on YouTube</a>
       </div>
@@ -450,9 +495,11 @@
   <script src="js/main.js"></script>
   <!-- Firebase + Store Data for dynamic thumbnails -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/store-data.js"></script>
+  <script src="js/auth.js"></script>
   <script>
     // Hub tab switching
     document.querySelectorAll('.hub-tab').forEach(function(tab) {

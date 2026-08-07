@@ -183,15 +183,15 @@
 
           <!-- ── EDITIONS (Hindi / English) ── -->
           <div style="border-top:1px solid var(--admin-border);margin:20px 0;padding-top:20px">
-            <h3 style="color:var(--admin-text-1);font-size:1rem;margin-bottom:8px">📚 Book Editions (Optional)</h3>
-            <p style="font-size:0.85rem;color:var(--admin-text-2);margin-bottom:16px">Add Hindi & English editions with Google Drive download links. Leave empty for non-book products.</p>
+            <h3 style="color:var(--admin-text-1);font-size:1rem;margin-bottom:8px">📦 Choose Your Preferences (Optional)</h3>
+            <p style="font-size:0.85rem;color:var(--admin-text-2);margin-bottom:16px">Add multiple variants of your product (different editions, video links, prompt files, etc). Leave empty if not needed.</p>
             <div id="variantsContainer" style="display:flex;flex-direction:column;gap:16px;margin-bottom:12px"></div>
-            <button type="button" class="btn-admin" onclick="addVariantField()" id="addVarBtn">+ Add Edition</button>
+            <button type="button" class="btn-admin" onclick="addVariantField()" id="addVarBtn">➕ Add Variant</button>
 
             <div style="margin-top:16px;padding:12px;background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:8px">
-              <label style="font-size:0.85rem;font-weight:600;color:var(--admin-text-1)">📦 Combo Price (₹) — Both Editions</label>
+              <label style="font-size:0.85rem;font-weight:600;color:var(--admin-text-1)">📦 Combo Price (₹) — All Variants</label>
               <input type="number" id="pComboPrice" placeholder="99" style="padding:8px;margin-top:4px">
-              <small style="color:var(--admin-text-2)">Leave 0 or empty to hide combo option on product page.</small>
+              <small style="color:var(--admin-text-2)">Leave 0 or empty to hide combo option. Shows automatically when 2+ variants exist.</small>
             </div>
             <textarea id="pVariants" style="display:none"></textarea>
           </div>
@@ -1221,24 +1221,19 @@ function renderVariants() {
         '<div><label style="font-size:0.8rem">Price (₹)</label><input type="number" value="' + (v.price || 0) + '" onchange="updateVariant(' + i + ', \'price\', this.value)" style="padding:8px"></div>' +
       '</div>' +
       '<div>' +
-        '<label style="font-size:0.8rem">Download Link (Google Drive)</label>' +
-        '<input type="text" id="varFile_' + i + '" value="' + (v.downloadUrl || '') + '" onchange="updateVariant(' + i + ', \'downloadUrl\', this.value)" placeholder="https://drive.google.com/..." style="padding:8px">' +
-        '<small style="font-size:0.75rem;color:var(--admin-text-2)">Drive pe file upload karo → Share link paste karo</small>' +
+        '<label style="font-size:0.8rem">Download / Video Link</label>' +
+        '<input type="text" id="varFile_' + i + '" value="' + (v.downloadUrl || '') + '" onchange="updateVariant(' + i + ', \'downloadUrl\', this.value)" placeholder="Google Drive, YouTube, or any URL" style="padding:8px">' +
+        '<small style="font-size:0.75rem;color:var(--admin-text-2)">Drive link, YouTube link, ya koi bhi URL paste karo</small>' +
       '</div>' +
     '</div>';
   }).join('');
   
-  var addBtn = document.getElementById('addVarBtn');
-  if (addBtn) addBtn.style.display = currentVariants.length >= 2 ? 'none' : 'inline-block';
 }
 
 function addVariantField() {
-  if (currentVariants.length >= 2) {
-    showToast('Maximum 2 editions allowed (Hindi & English).', 'error');
-    return;
-  }
-  var defaultName = currentVariants.length === 0 ? 'English Edition' : 'Hindi Edition';
-  currentVariants.push({ id: 'var_' + Date.now(), name: defaultName, price: 65, originalPrice: 0, downloadUrl: '' });
+  var num = currentVariants.length + 1;
+  var defaultName = 'Variant ' + num;
+  currentVariants.push({ id: 'var_' + Date.now(), name: defaultName, price: 0, originalPrice: 0, downloadUrl: '' });
   renderVariants();
 }
 

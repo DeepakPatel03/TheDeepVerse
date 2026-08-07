@@ -563,14 +563,13 @@
       if (hasVariants && isLive) {
         // ── EDITION-BASED LAYOUT ──
         sidebarHtml += '<div style="padding:4px 0">';
-        sidebarHtml += '<div style="text-align:center;margin-bottom:16px"><span style="background:rgba(212,175,55,0.15);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;letter-spacing:0.5px">📚 CHOOSE YOUR EDITION</span></div>';
+        sidebarHtml += '<div style="text-align:center;margin-bottom:16px"><span style="background:rgba(212,175,55,0.15);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;letter-spacing:0.5px">📦 CHOOSE YOUR PREFERENCE</span></div>';
 
         // Each variant as its own section
         p.variants.forEach(function(v, i) {
           sidebarHtml += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:12px">';
           sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
           sidebarHtml += '<div><div style="font-weight:700;font-size:1rem;color:var(--text-primary)">' + v.name + '</div>';
-          sidebarHtml += '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">PDF eBook</div></div>';
           sidebarHtml += '<div style="text-align:right"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + v.price + '</div>';
           if (v.originalPrice && v.originalPrice > v.price) {
             sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + v.originalPrice + '</div>';
@@ -581,19 +580,21 @@
         });
 
         // Combo Deal Section
-        if (p.comboPrice) {
+        if (p.comboPrice && p.variants.length >= 2) {
+          var comboLabel = p.variants.length === 2 ? 'Combo — Both' : 'Combo — All ' + p.variants.length;
+          var comboDesc = p.variants.map(function(v) { return v.name; }).join(' + ');
           sidebarHtml += '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.02));border:2px solid rgba(212,175,55,0.3);border-radius:12px;padding:16px;margin-bottom:12px;position:relative">';
           sidebarHtml += '<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:2px 12px;border-radius:10px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px">🔥 BEST DEAL</div>';
           sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;margin-top:4px">';
-          sidebarHtml += '<div><div style="font-weight:700;font-size:1rem;color:var(--text-primary)">📦 Combo — Both Editions</div>';
-          sidebarHtml += '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">Hindi + English PDF</div></div>';
+          sidebarHtml += '<div><div style="font-weight:700;font-size:1rem;color:var(--text-primary)">📦 ' + comboLabel + '</div>';
+          sidebarHtml += '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">' + comboDesc + '</div></div>';
           sidebarHtml += '<div style="text-align:right"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + p.comboPrice + '</div>';
           if (p.comboOriginalPrice && p.comboOriginalPrice > p.comboPrice) {
             var savePct = Math.round((1 - p.comboPrice / p.comboOriginalPrice) * 100);
             sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + p.comboOriginalPrice + '</div>';
           }
           sidebarHtml += '</div></div>';
-          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyCombo()" style="display:block;text-align:center;background:linear-gradient(135deg,#d4af37,#b8962e);color:#000;font-weight:800;padding:12px;border-radius:8px;text-decoration:none;font-size:0.95rem;box-shadow:0 4px 15px rgba(212,175,55,0.4);transition:all 0.2s">🛒 Buy Combo — ₹' + p.comboPrice + ' (Save ' + savePct + '%)</a>';
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyCombo()" style="display:block;text-align:center;background:linear-gradient(135deg,#d4af37,#b8962e);color:#000;font-weight:800;padding:12px;border-radius:8px;text-decoration:none;font-size:0.95rem;box-shadow:0 4px 15px rgba(212,175,55,0.4);transition:all 0.2s">🛒 Buy ' + comboLabel + ' — ₹' + p.comboPrice + (savePct ? ' (Save ' + savePct + '%)' : '') + '</a>';
           sidebarHtml += '</div>';
         }
 
@@ -771,13 +772,14 @@
       processPayment(currentProduct.id + '_' + (v.id || v.name.replace(/[^a-zA-Z0-9]/g, '')), v.price, v.name, [dlUrl]);
     };
 
-    // Buy combo (all editions)
+    // Buy combo (all variants)
     window.buyCombo = function() {
       if (!currentProduct || !currentProduct.variants) return;
       var allUrls = currentProduct.variants.map(function(v) { return v.downloadUrl; }).filter(Boolean);
       if (allUrls.length === 0) { alert('Download links not set yet.'); return; }
-      
-      processPayment(currentProduct.id + '_combo', currentProduct.comboPrice || 99, 'Combo — Both Editions', allUrls);
+      var count = currentProduct.variants.length;
+      var comboLabel = count === 2 ? 'Combo — Both' : 'Combo — All ' + count;
+      processPayment(currentProduct.id + '_combo', currentProduct.comboPrice || 99, comboLabel, allUrls);
     };
 
     // Buy simple product (no variants)
