@@ -573,6 +573,12 @@
     }
   }
 
+  // ── Export for global use ──
+  window.TDVAuth = {
+    openAuthModal: openAuthModal,
+    closeAuthModal: closeAuthModal
+  };
+
   // ── Initialize ──
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initAuth);

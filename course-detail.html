@@ -33,6 +33,34 @@
         <a href="about.html" class="nav__link">About</a>
         <a href="contact.html" class="nav__link">Contact</a>
       </div>
+
+      <div class="nav__cta">
+        <a href="https://youtube.com/@TheDeepVerse-YT" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--sm">Subscribe</a>
+        <button class="btn btn--secondary btn--sm" id="navLoginBtn" style="margin-left: 8px;">Login / Sign Up</button>
+      </div>
+
+      <!-- User Profile Dropdown (shown after login) -->
+      <div class="nav__user" id="navUser" style="display: none;">
+        <button class="nav__user-btn" id="navUserProfileBtn" aria-label="User menu">
+          <span class="nav__user-avatar" id="navUserAvatar">?</span>
+          <span class="nav__user-name" id="navUserName">User</span>
+        </button>
+        <div class="nav__user-dropdown" id="navUserDropdown">
+          <div class="nav__user-info">
+            <span class="nav__user-avatar-lg" id="navUserAvatarLg">?</span>
+            <div>
+              <span class="nav__user-name-lg" id="navUserNameLg">User</span>
+              <span class="nav__user-email" id="navUserEmail">email@example.com</span>
+            </div>
+          </div>
+          <div class="nav__user-divider"></div>
+          <a href="dashboard.html" class="nav__user-item">📊 My Dashboard</a>
+          <a href="store.html" class="nav__user-item">🛍️ Store</a>
+          <div class="nav__user-divider"></div>
+          <button class="nav__user-item nav__user-item--danger" id="navLogoutBtn">🚪 Logout</button>
+        </div>
+      </div>
+
       <button class="nav__toggle" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
