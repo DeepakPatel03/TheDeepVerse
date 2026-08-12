@@ -55,6 +55,7 @@
           </div>
           <div class="nav__user-divider"></div>
           <a href="dashboard.html" class="nav__user-item">📊 My Dashboard</a>
+          <a href="dashboard.html" class="nav__user-item">📚 My Courses</a>
           <a href="store.html" class="nav__user-item">🛍️ Store</a>
           <div class="nav__user-divider"></div>
           <button class="nav__user-item nav__user-item--danger" id="navLogoutBtn">🚪 Logout</button>
@@ -890,13 +891,18 @@
 
         // 🛑 Enforce login for video courses BEFORE payment
         if (isVideoCourse && !user) {
-          if (window.openAuthModal) {
+          // Open auth modal first, then show message
+          if (window.TDVAuth) {
+            window.TDVAuth.openAuthModal();
+          } else if (window.openAuthModal) {
             window.openAuthModal();
-            // Show a toast or alert so they know why the modal opened
-            alert('Please Login or Sign Up first to purchase this course. This ensures you can access it later from your Dashboard.');
           } else {
-            alert('Please login to purchase this course.');
+            var modal = document.getElementById('authModal');
+            if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
           }
+          setTimeout(function() {
+            alert('Please Login or Sign Up first to purchase this course. Your purchase will be saved to your account so you can access it anytime from My Courses.');
+          }, 300);
           return; // Stop payment process
         }
 

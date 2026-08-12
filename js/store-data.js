@@ -135,7 +135,7 @@ const StoreEngine = (function() {
   ];
 
   // ── Data versioning ──
-  const DATA_VERSION = '2026-08-12-v3'; // v3: ai-masterclass type changed to video-course for auth protection
+  const DATA_VERSION = '2026-08-12-v4'; // v4: Firebase Storage for images, auth dropdown fix
   const VERSION_KEY = 'tdv_data_version';
 
   // ── Firebase ──

@@ -551,6 +551,7 @@
 <!-- ── SCRIPTS ── -->
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="js/firebase-config.js"></script>
 <script src="js/store-data.js"></script>
@@ -851,9 +852,13 @@ function handleImageUpload(event) {
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
       var dataUrl = canvas.toDataURL('image/jpeg', 0.5);
-      document.getElementById('pThumbnail').value = dataUrl;
-      previewThumb();
-      showToast('✅ HD Image loaded! (' + w + 'x' + h + ', ' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');
+      var productId = document.getElementById('editId') ? document.getElementById('editId').value : '';
+      var storagePath = 'products/' + (productId || 'temp-' + Date.now()) + '/thumbnail-' + Date.now() + '.jpg';
+      uploadToStorage(dataUrl, storagePath).then(function(publicUrl) {
+        document.getElementById('pThumbnail').value = publicUrl;
+        previewThumb();
+        showToast('✅ HD Image loaded! (' + w + 'x' + h + ', uploaded to Storage)', 'success');
+      });
     };
     img.onerror = function() {
       showToast('Could not read image.', 'error');
@@ -1249,6 +1254,45 @@ function removeVariant(index) {
   renderVariants();
 }
 
+// Upload Base64 data URL to Firebase Storage, return the public download URL
+function uploadToStorage(dataUrl, storagePath) {
+  return new Promise(function(resolve, reject) {
+    if (!window.FirebaseStorage) {
+      // Fallback: if Storage not available, keep base64 (but warn)
+      console.warn('[Admin] Firebase Storage not available, using base64 fallback');
+      resolve(dataUrl);
+      return;
+    }
+    try {
+      var storageRef = window.FirebaseStorage.ref(storagePath);
+      // Convert base64 to blob
+      var byteString = atob(dataUrl.split(',')[1]);
+      var mimeString = dataUrl.split(',')[0].split(':')[1].split(';')[0];
+      var ab = new ArrayBuffer(byteString.length);
+      var ia = new Uint8Array(ab);
+      for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      var blob = new Blob([ab], { type: mimeString });
+      
+      var uploadTask = storageRef.put(blob, { contentType: mimeString });
+      uploadTask.then(function(snapshot) {
+        return snapshot.ref.getDownloadURL();
+      }).then(function(downloadURL) {
+        console.log('[Admin] Uploaded to Storage:', storagePath);
+        resolve(downloadURL);
+      }).catch(function(err) {
+        console.error('[Admin] Storage upload failed:', err);
+        // Fallback to base64
+        resolve(dataUrl);
+      });
+    } catch(e) {
+      console.error('[Admin] Storage upload error:', e);
+      resolve(dataUrl);
+    }
+  });
+}
+
 // ═══ GALLERY IMAGE UPLOADER ═══
 var galleryImages = [];
 
@@ -1297,12 +1341,16 @@ function handleGalleryUpload(event) {
         var ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
         var dataUrl = canvas.toDataURL('image/jpeg', 0.5); // Lower quality to keep size small
-        galleryImages.push(dataUrl);
-        processed++;
-        if (processed === total) {
-          renderGalleryGrid();
-          showToast('✅ ' + total + ' HD image(s) added to gallery!', 'success');
-        }
+        var productId = document.getElementById('editId') ? document.getElementById('editId').value : '';
+        var storagePath = 'products/' + (productId || 'temp-' + Date.now()) + '/gallery/img-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5) + '.jpg';
+        uploadToStorage(dataUrl, storagePath).then(function(publicUrl) {
+          galleryImages.push(publicUrl);
+          processed++;
+          if (processed === total) {
+            renderGalleryGrid();
+            showToast('✅ ' + total + ' HD image(s) added to gallery!', 'success');
+          }
+        });
       };
       img.src = e.target.result;
     };
@@ -1358,9 +1406,13 @@ function handleHdThumbUpload(event) {
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
       var dataUrl = canvas.toDataURL('image/jpeg', 0.5);
-      document.getElementById('pThumbnailUrl').value = dataUrl;
-      previewHdThumb();
-      showToast('✅ HD thumbnail loaded! (' + w + 'x' + h + ', ' + Math.round(dataUrl.length / 1024) + ' KB)', 'success');
+      var productId = document.getElementById('editId') ? document.getElementById('editId').value : '';
+      var storagePath = 'products/' + (productId || 'temp-' + Date.now()) + '/hdthumb-' + Date.now() + '.jpg';
+      uploadToStorage(dataUrl, storagePath).then(function(publicUrl) {
+        document.getElementById('pThumbnailUrl').value = publicUrl;
+        previewHdThumb();
+        showToast('✅ HD thumbnail loaded! (' + w + 'x' + h + ', uploaded to Storage)', 'success');
+      });
     };
     img.onerror = function() {
       showToast('Could not read image.', 'error');

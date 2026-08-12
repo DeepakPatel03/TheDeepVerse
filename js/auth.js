@@ -155,9 +155,15 @@
     // Cache DOM elements
     cacheElements();
 
-    // Set up event listeners (skip on course-detail page — has its own inline handler)
-    if (window.location.pathname.indexOf('course-detail') === -1) {
+    // Set up event listeners
+    // On course-detail page, skip auth modal form listeners (it has its own inline handler)
+    // but still attach the profile dropdown toggle
+    var isCourseDetail = window.location.pathname.indexOf('course-detail') !== -1;
+    if (!isCourseDetail) {
       setupEventListeners();
+    } else {
+      // Still attach dropdown + logout even on course-detail
+      setupDropdownListeners();
     }
 
     // Auth state observer
@@ -265,6 +271,27 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && modalOpen) {
         closeAuthModal();
+      }
+    });
+
+    // Logout button
+    const logoutBtn = document.getElementById('navLogoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', handleSignOut);
+    }
+  }
+
+  // ── Dropdown-only listeners (for pages like course-detail that have their own auth modal) ──
+  function setupDropdownListeners() {
+    // User dropdown toggle
+    if (userProfileBtn) {
+      userProfileBtn.addEventListener('click', toggleUserDropdown);
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
+      if (userDropdown && userProfileBtn && !userProfileBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+        userDropdown.classList.remove('is-open');
       }
     });
 
