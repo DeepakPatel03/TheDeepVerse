@@ -4,7 +4,6 @@
    Connected to Firebase Realtime Database.
    Admin panel changes now persist for ALL visitors.
    Firebase Auth enabled for user authentication.
-   Firebase Storage enabled for image uploads.
    ═══════════════════════════════════════════════════ */
 
 const FIREBASE_CONFIG = {
@@ -25,7 +24,6 @@ const FIREBASE_ENABLED = FIREBASE_CONFIG.apiKey !== "" && FIREBASE_CONFIG.databa
 let firebaseApp = null;
 let firebaseAuth = null;
 let firebaseDatabase = null;
-let firebaseStorage = null;
 
 if (FIREBASE_ENABLED && typeof firebase !== 'undefined') {
   try {
@@ -37,11 +35,6 @@ if (FIREBASE_ENABLED && typeof firebase !== 'undefined') {
     }
     firebaseAuth = firebaseApp.auth();
     firebaseDatabase = firebaseApp.database();
-    // Initialize Storage if SDK is loaded
-    if (typeof firebase.storage === 'function') {
-      firebaseStorage = firebaseApp.storage();
-      console.log('[Firebase] Storage initialized');
-    }
     console.log('[Firebase] Initialized successfully');
   } catch (e) {
     console.error('[Firebase] Initialization error:', e);
@@ -52,5 +45,4 @@ if (FIREBASE_ENABLED && typeof firebase !== 'undefined') {
 window.FirebaseAuth = firebaseAuth;
 window.FirebaseDatabase = firebaseDatabase;
 window.FirebaseApp = firebaseApp;
-window.FirebaseStorage = firebaseStorage;
 

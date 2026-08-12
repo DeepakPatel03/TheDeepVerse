@@ -551,7 +551,6 @@
 <!-- ── SCRIPTS ── -->
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="js/firebase-config.js"></script>
 <script src="js/store-data.js"></script>
@@ -839,9 +838,8 @@ function handleImageUpload(event) {
   reader.onload = function(e) {
     var img = new Image();
     img.onload = function() {
-      // High quality: max 2000px, JPEG 95% — excellent quality, reasonable size
       var canvas = document.createElement('canvas');
-      var maxSize = 2000;
+      var maxSize = 400;
       var w = img.width, h = img.height;
       if (w > maxSize || h > maxSize) {
         if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
@@ -851,14 +849,10 @@ function handleImageUpload(event) {
       canvas.height = h;
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
-      var dataUrl = canvas.toDataURL('image/jpeg', 0.5);
-      var productId = document.getElementById('editId') ? document.getElementById('editId').value : '';
-      var storagePath = 'products/' + (productId || 'temp-' + Date.now()) + '/thumbnail-' + Date.now() + '.jpg';
-      uploadToStorage(dataUrl, storagePath).then(function(publicUrl) {
-        document.getElementById('pThumbnail').value = publicUrl;
-        previewThumb();
-        showToast('✅ HD Image loaded! (' + w + 'x' + h + ', uploaded to Storage)', 'success');
-      });
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.3);
+      document.getElementById('pThumbnail').value = dataUrl;
+      previewThumb();
+      showToast('✅ Thumbnail loaded! (' + w + 'x' + h + ')', 'success');
     };
     img.onerror = function() {
       showToast('Could not read image.', 'error');
@@ -1254,44 +1248,6 @@ function removeVariant(index) {
   renderVariants();
 }
 
-// Upload Base64 data URL to Firebase Storage, return the public download URL
-function uploadToStorage(dataUrl, storagePath) {
-  return new Promise(function(resolve, reject) {
-    if (!window.FirebaseStorage) {
-      // Fallback: if Storage not available, keep base64 (but warn)
-      console.warn('[Admin] Firebase Storage not available, using base64 fallback');
-      resolve(dataUrl);
-      return;
-    }
-    try {
-      var storageRef = window.FirebaseStorage.ref(storagePath);
-      // Convert base64 to blob
-      var byteString = atob(dataUrl.split(',')[1]);
-      var mimeString = dataUrl.split(',')[0].split(':')[1].split(';')[0];
-      var ab = new ArrayBuffer(byteString.length);
-      var ia = new Uint8Array(ab);
-      for (var i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-      }
-      var blob = new Blob([ab], { type: mimeString });
-      
-      var uploadTask = storageRef.put(blob, { contentType: mimeString });
-      uploadTask.then(function(snapshot) {
-        return snapshot.ref.getDownloadURL();
-      }).then(function(downloadURL) {
-        console.log('[Admin] Uploaded to Storage:', storagePath);
-        resolve(downloadURL);
-      }).catch(function(err) {
-        console.error('[Admin] Storage upload failed:', err);
-        // Fallback to base64
-        resolve(dataUrl);
-      });
-    } catch(e) {
-      console.error('[Admin] Storage upload error:', e);
-      resolve(dataUrl);
-    }
-  });
-}
 
 // ═══ GALLERY IMAGE UPLOADER ═══
 var galleryImages = [];
@@ -1321,17 +1277,15 @@ function handleGalleryUpload(event) {
     files = files.slice(0, 4 - galleryImages.length);
   }
   if (files.length === 0) return;
-  var processed = 0;
-  var total = files.length;
 
   files.forEach(function(file) {
-    if (!file.type.startsWith('image/')) { processed++; return; }
+    if (!file.type.startsWith('image/')) return;
     var reader = new FileReader();
     reader.onload = function(e) {
       var img = new Image();
       img.onload = function() {
         var canvas = document.createElement('canvas');
-        var maxSize = 800; // Keep small for Firebase storage
+        var maxSize = 400; // Small for RTDB Base64
         var w = img.width, h = img.height;
         if (w > maxSize || h > maxSize) {
           if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
@@ -1340,17 +1294,10 @@ function handleGalleryUpload(event) {
         canvas.width = w; canvas.height = h;
         var ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        var dataUrl = canvas.toDataURL('image/jpeg', 0.5); // Lower quality to keep size small
-        var productId = document.getElementById('editId') ? document.getElementById('editId').value : '';
-        var storagePath = 'products/' + (productId || 'temp-' + Date.now()) + '/gallery/img-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5) + '.jpg';
-        uploadToStorage(dataUrl, storagePath).then(function(publicUrl) {
-          galleryImages.push(publicUrl);
-          processed++;
-          if (processed === total) {
-            renderGalleryGrid();
-            showToast('✅ ' + total + ' HD image(s) added to gallery!', 'success');
-          }
-        });
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.3);
+        galleryImages.push(dataUrl);
+        renderGalleryGrid();
+        showToast('✅ Gallery image added! (' + w + 'x' + h + ')', 'success');
       };
       img.src = e.target.result;
     };
@@ -1396,7 +1343,7 @@ function handleHdThumbUpload(event) {
     var img = new Image();
     img.onload = function() {
       var canvas = document.createElement('canvas');
-      var maxSize = 800; // Keep small for Firebase
+      var maxSize = 400; // Small for RTDB Base64
       var w = img.width, h = img.height;
       if (w > maxSize || h > maxSize) {
         if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
@@ -1405,14 +1352,10 @@ function handleHdThumbUpload(event) {
       canvas.width = w; canvas.height = h;
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
-      var dataUrl = canvas.toDataURL('image/jpeg', 0.5);
-      var productId = document.getElementById('editId') ? document.getElementById('editId').value : '';
-      var storagePath = 'products/' + (productId || 'temp-' + Date.now()) + '/hdthumb-' + Date.now() + '.jpg';
-      uploadToStorage(dataUrl, storagePath).then(function(publicUrl) {
-        document.getElementById('pThumbnailUrl').value = publicUrl;
-        previewHdThumb();
-        showToast('✅ HD thumbnail loaded! (' + w + 'x' + h + ', uploaded to Storage)', 'success');
-      });
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.3);
+      document.getElementById('pThumbnailUrl').value = dataUrl;
+      previewHdThumb();
+      showToast('✅ HD thumbnail loaded! (' + w + 'x' + h + ')', 'success');
     };
     img.onerror = function() {
       showToast('Could not read image.', 'error');
