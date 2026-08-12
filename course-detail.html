@@ -881,16 +881,32 @@
     // Process Razorpay payment and download
     function processPayment(productId, price, description, downloadUrls) {
       try {
+        var isVideoCourse = currentProduct && currentProduct.type === 'video-course';
+        var user = null;
+
+        if (window.FirebaseAuth && window.FirebaseAuth.currentUser) {
+          user = window.FirebaseAuth.currentUser;
+        }
+
+        // 🛑 Enforce login for video courses BEFORE payment
+        if (isVideoCourse && !user) {
+          if (window.openAuthModal) {
+            window.openAuthModal();
+            // Show a toast or alert so they know why the modal opened
+            alert('Please Login or Sign Up first to purchase this course. This ensures you can access it later from your Dashboard.');
+          } else {
+            alert('Please login to purchase this course.');
+          }
+          return; // Stop payment process
+        }
+
         // Pre-fill user info if logged in
         var prefill = { name: '', email: '', contact: '' };
-        if (window.FirebaseAuth && window.FirebaseAuth.currentUser) {
-          var user = window.FirebaseAuth.currentUser;
+        if (user) {
           prefill.name = user.displayName || '';
           prefill.email = user.email || '';
           prefill.contact = user.phoneNumber || '';
         }
-
-        var isVideoCourse = currentProduct && currentProduct.type === 'video-course';
 
         var options = {
           key: getRazorpayKey(),

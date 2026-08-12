@@ -61,7 +61,7 @@ const StoreEngine = (function() {
     },
     {
       id: 'ai-masterclass',
-      type: 'course',
+      type: 'video-course',
       category: 'course',
       title: 'AI Content Creation Masterclass',
       description: 'Complete Practical Course — Zero to Hero AI Workflow. Learn Script Writing, AI Image & Video Generation, Voice Generation, Professional Editing & SEO. 2+ Hours of HD Video + 2 FREE Master Prompts.',
@@ -135,7 +135,7 @@ const StoreEngine = (function() {
   ];
 
   // ── Data versioning ──
-  const DATA_VERSION = '2026-08-07-v2'; // v2: ai-masterclass type changed to course, login removed
+  const DATA_VERSION = '2026-08-12-v3'; // v3: ai-masterclass type changed to video-course for auth protection
   const VERSION_KEY = 'tdv_data_version';
 
   // ── Firebase ──

@@ -249,6 +249,144 @@
   gap: var(--space-4);
 }
 
+/* User Profile (Auth) */
+.nav__user {
+  display: none;
+  position: relative;
+}
+
+.nav__user-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.nav__user-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav__user-avatar,
+.nav__user-avatar-lg {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d4af37, #b8962e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #000;
+}
+
+.nav__user-avatar-lg {
+  width: 48px;
+  height: 48px;
+  font-size: 1rem;
+}
+
+.nav__user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.nav__user-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  min-width: 260px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+}
+
+.nav__user-dropdown.is-open {
+  display: block;
+  animation: fadeInDown 0.2s ease;
+}
+
+.nav__user-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.nav__user-name-lg {
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: block;
+  color: #f5f5f5;
+}
+
+.nav__user-email {
+  font-size: 0.75rem;
+  color: #888;
+  display: block;
+  /* Prevent huge emails from breaking layout */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.nav__user-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 4px 0;
+}
+
+.nav__user-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  color: #aaa;
+  text-decoration: none;
+  font-size: 0.85rem;
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.nav__user-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #f5f5f5;
+}
+
+.nav__user-item--danger {
+  color: #ff4444;
+}
+
+.nav__user-item--danger:hover {
+  background: rgba(255, 0, 0, 0.06);
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 /* ============================================================
    2. BUTTONS
