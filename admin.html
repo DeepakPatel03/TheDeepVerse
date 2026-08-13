@@ -379,8 +379,8 @@
       </div>
 
       <div class="data-section">
-        <h3>💳 Razorpay Payment Gateway</h3>
-        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Connect Razorpay to accept payments. Get your API key from <a href="https://dashboard.razorpay.com" target="_blank" style="color:var(--admin-accent)">dashboard.razorpay.com</a></p>
+        <h3>💳 Razorpay Payment Gateway (India)</h3>
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Indian payments ke liye Razorpay Key ID set karo. <a href="https://dashboard.razorpay.com" target="_blank" style="color:var(--admin-accent)">dashboard.razorpay.com</a> se key lo.</p>
         <div class="form-group">
           <label>Razorpay Key ID</label>
           <input type="text" id="settRazorpayKey" placeholder="rzp_live_XXXXXXXXXX or rzp_test_XXXXXXXXXX">
@@ -400,7 +400,42 @@
           <label>Logo URL (shown in Razorpay popup)</label>
           <input type="text" id="settLogoUrl" placeholder="https://thedeepverse.in/assets/images/logo.png">
         </div>
-        <button class="btn-admin btn-admin--primary" onclick="saveSettings()">💾 Save Settings</button>
+      </div>
+
+      <div class="data-section">
+        <h3>🌍 PayPal Payment Gateway (International)</h3>
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">International payments ke liye PayPal Client ID set karo. <a href="https://developer.paypal.com/dashboard/" target="_blank" style="color:var(--admin-accent)">developer.paypal.com</a> se Client ID lo.</p>
+        <div class="form-group">
+          <label>PayPal Client ID</label>
+          <input type="text" id="settPaypalClientId" placeholder="BAArKqbNWhZR0TiQkI_tP...">
+          <small>PayPal Developer Dashboard → Apps & Credentials → Your App → Client ID</small>
+        </div>
+        <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px;margin-top:8px">
+          <p style="color:#ef4444;font-size:0.8rem;font-weight:600;margin-bottom:4px">⚠️ Important</p>
+          <p style="color:var(--admin-text-2);font-size:0.78rem;margin:0">PayPal <strong>Secret Key</strong> kabhi yahan mat daalo. Sirf <strong>Client ID</strong> chahiye. Secret key server-side ke liye hoti hai.</p>
+        </div>
+      </div>
+
+      <div class="data-section">
+        <h3>🔐 Admin Password</h3>
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Admin panel ka login password yahan se change karo. Password Firebase mein securely save hota hai.</p>
+        <div class="form-group">
+          <label>Current Password</label>
+          <input type="password" id="settCurrentPw" placeholder="Current password enter karo">
+        </div>
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" id="settNewPw" placeholder="Naya password set karo">
+        </div>
+        <div class="form-group">
+          <label>Confirm New Password</label>
+          <input type="password" id="settConfirmPw" placeholder="Naya password dobara likho">
+        </div>
+        <button class="btn-admin btn-admin--primary" onclick="changeAdminPassword()">🔒 Change Password</button>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+        <button class="btn-admin btn-admin--primary" onclick="saveAllSettings()">💾 Save All Settings to Firebase</button>
         <button class="btn-admin btn-admin--success" onclick="testRazorpay()" style="margin-left:8px">🧪 Test Payment (₹1)</button>
       </div>
 
@@ -558,14 +593,20 @@
 // ═══ AUTH ═══
 function doLogin() {
   const pw = document.getElementById('loginPassword').value;
-  if (StoreEngine.login(pw)) {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'flex';
-    loadDashboard();
-  } else {
-    document.getElementById('loginError').style.display = 'block';
-    document.getElementById('loginPassword').value = '';
-  }
+  const loginBtn = document.querySelector('#loginScreen button');
+  if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = 'Checking...'; }
+  
+  StoreEngine.loginAsync(pw, function(success) {
+    if (success) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'flex';
+      loadDashboard();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+      document.getElementById('loginPassword').value = '';
+      if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'Login'; }
+    }
+  });
 }
 
 function doLogout() {
@@ -1060,11 +1101,24 @@ function cancelTestimonial() {
 // ═══ SETTINGS ═══
 function loadSettings() {
   try {
-    var settings = JSON.parse(localStorage.getItem('tdv_settings') || '{}');
-    document.getElementById('settRazorpayKey').value = settings.razorpayKey || '';
-    document.getElementById('settBusinessName').value = settings.businessName || 'TheDeepVerse';
-    document.getElementById('settThemeColor').value = settings.themeColor || '#d4af37';
-    document.getElementById('settLogoUrl').value = settings.logoUrl || '';
+    // Load from Firebase RTDB first
+    if (window.FirebaseDatabase) {
+      window.FirebaseDatabase.ref('config').once('value').then(function(snap) {
+        var cfg = snap.val() || {};
+        document.getElementById('settRazorpayKey').value = cfg.razorpayKey || '';
+        document.getElementById('settPaypalClientId').value = cfg.paypalClientId || '';
+        document.getElementById('settBusinessName').value = cfg.businessName || 'TheDeepVerse';
+        document.getElementById('settThemeColor').value = cfg.themeColor || '#d4af37';
+        document.getElementById('settLogoUrl').value = cfg.logoUrl || '';
+        // Also update localStorage as cache
+        localStorage.setItem('tdv_settings', JSON.stringify(cfg));
+      }).catch(function(e) {
+        console.error('Error loading settings from Firebase:', e);
+        loadSettingsFromLocal();
+      });
+    } else {
+      loadSettingsFromLocal();
+    }
     // Load site logo
     var siteLogoUrl = localStorage.getItem('tdv_site_logo') || '';
     document.getElementById('settSiteLogo').value = siteLogoUrl;
@@ -1077,16 +1131,79 @@ function loadSettings() {
   } catch(e) { console.error('Error loading settings:', e); }
 }
 
-function saveSettings() {
+function loadSettingsFromLocal() {
+  var settings = JSON.parse(localStorage.getItem('tdv_settings') || '{}');
+  document.getElementById('settRazorpayKey').value = settings.razorpayKey || '';
+  document.getElementById('settPaypalClientId').value = settings.paypalClientId || '';
+  document.getElementById('settBusinessName').value = settings.businessName || 'TheDeepVerse';
+  document.getElementById('settThemeColor').value = settings.themeColor || '#d4af37';
+  document.getElementById('settLogoUrl').value = settings.logoUrl || '';
+}
+
+function saveAllSettings() {
   var settings = {
     razorpayKey: document.getElementById('settRazorpayKey').value.trim(),
+    paypalClientId: document.getElementById('settPaypalClientId').value.trim(),
     businessName: document.getElementById('settBusinessName').value.trim(),
     themeColor: document.getElementById('settThemeColor').value.trim(),
     logoUrl: document.getElementById('settLogoUrl').value.trim()
   };
+  // Save to localStorage as cache
   localStorage.setItem('tdv_settings', JSON.stringify(settings));
-  showToast('Settings saved!', 'success');
+  // Save to Firebase RTDB
+  if (window.FirebaseDatabase) {
+    window.FirebaseDatabase.ref('config').update(settings).then(function() {
+      showToast('Settings saved to Firebase!', 'success');
+    }).catch(function(e) {
+      showToast('Firebase save failed: ' + e.message, 'error');
+    });
+  } else {
+    showToast('Settings saved locally (Firebase not connected).', 'warning');
+  }
 }
+
+function changeAdminPassword() {
+  var currentPw = document.getElementById('settCurrentPw').value;
+  var newPw = document.getElementById('settNewPw').value;
+  var confirmPw = document.getElementById('settConfirmPw').value;
+  
+  if (!currentPw || !newPw || !confirmPw) {
+    showToast('Saare fields fill karo!', 'error');
+    return;
+  }
+  if (newPw !== confirmPw) {
+    showToast('New password aur confirm password match nahi kar rahe!', 'error');
+    return;
+  }
+  if (newPw.length < 6) {
+    showToast('Password kam se kam 6 characters ka hona chahiye!', 'error');
+    return;
+  }
+  
+  // Verify current password first
+  StoreEngine.loginAsync(currentPw, function(valid) {
+    if (!valid) {
+      showToast('Current password galat hai!', 'error');
+      return;
+    }
+    // Save new password to Firebase
+    if (window.FirebaseDatabase) {
+      window.FirebaseDatabase.ref('config/adminPassword').set(newPw).then(function() {
+        showToast('Password successfully changed!', 'success');
+        document.getElementById('settCurrentPw').value = '';
+        document.getElementById('settNewPw').value = '';
+        document.getElementById('settConfirmPw').value = '';
+      }).catch(function(e) {
+        showToast('Error: ' + e.message, 'error');
+      });
+    } else {
+      showToast('Firebase not connected! Password change failed.', 'error');
+    }
+  });
+}
+
+// Keep old saveSettings as alias
+function saveSettings() { saveAllSettings(); }
 
 function forceRefreshAll() {
   try {

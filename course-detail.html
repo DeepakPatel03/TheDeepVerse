@@ -173,8 +173,8 @@
 
 
 
-  <!-- PayPal SDK for international payments -->
-  <script src="https://www.paypal.com/sdk/js?client-id=BAArKqbNWhZR0TiQkI_tPiBpsY_ObNSkXdfzkbccl-O4JUw5ItnZkHWFt4801FsvhCmcyhntC24pNgkf_w&currency=USD" data-sdk-integration-source="button-factory"></script>
+
+  <!-- PayPal SDK loaded dynamically after reading config from Firebase -->
 
   <script>
   (function() {
@@ -197,6 +197,53 @@
     })();
 
     function isIndianUser() { return userCountry === 'IN'; }
+
+    // Dynamic config from Firebase RTDB
+    var siteConfig = {};
+    var configLoaded = false;
+    (function loadSiteConfig() {
+      // Try localStorage cache first for instant load
+      try { siteConfig = JSON.parse(localStorage.getItem('tdv_settings') || '{}'); } catch(e) {}
+      // Then load fresh from Firebase
+      function tryFirebase() {
+        if (window.FirebaseDatabase) {
+          window.FirebaseDatabase.ref('config').once('value').then(function(snap) {
+            var cfg = snap.val();
+            if (cfg) {
+              siteConfig = cfg;
+              configLoaded = true;
+              localStorage.setItem('tdv_settings', JSON.stringify(cfg));
+              // Load PayPal SDK dynamically if Client ID exists
+              loadPayPalSDK();
+              // Re-render if product loaded
+              if (currentProduct) renderHero(currentProduct);
+            }
+          }).catch(function() {});
+        } else {
+          setTimeout(tryFirebase, 300);
+        }
+      }
+      tryFirebase();
+      // Also load PayPal SDK from cached config
+      loadPayPalSDK();
+    })();
+
+    function loadPayPalSDK() {
+      if (document.getElementById('paypal-sdk-script')) return; // already loaded
+      var clientId = siteConfig.paypalClientId || 'BAArKqbNWhZR0TiQkI_tPiBpsY_ObNSkXdfzkbccl-O4JUw5ItnZkHWFt4801FsvhCmcyhntC24pNgkf_w';
+      if (!clientId) return;
+      var script = document.createElement('script');
+      script.id = 'paypal-sdk-script';
+      script.src = 'https://www.paypal.com/sdk/js?client-id=' + clientId + '&currency=USD';
+      script.setAttribute('data-sdk-integration-source', 'button-factory');
+      script.onload = function() {
+        // Re-render PayPal buttons if product loaded
+        if (currentProduct && !isIndianUser()) {
+          renderHero(currentProduct);
+        }
+      };
+      document.head.appendChild(script);
+    }
 
     // â”€â”€ Get product ID from URL â”€â”€
     const params = new URLSearchParams(window.location.search);
@@ -562,11 +609,9 @@
     }
 
     // â”€â”€ Buy Functions â”€â”€
-    // Get Razorpay key
+    // Get Razorpay key from Firebase config, fallback to hardcoded
     function getRazorpayKey() {
-      var savedSettings = {};
-      try { savedSettings = JSON.parse(localStorage.getItem('tdv_settings') || '{}'); } catch(e) {}
-      return savedSettings.razorpayKey || 'rzp_live_T8fCgJ0kFyrOYl';
+      return siteConfig.razorpayKey || 'rzp_live_T8fCgJ0kFyrOYl';
     }
 
     // Buy a specific edition (variant)

@@ -281,10 +281,39 @@ const StoreEngine = (function() {
   // ── Auth ──
   function isAuthenticated() { return sessionStorage.getItem(ADMIN_KEY) === 'true'; }
 
+  // Sync login fallback (used if Firebase not ready)
+  var FALLBACK_PASSWORD = 'deepverse2026';
+
   function login(password) {
-    const ADMIN_PASSWORD = 'deepverse2026';
-    if (password === ADMIN_PASSWORD) { sessionStorage.setItem(ADMIN_KEY, 'true'); return true; }
+    // Sync check against fallback only
+    if (password === FALLBACK_PASSWORD) { sessionStorage.setItem(ADMIN_KEY, 'true'); return true; }
     return false;
+  }
+
+  // Async login - checks Firebase RTDB first, falls back to hardcoded
+  function loginAsync(password, callback) {
+    if (!firebaseReady || !window.FirebaseDatabase) {
+      // Firebase not ready, use sync fallback
+      callback(login(password));
+      return;
+    }
+    var ref = window.FirebaseDatabase.ref('config/adminPassword');
+    ref.once('value').then(function(snap) {
+      var savedPw = snap.val();
+      if (savedPw && password === savedPw) {
+        sessionStorage.setItem(ADMIN_KEY, 'true');
+        callback(true);
+      } else if (!savedPw && password === FALLBACK_PASSWORD) {
+        // No password set in Firebase yet, use fallback
+        sessionStorage.setItem(ADMIN_KEY, 'true');
+        callback(true);
+      } else {
+        callback(false);
+      }
+    }).catch(function() {
+      // Firebase error, use sync fallback
+      callback(login(password));
+    });
   }
 
   function logout() { sessionStorage.removeItem(ADMIN_KEY); }
@@ -298,7 +327,7 @@ const StoreEngine = (function() {
     getProducts, saveProducts, getProduct,
     addProduct, updateProduct, deleteProduct,
     resetToDefaults, exportJSON, importJSON,
-    generateId, isAuthenticated, login, logout,
+    generateId, isAuthenticated, login, loginAsync, logout,
     isFirebaseConnected, initFirebase,
     DEFAULT_PRODUCTS
   };
