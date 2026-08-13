@@ -20,7 +20,7 @@
 </head>
 <body>
 
-  <!-- ── Navigation (same as other pages) ── -->
+  <!-- â”€â”€ Navigation (same as other pages) â”€â”€ -->
   <nav class="nav" id="mainNav">
     <div class="container nav__inner">
       <a href="index.html" class="nav__logo">TheDeepVerse</a>
@@ -54,11 +54,11 @@
             </div>
           </div>
           <div class="nav__user-divider"></div>
-          <a href="dashboard.html" class="nav__user-item">📊 My Dashboard</a>
-          <a href="dashboard.html" class="nav__user-item">📚 My Courses</a>
-          <a href="store.html" class="nav__user-item">🛍️ Store</a>
+          <a href="dashboard.html" class="nav__user-item">ðŸ“Š My Dashboard</a>
+          <a href="dashboard.html" class="nav__user-item">ðŸ“š My Courses</a>
+          <a href="store.html" class="nav__user-item">ðŸ›ï¸ Store</a>
           <div class="nav__user-divider"></div>
-          <button class="nav__user-item nav__user-item--danger" id="navLogoutBtn">🚪 Logout</button>
+          <button class="nav__user-item nav__user-item--danger" id="navLogoutBtn">ðŸšª Logout</button>
         </div>
       </div>
 
@@ -83,9 +83,9 @@
       <!-- Breadcrumb -->
       <div class="breadcrumb" id="breadcrumb">
         <a href="index.html">Home</a>
-        <span class="breadcrumb__sep">›</span>
+        <span class="breadcrumb__sep">â€º</span>
         <a href="store.html">Store</a>
-        <span class="breadcrumb__sep">›</span>
+        <span class="breadcrumb__sep">â€º</span>
         <span class="breadcrumb__current" id="breadcrumbTitle">Loading...</span>
       </div>
 
@@ -122,7 +122,7 @@
       <!-- Related Products -->
       <section class="course-section" id="relatedSection" style="display:none">
         <h2 class="course-section__title">
-          <span class="course-section__title-icon">🔗</span>
+          <span class="course-section__title-icon">ðŸ”—</span>
           You Might Also Like
         </h2>
         <div class="related-grid" id="relatedGrid"></div>
@@ -168,312 +168,16 @@
     </div>
   </footer>
 
-  <!-- AUTH MODAL -->
-  <div class="auth-modal" id="authModal" style="display:none;">
-    <div class="auth-modal__backdrop" id="authModalBackdrop"></div>
-    <div class="auth-modal__box">
-      <button class="auth-modal__close" id="authModalClose">&times;</button>
-      <div class="auth-modal__tabs">
-        <button class="auth-tab is-active" id="tabSignIn">Sign In</button>
-        <button class="auth-tab" id="tabSignUp">Sign Up</button>
-        <button class="auth-tab" id="tabPhone">Phone</button>
-      </div>
-      <form class="auth-form" id="formSignIn">
-        <div class="auth-form__group">
-          <label class="auth-form__label" for="signInEmail">Email</label>
-          <input type="email" class="auth-form__input" id="signInEmail" placeholder="you@example.com" required>
-        </div>
-        <div class="auth-form__group">
-          <label class="auth-form__label" for="signInPassword">Password</label>
-          <input type="password" class="auth-form__input" id="signInPassword" placeholder="••••••••" required>
-        </div>
-        <button type="submit" class="btn btn--primary btn--md auth-form__submit" style="width:100%;margin-top:16px;">Sign In</button>
-        <p class="auth-form__footer">Don't have an account? <span class="auth-switch-tab" data-tab="signup">Sign Up</span></p>
-      </form>
-      <form class="auth-form" id="formSignUp" style="display:none;">
-        <div class="auth-form__group">
-          <label class="auth-form__label" for="signUpName">Full Name</label>
-          <input type="text" class="auth-form__input" id="signUpName" placeholder="Your Name" required>
-        </div>
-        <div class="auth-form__group">
-          <label class="auth-form__label" for="signUpEmail">Email</label>
-          <input type="email" class="auth-form__input" id="signUpEmail" placeholder="you@example.com" required>
-        </div>
-        <div class="auth-form__group">
-          <label class="auth-form__label" for="signUpPassword">Password</label>
-          <input type="password" class="auth-form__input" id="signUpPassword" placeholder="••••••••" minlength="6" required>
-        </div>
-        <div class="auth-form__group">
-          <label class="auth-form__label" for="signUpConfirmPassword">Confirm Password</label>
-          <input type="password" class="auth-form__input" id="signUpConfirmPassword" placeholder="••••••••" minlength="6" required>
-        </div>
-        <button type="submit" class="btn btn--primary btn--md auth-form__submit" style="width:100%;margin-top:16px;">Create Account</button>
-        <p class="auth-form__footer">Already have an account? <span class="auth-switch-tab" data-tab="signin">Sign In</span></p>
-      </form>
-      <form class="auth-form" id="formPhone" style="display:none;">
-        <div id="phoneNumberSection">
-          <div class="auth-form__group">
-            <label class="auth-form__label" for="phoneNumber">Phone Number</label>
-            <input type="tel" class="auth-form__input" id="phoneNumber" placeholder="+91 98765 43210" required>
-          </div>
-          <div class="auth-form__group">
-            <button type="button" class="btn btn--primary btn--md auth-form__submit" id="sendCodeBtn" style="width:100%;margin-top:8px;">Send Verification Code</button>
-          </div>
-        </div>
-        <div id="verificationCodeGroup" style="display:none;">
-          <div class="auth-form__group">
-            <label class="auth-form__label" for="verificationCode">Verification Code</label>
-            <input type="text" class="auth-form__input" id="verificationCode" placeholder="Enter 6-digit code" required>
-          </div>
-          <div class="auth-form__group" id="resendCodeGroup" style="display:none;margin-top:8px;text-align:center;">
-            <button type="button" class="btn btn--link btn--sm" id="resendCodeBtn">Didn't receive the code? Resend</button>
-          </div>
-        </div>
-        <button type="submit" class="btn btn--primary btn--md auth-form__submit" id="verifyPhoneBtn" style="width:100%;margin-top:16px;">Verify &amp; Sign In</button>
-        <p class="auth-form__footer">Or sign in with <span class="auth-switch-tab" data-tab="signin">Email</span> instead</p>
-      </form>
-      <div class="auth-divider"><span>Or continue with</span></div>
-      <button type="button" class="btn btn--secondary btn--md auth-google-btn" id="googleSignInBtn" style="width:100%;margin:0 0 16px;padding:12px;">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-        Continue with Google
-      </button>
-      <div class="auth-error" id="authError" style="display:none;"></div>
-      <div class="auth-loading" id="authLoading" style="display:none;justify-content:center;align-items:center;">
-        <div class="spinner" style="width:24px;height:24px;border:2px solid rgba(255,255,255,0.1);border-top-color:#d4af37;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
-        <span style="margin-left:8px;">Signing in...</span>
-      </div>
-    </div>
-  </div>
+  <!-- Auth modal is injected by auth.js via ensureAuthModal() -->
 
-  <style>
-    .auth-modal{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;display:flex;align-items:center;justify-content:center}
-    .auth-modal__backdrop{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(5,5,5,0.85);backdrop-filter:blur(4px)}
-    .auth-modal__box{position:relative;background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:16px;width:100%;max-width:420px;margin:0 24px;max-height:90vh;overflow-y:auto}
-    .auth-modal__close{position:absolute;top:12px;right:12px;width:24px;height:24px;background:transparent;border:none;font-size:1.5rem;color:#888;cursor:pointer;line-height:1;padding:0;z-index:1}
-    .auth-modal__close:hover{color:#f5f5f5}
-    .auth-modal__tabs{display:flex;border-bottom:1px solid rgba(255,255,255,0.08)}
-    .auth-tab{flex:1;padding:16px;font-size:0.85rem;font-weight:500;color:#888;background:transparent;border:none;cursor:pointer;text-align:center}
-    .auth-tab.is-active{color:#f5f5f5;border-bottom:2px solid #d4af37}
-    .auth-tab:hover:not(.is-active){color:#aaa}
-    .auth-form{padding:24px}
-    .auth-form__group{margin-bottom:16px}
-    .auth-form__label{display:block;margin-bottom:8px;font-size:0.75rem;font-weight:500;color:#888}
-    .auth-form__input{width:100%;padding:10px 16px;background:#050505;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#f5f5f5;font-size:0.85rem;box-sizing:border-box}
-    .auth-form__input:focus{outline:none;border-color:#d4af37;box-shadow:0 0 0 3px rgba(212,175,55,0.15)}
-    .auth-form__input::placeholder{color:#555}
-    .auth-form__footer{margin-top:16px;text-align:center;font-size:0.75rem;color:#888}
-    .auth-switch-tab{color:#d4af37;cursor:pointer;text-decoration:underline}
-    .auth-divider{display:flex;align-items:center;margin:0 24px;color:#555;font-size:0.75rem}
-    .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.08)}
-    .auth-divider span{padding:0 16px}
-    .auth-google-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:#f5f5f5;font-size:0.85rem;font-weight:500;border-radius:8px;cursor:pointer;margin:16px 24px 24px !important;width:calc(100% - 48px) !important}
-    .auth-google-btn:hover{border-color:#f5f5f5;background:rgba(255,255,255,0.04)}
-    .auth-error{margin:16px 24px;padding:10px 16px;background:rgba(255,69,0,0.1);border:1px solid rgba(255,69,0,0.3);border-radius:8px;color:#ff4500;font-size:0.75rem}
-    @keyframes spin{to{transform:rotate(360deg)}}
-  </style>
 
-  <!-- Scripts -->
-  <script src="js/main.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="js/firebase-config.js"></script>
-  <script src="js/store-data.js"></script>
-  <script src="js/auth.js"></script>
 
-  <!-- INLINE AUTH HANDLER (backup - guaranteed to work) -->
-  <script>
-  (function() {
-    // Wait for Firebase
-    function waitForAuth(cb) {
-      if (window.FirebaseAuth) { cb(window.FirebaseAuth); return; }
-      var tries = 0;
-      var interval = setInterval(function() {
-        tries++;
-        if (window.FirebaseAuth) { clearInterval(interval); cb(window.FirebaseAuth); }
-        else if (tries > 50) { clearInterval(interval); }
-      }, 100);
-    }
-
-    function showAuthError(msg) {
-      var el = document.getElementById('authError');
-      if (el) { el.textContent = msg; el.style.display = 'block'; }
-      else { alert(msg); }
-    }
-
-    function clearAuthError() {
-      var el = document.getElementById('authError');
-      if (el) { el.textContent = ''; el.style.display = 'none'; }
-    }
-
-    function closeModal() {
-      var m = document.getElementById('authModal');
-      if (m) m.style.display = 'none';
-      document.body.style.overflow = '';
-    }
-
-    // Tab switching
-    document.addEventListener('click', function(e) {
-      if (e.target.classList.contains('auth-switch-tab')) {
-        var tab = e.target.getAttribute('data-tab');
-        var signIn = document.getElementById('formSignIn');
-        var signUp = document.getElementById('formSignUp');
-        var tabSignIn = document.getElementById('tabSignIn');
-        var tabSignUp = document.getElementById('tabSignUp');
-        if (tab === 'signup') {
-          if (signIn) signIn.style.display = 'none';
-          if (signUp) signUp.style.display = 'block';
-          if (tabSignIn) tabSignIn.classList.remove('is-active');
-          if (tabSignUp) tabSignUp.classList.add('is-active');
-        } else if (tab === 'signin') {
-          if (signIn) signIn.style.display = 'block';
-          if (signUp) signUp.style.display = 'none';
-          if (tabSignIn) tabSignIn.classList.add('is-active');
-          if (tabSignUp) tabSignUp.classList.remove('is-active');
-        }
-      }
-    });
-
-    // Sign Up handler
-    var signUpForm = document.getElementById('formSignUp');
-    if (signUpForm) {
-      signUpForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        clearAuthError();
-        var name = document.getElementById('signUpName').value.trim();
-        var email = document.getElementById('signUpEmail').value.trim();
-        var pass = document.getElementById('signUpPassword').value;
-        var confirmPass = document.getElementById('signUpConfirmPassword').value;
-
-        if (!name || !email || !pass) { showAuthError('Please fill in all fields.'); return; }
-        if (pass.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
-        if (pass !== confirmPass) { showAuthError('Passwords do not match.'); return; }
-
-        waitForAuth(function(auth) {
-          auth.createUserWithEmailAndPassword(email, pass)
-            .then(function(result) {
-              if (result.user && name) {
-                result.user.updateProfile({ displayName: name });
-              }
-              closeModal();
-              alert('Account created! Welcome to TheDeepVerse! 🎉');
-              location.reload();
-            })
-            .catch(function(err) {
-              var msg = 'Sign up failed.';
-              if (err.code === 'auth/email-already-in-use') msg = 'This email is already registered. Try Sign In.';
-              else if (err.code === 'auth/invalid-email') msg = 'Invalid email address.';
-              else if (err.code === 'auth/weak-password') msg = 'Password is too weak.';
-              else msg = err.message;
-              showAuthError(msg);
-            });
-        });
-      });
-    }
-
-    // Sign In handler
-    var signInForm = document.getElementById('formSignIn');
-    if (signInForm) {
-      signInForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        clearAuthError();
-        var email = document.getElementById('signInEmail').value.trim();
-        var pass = document.getElementById('signInPassword').value;
-        if (!email || !pass) { showAuthError('Please enter email and password.'); return; }
-
-        waitForAuth(function(auth) {
-          auth.signInWithEmailAndPassword(email, pass)
-            .then(function() {
-              closeModal();
-              alert('Welcome back! 👋');
-              location.reload();
-            })
-            .catch(function(err) {
-              var msg = 'Sign in failed.';
-              if (err.code === 'auth/user-not-found') msg = 'No account found. Try Sign Up.';
-              else if (err.code === 'auth/wrong-password') msg = 'Wrong password.';
-              else if (err.code === 'auth/invalid-email') msg = 'Invalid email.';
-              else msg = err.message;
-              showAuthError(msg);
-            });
-        });
-      });
-    }
-
-    // Google Sign In handler
-    var googleBtn = document.getElementById('googleSignInBtn');
-    if (googleBtn) {
-      googleBtn.addEventListener('click', function() {
-        clearAuthError();
-        waitForAuth(function(auth) {
-          var provider = new firebase.auth.GoogleAuthProvider();
-          provider.setCustomParameters({ prompt: 'select_account' });
-          auth.signInWithPopup(provider)
-            .then(function() {
-              closeModal();
-              alert('Welcome to TheDeepVerse! 🎉');
-              location.reload();
-            })
-            .catch(function(err) {
-              if (err.code !== 'auth/popup-closed-by-user') {
-                showAuthError(err.message);
-              }
-            });
-        });
-      });
-    }
-
-    // Login button opens modal
-    var loginBtn = document.getElementById('navLoginBtn');
-    if (loginBtn) {
-      loginBtn.addEventListener('click', function() {
-        var modal = document.getElementById('authModal');
-        if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-      });
-    }
-
-    // Close modal
-    var closeBtn = document.getElementById('authModalClose');
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    var backdrop = document.getElementById('authModalBackdrop');
-    if (backdrop) backdrop.addEventListener('click', closeModal);
-
-    // Auth state: show/hide login button
-    waitForAuth(function(auth) {
-      auth.onAuthStateChanged(function(user) {
-        var loginBtn = document.getElementById('navLoginBtn');
-        var navCta = loginBtn ? loginBtn.parentElement : null;
-        var navUser = document.getElementById('navUser');
-        if (user) {
-          if (loginBtn) loginBtn.style.display = 'none';
-          if (navUser) {
-            navUser.style.display = 'flex';
-            var nameEl = document.getElementById('navUserName');
-            var nameLgEl = document.getElementById('navUserNameLg');
-            var emailEl = document.getElementById('navUserEmail');
-            if (nameEl) nameEl.textContent = user.displayName || 'User';
-            if (nameLgEl) nameLgEl.textContent = user.displayName || 'User';
-            if (emailEl) emailEl.textContent = user.email || '';
-          }
-        }
-      });
-    });
-
-    // Logout
-    var logoutBtn = document.getElementById('navLogoutBtn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', function() {
-        waitForAuth(function(auth) { auth.signOut().then(function() { location.reload(); }); });
-      });
-    }
-  })();
-  </script>
 
   <script>
   (function() {
     'use strict';
 
-    // ── Get product ID from URL ──
+    // â”€â”€ Get product ID from URL â”€â”€
     const params = new URLSearchParams(window.location.search);
     const productId = params.get('id');
 
@@ -494,7 +198,7 @@
       }
 
       if (!product) {
-        document.getElementById('heroMain').innerHTML = '<div style="text-align:center;padding:80px 0"><h2 style="color:var(--text-primary);margin-bottom:12px">Product Not Found</h2><p style="color:var(--text-muted)">This product doesn\'t exist.</p><a href="store.html" style="color:var(--accent-gold)">← Back to Store</a></div>';
+        document.getElementById('heroMain').innerHTML = '<div style="text-align:center;padding:80px 0"><h2 style="color:var(--text-primary);margin-bottom:12px">Product Not Found</h2><p style="color:var(--text-muted)">This product doesn\'t exist.</p><a href="store.html" style="color:var(--accent-gold)">â† Back to Store</a></div>';
         return;
       }
 
@@ -509,11 +213,11 @@
       renderRelated(product);
     }
 
-    // ── Render Hero ──
+    // â”€â”€ Render Hero â”€â”€
     function renderHero(p) {
       const imageHtml = p.thumbnailUrl
         ? '<img src="' + p.thumbnailUrl + '" alt="' + p.title + '">'
-        : '<span class="purchase-card__emoji">' + (p.emoji || '📦') + '</span>';
+        : '<span class="purchase-card__emoji">' + (p.emoji || 'ðŸ“¦') + '</span>';
 
       const tagBadge = p.tag
         ? '<span class="course-hero__badge course-hero__badge--tag">' + p.tag + '</span>'
@@ -528,8 +232,8 @@
       var isVideoCourse = p.type === 'video-course' && p.videoId;
       const isLive = !!(p.downloadUrl && p.downloadUrl.trim()) || hasVariantLinks || isVideoCourse;
       const statusBadge = isLive
-        ? '<span class="course-hero__badge" style="background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.4)">● LIVE</span>'
-        : '<span class="course-hero__badge" style="background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid rgba(251,146,60,0.4)">🔜 Coming Soon</span>';
+        ? '<span class="course-hero__badge" style="background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.4)">â— LIVE</span>'
+        : '<span class="course-hero__badge" style="background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid rgba(251,146,60,0.4)">ðŸ”œ Coming Soon</span>';
 
       // Hero main content
       document.getElementById('heroMain').innerHTML =
@@ -541,89 +245,89 @@
         '<h1 class="course-hero__title">' + p.title + '</h1>' +
         '<p class="course-hero__desc">' + p.description + '</p>' +
         '<div class="course-hero__meta">' +
-          (p.instructor ? '<div class="course-meta-item"><span class="course-meta-item__icon">👨‍🏫</span><span class="course-meta-item__value">' + p.instructor + '</span></div>' : '') +
-          (p.duration ? '<div class="course-meta-item"><span class="course-meta-item__icon">📖</span><span class="course-meta-item__value">' + p.duration + '</span></div>' : '') +
-          (p.language ? '<div class="course-meta-item"><span class="course-meta-item__icon">🌐</span><span class="course-meta-item__value">' + p.language + '</span></div>' : '') +
-          (p.level ? '<div class="course-meta-item"><span class="course-meta-item__icon">📊</span><span class="course-meta-item__value">' + p.level + '</span></div>' : '') +
-          (p.students ? '<div class="course-meta-item"><span class="course-meta-item__icon">👥</span><span class="course-meta-item__value">' + p.students + ' students</span></div>' : '') +
-          (p.lastUpdated ? '<div class="course-meta-item"><span class="course-meta-item__icon">🔄</span><span class="course-meta-item__value">Updated ' + p.lastUpdated + '</span></div>' : '') +
+          (p.instructor ? '<div class="course-meta-item"><span class="course-meta-item__icon">ðŸ‘¨â€ðŸ«</span><span class="course-meta-item__value">' + p.instructor + '</span></div>' : '') +
+          (p.duration ? '<div class="course-meta-item"><span class="course-meta-item__icon">ðŸ“–</span><span class="course-meta-item__value">' + p.duration + '</span></div>' : '') +
+          (p.language ? '<div class="course-meta-item"><span class="course-meta-item__icon">ðŸŒ</span><span class="course-meta-item__value">' + p.language + '</span></div>' : '') +
+          (p.level ? '<div class="course-meta-item"><span class="course-meta-item__icon">ðŸ“Š</span><span class="course-meta-item__value">' + p.level + '</span></div>' : '') +
+          (p.students ? '<div class="course-meta-item"><span class="course-meta-item__icon">ðŸ‘¥</span><span class="course-meta-item__value">' + p.students + ' students</span></div>' : '') +
+          (p.lastUpdated ? '<div class="course-meta-item"><span class="course-meta-item__icon">ðŸ”„</span><span class="course-meta-item__value">Updated ' + p.lastUpdated + '</span></div>' : '') +
         '</div>' +
         '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">' +
-          '<button class="share-btn" onclick="copyShareLink()">📤 Share</button>' +
+          '<button class="share-btn" onclick="copyShareLink()">ðŸ“¤ Share</button>' +
         '</div>';
 
-      // ── Purchase Card (Sidebar) ──
+      // â”€â”€ Purchase Card (Sidebar) â”€â”€
       var hasVariants = p.variants && p.variants.length > 0;
       var sidebarHtml = '<div class="purchase-card">';
       sidebarHtml += '<div class="purchase-card__image">' + imageHtml + '</div>';
 
       if (hasVariants && isLive) {
-        // ── EDITION-BASED LAYOUT ──
+        // â”€â”€ EDITION-BASED LAYOUT â”€â”€
         sidebarHtml += '<div style="padding:4px 0">';
-        sidebarHtml += '<div style="text-align:center;margin-bottom:16px"><span style="background:rgba(212,175,55,0.15);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;letter-spacing:0.5px">📦 CHOOSE YOUR PREFERENCE</span></div>';
+        sidebarHtml += '<div style="text-align:center;margin-bottom:16px"><span style="background:rgba(212,175,55,0.15);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;letter-spacing:0.5px">ðŸ“¦ CHOOSE YOUR PREFERENCE</span></div>';
 
         // Each variant as its own section
         p.variants.forEach(function(v, i) {
           sidebarHtml += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:12px">';
           sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:12px">';
           sidebarHtml += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:0.95rem;color:var(--text-primary);word-wrap:break-word;overflow-wrap:break-word">' + v.name + '</div></div>';
-          sidebarHtml += '<div style="text-align:right;flex-shrink:0"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + v.price + '</div>';
+          sidebarHtml += '<div style="text-align:right;flex-shrink:0"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">â‚¹' + v.price + '</div>';
           if (v.originalPrice && v.originalPrice > v.price) {
-            sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + v.originalPrice + '</div>';
+            sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">â‚¹' + v.originalPrice + '</div>';
           }
           sidebarHtml += '</div></div>';
-          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyEdition(' + i + ')" style="display:block;text-align:center;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:12px;border-radius:8px;text-decoration:none;font-size:0.95rem;box-shadow:0 4px 15px rgba(34,197,94,0.3);transition:all 0.2s">🛒 Buy & Download — ₹' + v.price + '</a>';
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyEdition(' + i + ')" style="display:block;text-align:center;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:12px;border-radius:8px;text-decoration:none;font-size:0.95rem;box-shadow:0 4px 15px rgba(34,197,94,0.3);transition:all 0.2s">ðŸ›’ Buy & Download â€” â‚¹' + v.price + '</a>';
           sidebarHtml += '</div>';
         });
 
         // Combo Deal Section
         if (p.comboPrice && p.variants.length >= 2) {
-          var comboLabel = p.variants.length === 2 ? 'Combo — Both' : 'Combo — All ' + p.variants.length;
+          var comboLabel = p.variants.length === 2 ? 'Combo â€” Both' : 'Combo â€” All ' + p.variants.length;
           var comboDesc = p.variants.map(function(v) { return v.name; }).join(' + ');
           sidebarHtml += '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.02));border:2px solid rgba(212,175,55,0.3);border-radius:12px;padding:16px;margin-bottom:12px;position:relative">';
-          sidebarHtml += '<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:2px 12px;border-radius:10px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px">🔥 BEST DEAL</div>';
+          sidebarHtml += '<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:2px 12px;border-radius:10px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px">ðŸ”¥ BEST DEAL</div>';
           sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;margin-top:4px">';
-          sidebarHtml += '<div><div style="font-weight:700;font-size:1rem;color:var(--text-primary)">📦 ' + comboLabel + '</div>';
+          sidebarHtml += '<div><div style="font-weight:700;font-size:1rem;color:var(--text-primary)">ðŸ“¦ ' + comboLabel + '</div>';
           sidebarHtml += '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">' + comboDesc + '</div></div>';
-          sidebarHtml += '<div style="text-align:right"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + p.comboPrice + '</div>';
+          sidebarHtml += '<div style="text-align:right"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">â‚¹' + p.comboPrice + '</div>';
           if (p.comboOriginalPrice && p.comboOriginalPrice > p.comboPrice) {
             var savePct = Math.round((1 - p.comboPrice / p.comboOriginalPrice) * 100);
-            sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + p.comboOriginalPrice + '</div>';
+            sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">â‚¹' + p.comboOriginalPrice + '</div>';
           }
           sidebarHtml += '</div></div>';
-          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyCombo()" style="display:block;text-align:center;background:linear-gradient(135deg,#d4af37,#b8962e);color:#000;font-weight:800;padding:12px;border-radius:8px;text-decoration:none;font-size:0.95rem;box-shadow:0 4px 15px rgba(212,175,55,0.4);transition:all 0.2s">🛒 Buy ' + comboLabel + ' — ₹' + p.comboPrice + (savePct ? ' (Save ' + savePct + '%)' : '') + '</a>';
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyCombo()" style="display:block;text-align:center;background:linear-gradient(135deg,#d4af37,#b8962e);color:#000;font-weight:800;padding:12px;border-radius:8px;text-decoration:none;font-size:0.95rem;box-shadow:0 4px 15px rgba(212,175,55,0.4);transition:all 0.2s">ðŸ›’ Buy ' + comboLabel + ' â€” â‚¹' + p.comboPrice + (savePct ? ' (Save ' + savePct + '%)' : '') + '</a>';
           sidebarHtml += '</div>';
         }
 
         sidebarHtml += '</div>';
       } else if (isLive) {
-        // ── SIMPLE PRODUCT (no variants) ──
+        // â”€â”€ SIMPLE PRODUCT (no variants) â”€â”€
         var priceH = p.price === 0
           ? '<span class="purchase-card__price-free">Free</span>'
-          : '<span class="purchase-card__price-current">₹' + p.price.toLocaleString('en-IN') + '</span>' +
-            (p.originalPrice ? '<span class="purchase-card__price-original">₹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
+          : '<span class="purchase-card__price-current">â‚¹' + p.price.toLocaleString('en-IN') + '</span>' +
+            (p.originalPrice ? '<span class="purchase-card__price-original">â‚¹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
         sidebarHtml += '<div class="purchase-card__price">' + priceH + '</div>';
-        if (discount) sidebarHtml += '<div class="purchase-card__discount">🔥 ' + discount + '</div>';
+        if (discount) sidebarHtml += '<div class="purchase-card__discount">ðŸ”¥ ' + discount + '</div>';
         if (p.price === 0) {
-          sidebarHtml += '<a href="#" class="purchase-card__buy purchase-card__buy--free" onclick="event.preventDefault(); buySimple()">🎁 Download Free</a>';
+          sidebarHtml += '<a href="#" class="purchase-card__buy purchase-card__buy--free" onclick="event.preventDefault(); buySimple()">ðŸŽ Download Free</a>';
         } else {
-          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buySimple()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;box-shadow:0 4px 20px rgba(34,197,94,0.4)">🛒 Buy Now — ₹' + p.price.toLocaleString('en-IN') + '</a>';
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buySimple()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;box-shadow:0 4px 20px rgba(34,197,94,0.4)">ðŸ›’ Buy Now â€” â‚¹' + p.price.toLocaleString('en-IN') + '</a>';
         }
       } else {
-        // ── COMING SOON ──
-        sidebarHtml += '<a href="#" class="purchase-card__buy" style="opacity:0.65;cursor:not-allowed;background:rgba(251,146,60,0.15);color:#fb923c" onclick="event.preventDefault()">🔜 Coming Soon</a>';
+        // â”€â”€ COMING SOON â”€â”€
+        sidebarHtml += '<a href="#" class="purchase-card__buy" style="opacity:0.65;cursor:not-allowed;background:rgba(251,146,60,0.15);color:#fb923c" onclick="event.preventDefault()">ðŸ”œ Coming Soon</a>';
       }
 
       // Features
       var featuresHtml = (p.features || []).map(function(f) { return '<li>' + f + '</li>'; }).join('');
       if (featuresHtml) sidebarHtml += '<ul class="purchase-card__features">' + featuresHtml + '</ul>';
-      sidebarHtml += '<div class="purchase-card__guarantee"><span class="purchase-card__guarantee-icon">🔒</span>' + (isLive ? 'Secure payment via Razorpay. Instant download after purchase.' : 'This product is launching soon. Stay tuned!') + '</div>';
+      sidebarHtml += '<div class="purchase-card__guarantee"><span class="purchase-card__guarantee-icon">ðŸ”’</span>' + (isLive ? 'Secure payment via Razorpay. Instant download after purchase.' : 'This product is launching soon. Stay tuned!') + '</div>';
       sidebarHtml += '</div>';
 
       document.getElementById('heroSidebar').innerHTML = sidebarHtml;
     }
 
-    // ── Render Content Sections ──
+    // â”€â”€ Render Content Sections â”€â”€
     function renderContent(p) {
       document.getElementById('courseNav').style.display = '';
       document.getElementById('courseContent').style.display = '';
@@ -632,7 +336,7 @@
 
       // Overview
       html += '<section class="course-section" id="section-overview">' +
-        '<h2 class="course-section__title"><span class="course-section__title-icon">📋</span> Overview</h2>' +
+        '<h2 class="course-section__title"><span class="course-section__title-icon">ðŸ“‹</span> Overview</h2>' +
         '<div class="course-overview">' + (p.overview || p.description) + '</div>' +
       '</section>';
 
@@ -645,10 +349,10 @@
           '</div>';
         }).join('');
       } else {
-        galleryHtml = '<div class="course-gallery__empty">📷 Preview images will be added soon. Check back later!</div>';
+        galleryHtml = '<div class="course-gallery__empty">ðŸ“· Preview images will be added soon. Check back later!</div>';
       }
       html += '<section class="course-section" id="section-gallery">' +
-        '<h2 class="course-section__title"><span class="course-section__title-icon">🖼️</span> Gallery</h2>' +
+        '<h2 class="course-section__title"><span class="course-section__title-icon">ðŸ–¼ï¸</span> Gallery</h2>' +
         '<div class="course-gallery">' + galleryHtml + '</div>' +
       '</section>';
 
@@ -661,7 +365,7 @@
           '</li>';
         }).join('');
         html += '<section class="course-section" id="section-curriculum">' +
-          '<h2 class="course-section__title"><span class="course-section__title-icon">📚</span> What\'s Inside</h2>' +
+          '<h2 class="course-section__title"><span class="course-section__title-icon">ðŸ“š</span> What\'s Inside</h2>' +
           '<ul class="course-curriculum">' + currHtml + '</ul>' +
         '</section>';
       }
@@ -677,20 +381,20 @@
           '</div>';
         }).join('');
         html += '<section class="course-section" id="section-method">' +
-          '<h2 class="course-section__title"><span class="course-section__title-icon">🔧</span> How to Use</h2>' +
+          '<h2 class="course-section__title"><span class="course-section__title-icon">ðŸ”§</span> How to Use</h2>' +
           '<div class="course-method">' + methodHtml + '</div>' +
         '</section>';
       }
 
       // Instructor
       html += '<section class="course-section" id="section-instructor">' +
-        '<h2 class="course-section__title"><span class="course-section__title-icon">👨‍🏫</span> About the Instructor</h2>' +
+        '<h2 class="course-section__title"><span class="course-section__title-icon">ðŸ‘¨â€ðŸ«</span> About the Instructor</h2>' +
         '<div class="instructor-card">' +
           '<div class="instructor-card__avatar">DP</div>' +
           '<div>' +
             '<div class="instructor-card__name">' + (p.instructor || 'Deepak Patel') + '</div>' +
             '<div class="instructor-card__role">Creator of TheDeepVerse</div>' +
-            '<div class="instructor-card__bio">Deepak Patel is the creator of TheDeepVerse — a platform dedicated to decoding human psychology through cinematic storytelling. With a passion for understanding the dark side of the human mind, Deepak creates documentary-style content that educates, inspires, and challenges the way people think about human behavior.</div>' +
+            '<div class="instructor-card__bio">Deepak Patel is the creator of TheDeepVerse â€” a platform dedicated to decoding human psychology through cinematic storytelling. With a passion for understanding the dark side of the human mind, Deepak creates documentary-style content that educates, inspires, and challenges the way people think about human behavior.</div>' +
           '</div>' +
         '</div>' +
       '</section>';
@@ -709,7 +413,7 @@
       });
     }
 
-    // ── Render Related Products ──
+    // â”€â”€ Render Related Products â”€â”€
     function renderRelated(currentProduct) {
       var products = StoreEngine.getProducts().filter(function(p) {
         return p.active && p.id !== currentProduct.id;
@@ -723,12 +427,12 @@
       grid.innerHTML = products.map(function(p) {
         var priceHtml = p.price === 0
           ? '<span style="color:#22c55e;font-weight:600">Free</span>'
-          : '<span style="font-weight:600">₹' + p.price.toLocaleString('en-IN') + '</span>' +
-            (p.originalPrice ? ' <span style="text-decoration:line-through;color:var(--text-muted);font-size:0.85em">₹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
+          : '<span style="font-weight:600">â‚¹' + p.price.toLocaleString('en-IN') + '</span>' +
+            (p.originalPrice ? ' <span style="text-decoration:line-through;color:var(--text-muted);font-size:0.85em">â‚¹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
 
         return '<a href="course-detail.html?id=' + p.id + '" style="text-decoration:none;color:inherit">' +
           '<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;transition:all 0.3s" onmouseover="this.style.borderColor=\'rgba(212,175,55,0.3)\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,0.06)\'">' +
-            '<div style="font-size:2rem;margin-bottom:12px">' + (p.emoji || '📦') + '</div>' +
+            '<div style="font-size:2rem;margin-bottom:12px">' + (p.emoji || 'ðŸ“¦') + '</div>' +
             '<div style="font-size:0.7rem;text-transform:uppercase;color:var(--accent-gold);letter-spacing:1px;margin-bottom:6px">' + p.category + '</div>' +
             '<h3 style="font-size:1rem;color:var(--text-primary);margin-bottom:8px">' + p.title + '</h3>' +
             '<div>' + priceHtml + '</div>' +
@@ -737,14 +441,14 @@
       }).join('');
     }
 
-    // ── Initialize ──
+    // â”€â”€ Initialize â”€â”€
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', function() { setTimeout(init, 100); });
     } else {
       setTimeout(init, 100);
     }
 
-    // ── Buy Functions ──
+    // â”€â”€ Buy Functions â”€â”€
     // Get Razorpay key
     function getRazorpayKey() {
       var savedSettings = {};
@@ -775,7 +479,7 @@
       var allUrls = currentProduct.variants.map(function(v) { return v.downloadUrl; }).filter(Boolean);
       if (allUrls.length === 0) { alert('Download links not set yet.'); return; }
       var count = currentProduct.variants.length;
-      var comboLabel = count === 2 ? 'Combo — Both' : 'Combo — All ' + count;
+      var comboLabel = count === 2 ? 'Combo â€” Both' : 'Combo â€” All ' + count;
       processPayment(currentProduct.id + '_combo', currentProduct.comboPrice || 99, comboLabel, allUrls);
     };
 
@@ -829,7 +533,7 @@
 
       // Create download section HTML
       var dlHtml = '<div id="postPaymentDownload" style="background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(34,197,94,0.03));border:2px solid rgba(34,197,94,0.4);border-radius:16px;padding:24px;margin:24px 0;text-align:center;animation:fadeIn 0.5s ease">';
-      dlHtml += '<div style="font-size:2.5rem;margin-bottom:8px">✅</div>';
+      dlHtml += '<div style="font-size:2.5rem;margin-bottom:8px">âœ…</div>';
       dlHtml += '<h2 style="color:#22c55e;font-size:1.3rem;margin-bottom:4px">Payment Successful!</h2>';
       dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:4px">Payment ID: ' + paymentId + '</p>';
       dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">' + description + '</p>';
@@ -845,28 +549,27 @@
         var label = variantNames[i] || (downloadUrls.length > 1 ? 'File ' + (i + 1) : 'Your File');
         
         if (isYouTube(url)) {
-          // YouTube video — Watch button + Copy button
+          // Video course â€” DO NOT expose YouTube URL. Redirect to My Courses.
           dlHtml += '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px">';
-          dlHtml += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:8px">🎬 ' + label + '</div>';
-          dlHtml += '<a href="' + url + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:700;padding:14px 20px;border-radius:10px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);margin-bottom:8px">▶️ Watch Video Now</a>';
-          dlHtml += '<button onclick="navigator.clipboard.writeText(\'' + url + '\').then(function(){this.textContent=\'✅ Link Copied!\'}.bind(this))" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary);padding:10px;border-radius:8px;cursor:pointer;font-size:0.85rem">📋 Copy Link (Save for Later)</button>';
-          dlHtml += '<p style="color:#f59e0b;font-size:0.75rem;margin-top:6px">⚠️ Ye link save kar lo — isse UNLIMITED baar video dekh sakte ho!</p>';
+          dlHtml += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:8px">ðŸŽ¬ ' + label + '</div>';
+          dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:12px">Your course has been added to My Courses. Access it anytime from your dashboard.</p>';
+          dlHtml += '<a href="dashboard.html" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#d4af37,#b8962e);color:#000;font-weight:700;padding:14px 20px;border-radius:10px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(212,175,55,0.4)">ðŸ“š Go to My Courses</a>';
           dlHtml += '</div>';
         } else {
-          // Regular file — Download button + Copy button
+          // Regular file â€” Download button + Copy button
           var directUrl = toDirectDownload(url);
           dlHtml += '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px">';
-          dlHtml += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:8px">📄 ' + label + '</div>';
-          dlHtml += '<a href="' + directUrl + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:14px 20px;border-radius:10px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(34,197,94,0.4);margin-bottom:8px">📥 Download Now</a>';
-          dlHtml += '<button onclick="navigator.clipboard.writeText(\'' + url + '\').then(function(){this.textContent=\'✅ Link Copied!\'}.bind(this))" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary);padding:10px;border-radius:8px;cursor:pointer;font-size:0.85rem">📋 Copy Link (Save for Later)</button>';
+          dlHtml += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:8px">ðŸ“„ ' + label + '</div>';
+          dlHtml += '<a href="' + directUrl + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:14px 20px;border-radius:10px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(34,197,94,0.4);margin-bottom:8px">ðŸ“¥ Download Now</a>';
+          dlHtml += '<button onclick="navigator.clipboard.writeText(\'' + url + '\').then(function(){this.textContent=\'âœ… Link Copied!\'}.bind(this))" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary);padding:10px;border-radius:8px;cursor:pointer;font-size:0.85rem">ðŸ“‹ Copy Link (Save for Later)</button>';
           dlHtml += '</div>';
         }
       });
 
       dlHtml += '</div>';
       dlHtml += '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:12px;margin-top:16px;max-width:400px;margin-left:auto;margin-right:auto">';
-      dlHtml += '<p style="color:#f59e0b;font-size:0.85rem;font-weight:600;margin-bottom:4px">💡 Important:</p>';
-      dlHtml += '<p style="color:var(--text-muted);font-size:0.8rem;margin:0">Sab links copy karke safe jagah save kar lo (Notes/WhatsApp). Ye links expire nahi hote — kabhi bhi access kar sakte ho!</p>';
+      dlHtml += '<p style="color:#f59e0b;font-size:0.85rem;font-weight:600;margin-bottom:4px">ðŸ’¡ Important:</p>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.8rem;margin:0">Sab links copy karke safe jagah save kar lo (Notes/WhatsApp). Ye links expire nahi hote â€” kabhi bhi access kar sakte ho!</p>';
       dlHtml += '</div>';
       dlHtml += '<p style="color:var(--text-muted);font-size:0.75rem;margin-top:12px">Koi problem ho toh <a href="contact.html" style="color:var(--accent)">Contact Us</a> par payment ID ke saath message karo</p>';
       dlHtml += '</div>';
@@ -889,7 +592,7 @@
           user = window.FirebaseAuth.currentUser;
         }
 
-        // 🛑 Enforce login for video courses BEFORE payment
+        // ðŸ›‘ Enforce login for video courses BEFORE payment
         if (isVideoCourse && !user) {
           // Open auth modal first, then show message
           if (window.TDVAuth) {
@@ -926,7 +629,7 @@
               // Save purchase to Firebase and redirect to player
               savePurchaseToFirebase(currentProduct.id, response.razorpay_payment_id);
             } else {
-              // Show download section on the page — NO popup, NO alert
+              // Show download section on the page â€” NO popup, NO alert
               showDownloadSection(response.razorpay_payment_id, description, downloadUrls);
             }
           },
@@ -940,7 +643,7 @@
         };
         var rzp = new Razorpay(options);
         rzp.on('payment.failed', function(response) {
-          alert('❌ Payment failed: ' + response.error.description + '\n\nPlease try again.');
+          alert('âŒ Payment failed: ' + response.error.description + '\n\nPlease try again.');
         });
         rzp.open();
       } catch(e) {
@@ -982,15 +685,15 @@
       }
     }
 
-    // ── Share Link ──
+    // â”€â”€ Share Link â”€â”€
     window.copyShareLink = function() {
       navigator.clipboard.writeText(window.location.href).then(function() {
         var btn = document.querySelector('.share-btn');
-        if (btn) { btn.textContent = '✅ Link Copied!'; setTimeout(function() { btn.innerHTML = '📤 Share'; }, 2000); }
+        if (btn) { btn.textContent = 'âœ… Link Copied!'; setTimeout(function() { btn.innerHTML = 'ðŸ“¤ Share'; }, 2000); }
       });
     };
 
-    // ── Lightbox ──
+    // â”€â”€ Lightbox â”€â”€
     window.openLightbox = function(src) {
       document.getElementById('lightboxImg').src = src;
       document.getElementById('lightbox').classList.add('is-open');
