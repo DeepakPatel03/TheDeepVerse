@@ -155,8 +155,16 @@
     // Cache DOM elements
     cacheElements();
 
-    // Set up event listeners on all pages
-    setupEventListeners();
+    // Set up event listeners
+    // On course-detail page, skip auth modal form listeners (it has its own inline handler)
+    // but still attach the profile dropdown toggle
+    var isCourseDetail = window.location.pathname.indexOf('course-detail') !== -1;
+    if (!isCourseDetail) {
+      setupEventListeners();
+    } else {
+      // Still attach dropdown + logout even on course-detail
+      setupDropdownListeners();
+    }
 
     // Auth state observer
     auth.onAuthStateChanged(handleAuthStateChanged);
@@ -273,6 +281,26 @@
     }
   }
 
+  // ── Dropdown-only listeners (for pages like course-detail that have their own auth modal) ──
+  function setupDropdownListeners() {
+    // User dropdown toggle
+    if (userProfileBtn) {
+      userProfileBtn.addEventListener('click', toggleUserDropdown);
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
+      if (userDropdown && userProfileBtn && !userProfileBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+        userDropdown.classList.remove('is-open');
+      }
+    });
+
+    // Logout button
+    const logoutBtn = document.getElementById('navLogoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', handleSignOut);
+    }
+  }
 
   // ── Auth State Handler ──
   function handleAuthStateChanged(user) {
@@ -463,9 +491,7 @@
     } catch (error) {
       console.error('[Auth] Sign-In error:', error);
       let message = 'Sign-in failed. Please check your credentials.';
-      if (error.code === 'auth/invalid-credential') {
-        message = 'Invalid email or password. Please try again.';
-      } else if (error.code === 'auth/user-not-found') {
+      if (error.code === 'auth/user-not-found') {
         message = 'No account found with this email.';
       } else if (error.code === 'auth/wrong-password') {
         message = 'Incorrect password.';
@@ -473,10 +499,6 @@
         message = 'Invalid email address.';
       } else if (error.code === 'auth/too-many-requests') {
         message = 'Too many attempts. Please try again later.';
-      } else if (error.code === 'auth/user-disabled') {
-        message = 'This account has been disabled.';
-      } else if (error.message) {
-        message = error.message;
       }
       showError(message);
     } finally {
