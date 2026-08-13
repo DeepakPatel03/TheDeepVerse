@@ -1007,5 +1007,147 @@
   })();
   </script>
 
+  <!-- PayPal SDK for international payments -->
+  <script src="https://www.paypal.com/sdk/js?client-id=BAArKqbNWhZR0TiQkI_tPiBpsY_ObNSkXdfzkbccl-O4JUw5ItnZkHWFt4801FsvhCmcyhntC24pNgkf_w&currency=USD" data-sdk-integration-source="button-factory"></script>
+
+  <script>
+  // PayPal International Payment Enhancement (separate from main code)
+  (function() {
+    var isIndia = true;
+
+    // Detect country
+    try {
+      fetch('https://ipapi.co/country_code/', { mode: 'cors' })
+        .then(function(r) { return r.text(); })
+        .then(function(code) {
+          code = (code || '').trim().toUpperCase();
+          if (code.length === 2 && code !== 'IN') {
+            isIndia = false;
+            applyPayPal();
+          }
+        })
+        .catch(function() {});
+    } catch(e) {}
+
+    function applyPayPal() {
+      // Wait for product to load
+      var tries = 0;
+      function waitForProduct() {
+        var sidebar = document.getElementById('heroSidebar');
+        var buyBtn = sidebar ? sidebar.querySelector('.purchase-card__buy') : null;
+        if (!buyBtn || tries > 30) return;
+        if (!sidebar.innerHTML || sidebar.innerHTML.indexOf('purchase-card__buy') === -1) {
+          tries++;
+          setTimeout(waitForProduct, 300);
+          return;
+        }
+
+        // Get product info from the page
+        var params = new URLSearchParams(window.location.search);
+        var productId = params.get('id');
+        if (!productId) return;
+
+        var product = null;
+        try { product = StoreEngine.getProduct(productId); } catch(e) {}
+        if (!product && StoreEngine.DEFAULT_PRODUCTS) {
+          product = StoreEngine.DEFAULT_PRODUCTS.find(function(p) { return p.id === productId; });
+        }
+        if (!product) return;
+
+        // Replace buy buttons with PayPal
+        var allBuyBtns = sidebar.querySelectorAll('.purchase-card__buy');
+        allBuyBtns.forEach(function(btn) {
+          // Create PayPal container
+          var container = document.createElement('div');
+          container.id = 'paypal-btn-' + Math.random().toString(36).substr(2, 6);
+          container.style.marginTop = '8px';
+
+          // Get price from button text or product
+          var priceUSD = product.priceUSD || 3;
+          var description = product.title || 'TheDeepVerse Product';
+
+          // Check if this is a combo button
+          var isCombo = btn.textContent.indexOf('Combo') !== -1;
+          if (isCombo) {
+            priceUSD = product.comboPriceUSD || 3;
+            description = product.title + ' — Combo';
+          }
+
+          // Check if this is a variant button
+          var btnText = btn.textContent;
+          if (product.variants && product.variants.length > 0) {
+            product.variants.forEach(function(v, i) {
+              if (btnText.indexOf(v.price) !== -1 && !isCombo) {
+                priceUSD = v.priceUSD || 2;
+                description = v.name || product.title;
+              }
+            });
+          }
+
+          // Update price display
+          var priceEls = sidebar.querySelectorAll('.purchase-card__price-current');
+          priceEls.forEach(function(el) {
+            el.textContent = '$' + priceUSD;
+          });
+          var origEls = sidebar.querySelectorAll('.purchase-card__price-original');
+          origEls.forEach(function(el) {
+            el.style.display = 'none';
+          });
+
+          // Replace button with PayPal
+          btn.style.display = 'none';
+          btn.parentNode.insertBefore(container, btn.nextSibling);
+
+          if (typeof paypal !== 'undefined') {
+            try {
+              paypal.Buttons({
+                style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 40 },
+                createOrder: function(data, actions) {
+                  return actions.order.create({
+                    purchase_units: [{ description: description, amount: { value: String(priceUSD), currency_code: 'USD' } }]
+                  });
+                },
+                onApprove: function(data, actions) {
+                  return actions.order.capture().then(function(details) {
+                    var payId = 'PAYPAL-' + details.id;
+                    if (product.type === 'video-course') {
+                      // Save purchase to Firebase
+                      try {
+                        var user = window.FirebaseAuth ? window.FirebaseAuth.currentUser : null;
+                        if (user) {
+                          window.FirebaseDatabase.ref('users/' + user.uid + '/purchases/' + product.id).set(true);
+                        }
+                      } catch(e) {}
+                      alert('Payment successful! Go to Dashboard to access your course.');
+                      window.location.href = 'dashboard.html';
+                    } else {
+                      var dl = product.downloadUrl || '';
+                      if (isCombo && product.variants) {
+                        var urls = product.variants.map(function(v) { return v.downloadUrl; }).filter(Boolean);
+                        urls.forEach(function(u) { window.open(u, '_blank'); });
+                      } else if (dl) {
+                        window.open(dl, '_blank');
+                      }
+                      alert('Payment successful! Payment ID: ' + payId);
+                    }
+                  });
+                },
+                onError: function(err) { alert('Payment failed. Please try again.'); }
+              }).render('#' + container.id);
+            } catch(e) {}
+          }
+        });
+
+        // Update guarantee text
+        var guarantee = sidebar.querySelector('.purchase-card__guarantee');
+        if (guarantee) {
+          guarantee.innerHTML = '<span class="purchase-card__guarantee-icon">🔒</span>Secure payment via PayPal. Instant access after purchase.';
+        }
+      }
+      waitForProduct();
+    }
+  })();
+  </script>
+
 </body>
 </html>
