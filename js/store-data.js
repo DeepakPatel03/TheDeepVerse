@@ -28,9 +28,7 @@ const StoreEngine = (function() {
       ],
       method: 'Step 1: Choose your preferred edition (Hindi, English, or Combo).\nStep 2: Complete payment via Razorpay.\nStep 3: Download your PDF instantly after payment.\nStep 4: Read at your own pace — works on any device.',
       price: 65,
-      priceUSD: 2,
       originalPrice: 99,
-      originalPriceUSD: 3,
       tag: 'New Launch',
       tagColor: 'gold',
       thumbnail: '',
@@ -48,13 +46,11 @@ const StoreEngine = (function() {
       active: true,
       downloadUrl: 'https://drive.google.com/file/d/1sjbMKaaFCE-lWQd-B-aEmdBj559E_ipm/view?usp=drive_link',
       variants: [
-        { id: 'eng', name: 'English Edition', price: 65, priceUSD: 2, originalPrice: 99, originalPriceUSD: 3, downloadUrl: 'https://drive.google.com/file/d/1sjbMKaaFCE-lWQd-B-aEmdBj559E_ipm/view?usp=drive_link' },
-        { id: 'hin', name: 'Hindi Edition (Manovigyan Ka Khatarnak Jal)', price: 65, priceUSD: 2, originalPrice: 99, originalPriceUSD: 3, downloadUrl: 'https://drive.google.com/file/d/1L3i0_gV25u9sIeSWI1mtgufKRxwS0V0J/view?usp=drive_link' }
+        { id: 'eng', name: 'English Edition', price: 65, originalPrice: 99, downloadUrl: 'https://drive.google.com/file/d/1sjbMKaaFCE-lWQd-B-aEmdBj559E_ipm/view?usp=drive_link' },
+        { id: 'hin', name: 'Hindi Edition (Manovigyan Ka Khatarnak Jal)', price: 65, originalPrice: 99, downloadUrl: 'https://drive.google.com/file/d/1L3i0_gV25u9sIeSWI1mtgufKRxwS0V0J/view?usp=drive_link' }
       ],
       comboPrice: 99,
-      comboPriceUSD: 3,
       comboOriginalPrice: 198,
-      comboPriceOriginalUSD: 5,
       instructor: 'Deepak Patel',
       duration: 'Complete Book',
       language: 'Hindi + English',
@@ -109,9 +105,7 @@ const StoreEngine = (function() {
       ],
       method: 'Step 1: Purchase the course and login to your account.\\nStep 2: Open the Course Player from your Dashboard.\\nStep 3: Follow along with the video — pause and practice each step.\\nStep 4: Use the FREE Master Prompts to generate your own content.\\nStep 5: Create your first AI-powered video using the complete workflow.',
       price: 175,
-      priceUSD: 3,
       originalPrice: 499,
-      originalPriceUSD: 6,
       tag: '65% OFF',
       tagColor: 'red',
       thumbnail: '',
@@ -281,39 +275,10 @@ const StoreEngine = (function() {
   // ── Auth ──
   function isAuthenticated() { return sessionStorage.getItem(ADMIN_KEY) === 'true'; }
 
-  // Sync login fallback (used if Firebase not ready)
-  var FALLBACK_PASSWORD = 'deepverse2026';
-
   function login(password) {
-    // Sync check against fallback only
-    if (password === FALLBACK_PASSWORD) { sessionStorage.setItem(ADMIN_KEY, 'true'); return true; }
+    const ADMIN_PASSWORD = 'deepverse2026';
+    if (password === ADMIN_PASSWORD) { sessionStorage.setItem(ADMIN_KEY, 'true'); return true; }
     return false;
-  }
-
-  // Async login - checks Firebase RTDB first, falls back to hardcoded
-  function loginAsync(password, callback) {
-    if (!firebaseReady || !window.FirebaseDatabase) {
-      // Firebase not ready, use sync fallback
-      callback(login(password));
-      return;
-    }
-    var ref = window.FirebaseDatabase.ref('config/adminPassword');
-    ref.once('value').then(function(snap) {
-      var savedPw = snap.val();
-      if (savedPw && password === savedPw) {
-        sessionStorage.setItem(ADMIN_KEY, 'true');
-        callback(true);
-      } else if (!savedPw && password === FALLBACK_PASSWORD) {
-        // No password set in Firebase yet, use fallback
-        sessionStorage.setItem(ADMIN_KEY, 'true');
-        callback(true);
-      } else {
-        callback(false);
-      }
-    }).catch(function() {
-      // Firebase error, use sync fallback
-      callback(login(password));
-    });
   }
 
   function logout() { sessionStorage.removeItem(ADMIN_KEY); }
@@ -327,7 +292,7 @@ const StoreEngine = (function() {
     getProducts, saveProducts, getProduct,
     addProduct, updateProduct, deleteProduct,
     resetToDefaults, exportJSON, importJSON,
-    generateId, isAuthenticated, login, loginAsync, logout,
+    generateId, isAuthenticated, login, logout,
     isFirebaseConnected, initFirebase,
     DEFAULT_PRODUCTS
   };
