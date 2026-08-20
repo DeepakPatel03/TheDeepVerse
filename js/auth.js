@@ -1,8 +1,6 @@
 /* ═══════════════════════════════════════════════════
    AUTHENTICATION — TheDeepVerse
-   ═══════════════════════════════════════════════════
-   Handles: Google Sign-In, Email/Password Auth,
-   Phone Number Auth, Auth State Observer, Login Modal, User Profile UI
+   (updated safe global fallbacks)
    ═══════════════════════════════════════════════════ */
 
 (function () {
@@ -290,16 +288,53 @@
     }
   }
 
-  // Export for global use
+  // Export for global use (safe: reference fallbacks)
+  function _safeOpenAuthModal() {
+    try {
+      if (typeof openAuthModal === 'function') return openAuthModal();
+      // fallback: ensure modal exists and show it
+      ensureAuthModal();
+      var m = document.getElementById('authModal');
+      if (m) { m.style.display = 'block'; modalOpen = true; }
+      try { if (typeof switchTab === 'function') switchTab('signin'); } catch(e) {}
+    } catch (e) { console.warn('[Auth] safeOpenAuthModal failed', e); }
+  }
+
+  function _safeCloseAuthModal() {
+    try {
+      if (typeof closeAuthModal === 'function') return closeAuthModal();
+      var m = document.getElementById('authModal');
+      if (m) { m.style.display = 'none'; modalOpen = false; }
+    } catch (e) { console.warn('[Auth] safeCloseAuthModal failed', e); }
+  }
+
+  function _safeRequireLogin() {
+    return new Promise(function(resolve) {
+      _safeOpenAuthModal();
+      // wait for auth state change or timeout
+      var resolved = false;
+      function check() {
+        if (window.FirebaseAuth && window.FirebaseAuth.currentUser) {
+          resolved = true; resolve(window.FirebaseAuth.currentUser); return;
+        }
+        if (resolved) return;
+        setTimeout(check, 500);
+      }
+      check();
+      // fallback timeout
+      setTimeout(function() { if (!resolved) resolve(null); }, 60000);
+    });
+  }
+
   window.TDVAuth = {
-    openAuthModal: openAuthModal,
-    closeAuthModal: closeAuthModal,
+    openAuthModal: _safeOpenAuthModal,
+    closeAuthModal: _safeCloseAuthModal,
     getCurrentUser: function () { return currentUser; },
-    requireLogin: requireLogin
+    requireLogin: _safeRequireLogin
   };
-  // Convenience globals used by some inline handlers
-  window.openAuthModal = openAuthModal;
-  window.requireLogin = requireLogin;
+  // Convenience globals used by some inline handlers (safe assignments)
+  if (typeof window.openAuthModal !== 'function') window.openAuthModal = _safeOpenAuthModal;
+  if (typeof window.requireLogin !== 'function') window.requireLogin = _safeRequireLogin;
 
   // ── Initialize ──
   if (document.readyState === 'loading') {
@@ -309,3 +344,13 @@
   }
 
 })();
+
+// Extra safety: if some pages load auth.js and earlier inline scripts expected openAuthModal immediately
+if (typeof window.openAuthModal !== 'function') {
+  window.openAuthModal = function() {
+    try { var m = document.getElementById('authModal'); if (m) m.style.display = 'block'; } catch(e){}
+  };
+}
+if (typeof window.requireLogin !== 'function') {
+  window.requireLogin = function() { return new Promise(function(res){ window.openAuthModal(); setTimeout(function(){ res(null); }, 60000); }); };
+}
