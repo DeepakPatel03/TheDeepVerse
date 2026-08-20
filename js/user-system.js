@@ -135,6 +135,9 @@ const UserSystem = (function () {
   // saved one yet. Keeps the existing chapters as lessons so nothing breaks.
   function seedCurriculum(product) {
     if (!product) return [];
+    if (product.modules && product.modules.length > 0) {
+      return normalizeModules(JSON.parse(JSON.stringify(product.modules)));
+    }
     var modules = [];
     var lessons = [];
     var chapters = product.chapters || [];
@@ -174,7 +177,7 @@ const UserSystem = (function () {
     if (lessons.length) {
       modules.push({ id: 'module-' + Date.now() + '-0', title: product.title || 'Course Content', lessons: lessons });
     }
-    return modules;
+    return normalizeModules(modules);
   }
 
   // Loads curriculum for a course. Falls back to seeds from the product data.
