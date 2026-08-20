@@ -38,6 +38,7 @@
     <a href="#" class="sidebar-link" onclick="showSection('add')"><span class="sidebar-link__icon">➕</span> Add Product</a>
     <a href="#" class="sidebar-link" onclick="showSection('social')"><span class="sidebar-link__icon">🔗</span> Social Links</a>
     <a href="#" class="sidebar-link" onclick="showSection('testimonials')"><span class="sidebar-link__icon">⭐</span> Testimonials</a>
+    <a href="#" class="sidebar-link" onclick="showSection('curriculum')"><span class="sidebar-link__icon">🎬</span> Course Curriculum</a>
     <a href="#" class="sidebar-link" onclick="showSection('data')"><span class="sidebar-link__icon">💾</span> Import / Export</a>
     <a href="#" class="sidebar-link" onclick="showSection('settings')"><span class="sidebar-link__icon">⚙️</span> Settings</a>
     <div class="sidebar-section-title">Quick Links</div>
@@ -538,10 +539,44 @@
       </div>
     </div>
 
+  <!-- ── COURSE CURRICULUM SECTION ── -->
+    <div id="section-curriculum" style="display:none">
+      <div class="admin-header">
+        <h1>🎬 Course Curriculum</h1>
+        <button class="btn-admin" onclick="showSection('products')">← Back</button>
+      </div>
+
+      <div class="data-section">
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Structure your video courses into <strong>Modules</strong> and <strong>Lessons</strong>. Each lesson has a timestamp inside the SAME YouTube video — students click a lesson and the player seeks to that point. Changes save to Firebase and apply instantly for students.</p>
+
+        <div class="form-group">
+          <label>Select Course</label>
+          <select id="curProductSelect" onchange="loadCurriculumProject()">
+            <option value="">— Choose a video course —</option>
+          </select>
+          <small>Only video courses with a YouTube video are shown.</small>
+        </div>
+
+        <div id="curWorkingCourse" style="display:none">
+          <div style="border:1px solid var(--admin-border);border-radius:8px;padding:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+            <div>
+              <div style="font-weight:700;color:var(--admin-text-1)" id="curCourseTitle">—</div>
+              <div style="font-size:0.8rem;color:var(--admin-text-2)" id="curCourseVideo">Video ID: —</div>
+            </div>
+            <button class="btn-admin btn-admin--primary" onclick="saveCurriculum()">💾 Save Curriculum</button>
+          </div>
+
+          <div id="curModules" style="display:flex;flex-direction:column;gap:20px"></div>
+
+          <button class="btn-admin" onclick="addCurModule()" style="margin-top:12px">➕ Add Module</button>
+        </div>
+
+        <p id="curStatus" style="color:#22c55e;font-size:0.85rem;margin-top:12px;display:none"></p>
+      </div>
+    </div>
+
   </main>
 </div>
-
-<!-- ── IMAGE CROP/ADJUST MODAL ── -->
 <div id="cropModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:2000;display:none;align-items:center;justify-content:center;padding:16px">
   <div style="background:var(--admin-surface);border:1px solid var(--admin-border);border-radius:16px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--admin-border)">
@@ -589,6 +624,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="js/firebase-config.js"></script>
 <script src="js/store-data.js"></script>
+  <script src="js/user-system.js"></script>
 <script>
 // ═══ AUTH ═══
 function doLogin() {
@@ -960,7 +996,7 @@ function importFile(event) {
 
 // ═══ UI HELPERS ═══
 function showSection(name) {
-  ['products', 'add', 'data', 'settings', 'social', 'testimonials'].forEach(s => {
+  ['products', 'add', 'data', 'settings', 'social', 'testimonials', 'curriculum'].forEach(s => {
     var el = document.getElementById('section-' + s);
     if (el) el.style.display = s === name ? '' : 'none';
   });
@@ -972,6 +1008,7 @@ function showSection(name) {
   if (name === 'settings') { loadSettings(); }
   if (name === 'social') { loadSocialLinks(); }
   if (name === 'testimonials') { loadTestimonials(); }
+  if (name === 'curriculum') { setupCurriculumEditor(); }
   window.scrollTo(0, 0);
 }
 
@@ -1592,6 +1629,203 @@ function closeCropModal() {
 
 // Initialize gallery grid on page load
 setTimeout(function() { renderGalleryGrid(); }, 100);
+
+// ═══ COURSE CURRICULUM EDITOR ═══
+var curModules = [];
+var curProduct = null;
+
+function curUid(prefix) { return prefix + '-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
+
+function setupCurriculumEditor() {
+  var select = document.getElementById('curProductSelect');
+  if (!select) return;
+  // Keep current selection if possible
+  var prev = select.value;
+  select.innerHTML = '<option value="">— Choose a video course —</option>';
+  var products = [];
+  try { products = StoreEngine.getProducts(); } catch(e) {}
+  var videoCourses = products.filter(function(p) { return p.active && (p.type === 'video-course' || p.type === 'course') && p.videoId; });
+  videoCourses.forEach(function(p) {
+    var opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = p.title + (p.videoId ? '  (' + p.videoId + ')' : '');
+    select.appendChild(opt);
+  });
+  if (prev && document.querySelector('#curProductSelect option[value="' + prev + '"]')) {
+    select.value = prev;
+    loadCurriculumProject();
+  }
+  document.getElementById('curModules').innerHTML = '';
+  document.getElementById('curWorkingCourse').style.display = 'none';
+}
+
+function loadCurriculumProject() {
+  var select = document.getElementById('curProductSelect');
+  var pid = select.value;
+  var statusEl = document.getElementById('curStatus');
+  if (statusEl) statusEl.style.display = 'none';
+
+  if (!pid) {
+    document.getElementById('curWorkingCourse').style.display = 'none';
+    curModules = [];
+    curProduct = null;
+    return;
+  }
+
+  var products = [];
+  try { products = StoreEngine.getProducts(); } catch(e) {}
+  var p = null;
+  for (var i = 0; i < products.length; i++) { if (products[i].id === pid) { p = products[i]; break; } }
+  if (!p) return;
+
+  curProduct = p;
+  document.getElementById('curWorkingCourse').style.display = 'block';
+  document.getElementById('curCourseTitle').textContent = p.title || 'Untitled Course';
+  document.getElementById('curCourseVideo').textContent = 'Video ID: ' + (p.videoId || '—') + ' • YouTube plays inside the website player';
+
+  if (window.UserSystem) {
+    window.UserSystem.getCurriculum(p).then(function(modules) {
+      curModules = JSON.parse(JSON.stringify(modules));
+      renderCurriculum();
+    });
+  } else {
+    curModules = window.UserSystem ? [] : [];
+    renderCurriculum();
+  }
+}
+
+function renderCurriculum() {
+  var wrap = document.getElementById('curModules');
+  if (!wrap) return;
+  if (!curModules.length) {
+    wrap.innerHTML = '<div style="border:2px dashed var(--admin-border);border-radius:8px;padding:28px;text-align:center;color:var(--admin-text-2);font-size:0.85rem">No modules yet. Click "➕ Add Module" to build the curriculum.</div>';
+    return;
+  }
+
+  wrap.innerHTML = curModules.map(function(m, mi) {
+    var lessons = (m.lessons || []).map(function(l, li) {
+      return '<div style="background:var(--admin-surface-2);border:1px solid var(--admin-border);border-radius:8px;padding:12px;margin-bottom:8px">' +
+        '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">' +
+          '<button type="button" class="btn-admin btn-admin--sm" onclick="moveCurLesson(' + mi + ',' + li + ',-1)" title="Move up">⬆️</button>' +
+          '<button type="button" class="btn-admin btn-admin--sm" onclick="moveCurLesson(' + mi + ',' + li + ',1)" title="Move down">⬇️</button>' +
+          '<span style="font-size:0.85rem;font-weight:600;color:var(--admin-text-1)">Lesson ' + (li + 1) + '</span>' +
+          '<span style="flex:1"></span>' +
+          '<label style="font-size:0.78rem;color:var(--admin-text-2);display:flex;align-items:center;gap:4px"><input type="checkbox" ' + (l.published === false ? '' : 'checked') + ' onchange="setCurLessonPub(' + mi + ',' + li + ',this.checked)" style="accent-color:var(--admin-accent)"> Published</label>' +
+          '<button type="button" class="btn-admin btn-admin--sm" onclick="delCurLesson(' + mi + ',' + li + ')">🗑️</button>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 150px 1fr;gap:8px;margin-bottom:8px">' +
+          '<div><label style="font-size:0.75rem;color:var(--admin-text-2)">Lesson Title</label><input type="text" value="' + l.title.replace(/"/g, '&quot;') + '" onchange="setCurLesson(' + mi + ',' + li + ',\'title\',this.value)" placeholder="e.g. Voice Generation"></div>' +
+          '<div><label style="font-size:0.75rem;color:var(--admin-text-2)">Timestamp (MM:SS or HH:MM:SS)</label><input type="text" value="' + ((l.timeText || l.timestamp)) + '" onchange="setCurLesson(' + mi + ',' + li + ',\'time\',this.value)" placeholder="00:00:00"></div>' +
+          '<div><label style="font-size:0.75rem;color:var(--admin-text-2)">Optional Duration</label><input type="text" value="' + (l.duration || '') + '" onchange="setCurLesson(' + mi + ',' + li + ',\'duration\',this.value)" placeholder="e.g. 4:20"></div>' +
+        '</div>' +
+        '<div><label style="font-size:0.75rem;color:var(--admin-text-2)">Optional Description</label><textarea rows="1" onchange="setCurLesson(' + mi + ',' + li + ',\'description\',this.value)" placeholder="Short description shown under the lesson...">' + (l.description || '') + '</textarea></div>' +
+      '</div>';
+    }).join('');
+
+    return '<div style="border:1px solid var(--admin-border);border-radius:10px;background:var(--admin-surface);overflow:hidden">' +
+      '<div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--admin-border);flex-wrap:wrap">' +
+        '<span style="font-weight:700;color:var(--admin-accent)">MODULE ' + (mi + 1) + '</span>' +
+        '<button type="button" class="btn-admin btn-admin--sm" onclick="moveCurModule(' + mi + ',-1)" title="Move module up">⬆️</button>' +
+        '<button type="button" class="btn-admin btn-admin--sm" onclick="moveCurModule(' + mi + ',1)" title="Move module down">⬇️</button>' +
+        '<button type="button" class="btn-admin btn-admin--sm btn-admin--danger" onclick="delCurModule(' + mi + ')" style="margin-left:auto">🗑️ Remove Module</button>' +
+      '</div>' +
+      '<div style="padding:14px;border-bottom:1px solid var(--admin-border)">' +
+        '<label style="font-size:0.75rem;color:var(--admin-text-2)">Module Title</label>' +
+        '<input type="text" value="' + (m.title || '').replace(/"/g, '&quot;') + '" onchange="setCurModuleTitle(' + mi + ',this.value)" placeholder="e.g. AI Content Creation">' +
+      '</div>' +
+      '<div style="padding:14px">' + lessons + '</div>' +
+      '<div style="padding:0 14px 14px"><button type="button" class="btn-admin" onclick="addCurLesson(' + mi + ')">➕ Add Lesson</button></div>' +
+    '</div>';
+  }).join('');
+}
+
+function moveCurModule(i, dir) {
+  var j = i + dir;
+  if (j < 0 || j >= curModules.length) return;
+  var tmp = curModules[i]; curModules[i] = curModules[j]; curModules[j] = tmp;
+  renderCurriculum();
+}
+
+function setCurModuleTitle(i, val) {
+  if (curModules[i]) curModules[i].title = val;
+}
+
+function addCurModule() {
+  curModules.push({ id: curUid('module'), title: 'New Module', lessons: [] });
+  renderCurriculum();
+}
+
+function delCurModule(i) {
+  if (!confirm('Delete this module and all its lessons?')) return;
+  curModules.splice(i, 1);
+  renderCurriculum();
+}
+
+function addCurLesson(mi) {
+  if (!curModules[mi]) return;
+  if (!curModules[mi].lessons) curModules[mi].lessons = [];
+  curModules[mi].lessons.push({ id: curUid('lesson'), title: 'New Lesson', timestamp: 0, timeText: '00:00:00', description: '', duration: '', published: true });
+  renderCurriculum();
+}
+
+function moveCurLesson(mi, li, dir) {
+  if (!curModules[mi]) return;
+  var lessons = curModules[mi].lessons;
+  var lj = li + dir;
+  if (lj < 0 || lj >= lessons.length) return;
+  var tmp = lessons[li]; lessons[li] = lessons[lj]; lessons[lj] = tmp;
+  renderCurriculum();
+}
+
+function setCurLesson(mi, li, field, val) {
+  if (!curModules[mi] || !curModules[mi].lessons[li]) return;
+  var l = curModules[mi].lessons[li];
+  if (field === 'title') l.title = val;
+  else if (field === 'time') {
+    var sec = window.UserSystem ? window.UserSystem.parseTimestamp(val) : 0;
+    l.timestamp = sec;
+    l.timeText = window.UserSystem ? window.UserSystem.formatTimestamp(sec, true) : val;
+  } else if (field === 'duration') l.duration = val;
+  else if (field === 'description') l.description = val;
+}
+
+function setCurLessonPub(mi, li, val) {
+  if (!curModules[mi] || !curModules[mi].lessons[li]) return;
+  curModules[mi].lessons[li].published = !!val;
+}
+
+function delCurLesson(mi, li) {
+  if (!curModules[mi]) return;
+  curModules[mi].lessons.splice(li, 1);
+  renderCurriculum();
+}
+
+function saveCurriculum() {
+  if (!curProduct || !window.UserSystem || !window.FirebaseDatabase) {
+    showToast('Firebase not connected. Cannot save curriculum.', 'error');
+    return;
+  }
+  var statusEl = document.getElementById('curStatus');
+  // Normalize timestamps before save
+  curModules.forEach(function(m) {
+    (m.lessons || []).forEach(function(l) {
+      l.timestamp = window.UserSystem.parseTimestamp(l.timestamp);
+      l.timeText = l.timeText || window.UserSystem.formatTimestamp(l.timestamp, true);
+      l.published = l.published !== false;
+    });
+  });
+  window.UserSystem.saveCurriculum(curProduct.id, curModules).then(function() {
+    showToast('✅ Curriculum saved! Students will see updated lessons instantly.', 'success');
+    if (statusEl) {
+      statusEl.textContent = 'Saved at ' + new Date().toLocaleTimeString() + ' — students see updates automatically.';
+      statusEl.style.display = 'block';
+      setTimeout(function() { statusEl.style.display = 'none'; }, 6000);
+    }
+  }).catch(function(err) {
+    console.error('[Curriculum] Save error:', err);
+    showToast('Curriculum save failed: ' + err.message, 'error');
+  });
+}
 
 </script>
 </body>

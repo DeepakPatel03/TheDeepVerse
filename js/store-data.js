@@ -142,6 +142,24 @@ const StoreEngine = (function() {
   let firebaseDB = null;
   let firebaseReady = false;
   let firebaseProducts = null;
+  let listeners = [];
+
+  function notifyChange() {
+    listeners.forEach(function(cb) {
+      try { cb(getProducts()); } catch(e) { console.error('[StoreEngine] Listener error:', e); }
+    });
+  }
+
+  // Subscribe to product changes (e.g. after Firebase image sync). Returns unsubscribe.
+  function subscribe(cb) {
+    if (typeof cb !== 'function') return function() {};
+    listeners.push(cb);
+    // Immediately fire with current data
+    try { cb(getProducts()); } catch(e) {}
+    return function() {
+      listeners = listeners.filter(function(l) { return l !== cb; });
+    };
+  }
 
   function initFirebase() {
     if (typeof FIREBASE_ENABLED === 'undefined' || !FIREBASE_ENABLED) return;
@@ -155,7 +173,8 @@ const StoreEngine = (function() {
         const data = snapshot.val();
         if (data && Array.isArray(data)) {
           firebaseProducts = data;
-          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+          cacheProductsLocal(data);
+          notifyChange();
           console.log('[StoreEngine] Products synced from Firebase (' + data.length + ')');
         }
       });
@@ -177,6 +196,22 @@ const StoreEngine = (function() {
     }
   }
 
+  // Safely cache a product list. Base64 images can exceed localStorage quota,
+  // so we only cache when the serialized payload is reasonably small.
+  function cacheProductsLocal(data) {
+    try {
+      var json = JSON.stringify(data);
+      // ~250 KB max cached payload; larger lists (with base64 images) are still
+      // served live from Firebase instead of localStorage.
+      if (json.length < 250000) {
+        localStorage.setItem(STORAGE_KEY, json);
+      }
+    } catch(e) {
+      try { localStorage.removeItem(STORAGE_KEY); } catch(_) {}
+      console.warn('[StoreEngine] Skipped localStorage cache (size/quota)', e.message);
+    }
+  }
+
   // ── Core Methods ──
   function mergeNewDefaults(products) {
     // If DEFAULT_PRODUCTS has new items not in the cached list, add them
@@ -190,7 +225,7 @@ const StoreEngine = (function() {
       }
     });
     if (added) {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(products)); } catch(e) {}
+      cacheProductsLocal(products);
     }
     return products;
   }
@@ -215,10 +250,10 @@ const StoreEngine = (function() {
   }
 
   function saveProducts(products) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(products)); } catch(e) {}
+    cacheProductsLocal(products);
     if (firebaseReady && firebaseDB) {
       firebaseDB.ref('products').set(products)
-        .then(function() { console.log('[StoreEngine] Saved to Firebase ✅'); })
+        .then(function() { console.log('[StoreEngine] Saved to Firebase ✅'); notifyChange(); })
         .catch(function(e) { console.error('[StoreEngine] Firebase save failed:', e); });
     }
     return true;
@@ -275,10 +310,36 @@ const StoreEngine = (function() {
   // ── Auth ──
   function isAuthenticated() { return sessionStorage.getItem(ADMIN_KEY) === 'true'; }
 
+  // Legacy sync login (default password only). Used by inline fallbacks.
   function login(password) {
     const ADMIN_PASSWORD = 'deepverse2026';
     if (password === ADMIN_PASSWORD) { sessionStorage.setItem(ADMIN_KEY, 'true'); return true; }
     return false;
+  }
+
+  const DEFAULT_ADMIN_PASSWORD = 'deepverse2026';
+
+  // Async login that honours the Firebase-configured admin password when set.
+  function loginAsync(password, cb) {
+    var done = function(valid) {
+      if (valid) sessionStorage.setItem(ADMIN_KEY, 'true');
+      if (typeof cb === 'function') cb(valid);
+    };
+
+    if (!firebaseReady || !firebaseDB) {
+      done(password === DEFAULT_ADMIN_PASSWORD);
+      return;
+    }
+    firebaseDB.ref('config/adminPassword').once('value').then(function(snap) {
+      var configured = snap.val();
+      if (configured) {
+        done(password === configured);
+      } else {
+        done(password === DEFAULT_ADMIN_PASSWORD);
+      }
+    }).catch(function() {
+      done(password === DEFAULT_ADMIN_PASSWORD);
+    });
   }
 
   function logout() { sessionStorage.removeItem(ADMIN_KEY); }
@@ -292,8 +353,8 @@ const StoreEngine = (function() {
     getProducts, saveProducts, getProduct,
     addProduct, updateProduct, deleteProduct,
     resetToDefaults, exportJSON, importJSON,
-    generateId, isAuthenticated, login, logout,
-    isFirebaseConnected, initFirebase,
+    generateId, isAuthenticated, login, loginAsync, logout,
+    isFirebaseConnected, initFirebase, subscribe,
     DEFAULT_PRODUCTS
   };
 })();

@@ -425,7 +425,7 @@
         <!-- Header -->
         <div class="dashboard__header">
           <h1 class="dashboard__greeting" id="dashGreeting">Welcome back! 👋</h1>
-          <p class="dashboard__subtitle">Your personal learning hub — track your courses and continue learning.</p>
+          <p class="dashboard__subtitle">Your personal learning hub — track your courses, ebooks and library, and continue learning.</p>
         </div>
 
         <!-- Stats -->
@@ -433,12 +433,17 @@
           <div class="stat-card">
             <div class="stat-card__icon">📚</div>
             <div class="stat-card__value" id="statCourses">0</div>
-            <div class="stat-card__label">Courses Purchased</div>
+            <div class="stat-card__label">Products Owned</div>
           </div>
           <div class="stat-card">
-            <div class="stat-card__icon">⏱️</div>
-            <div class="stat-card__value" id="statHours">0h</div>
-            <div class="stat-card__label">Learning Hours</div>
+            <div class="stat-card__icon">🎬</div>
+            <div class="stat-card__value" id="statVideo">0</div>
+            <div class="stat-card__label">Courses</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__icon">📖</div>
+            <div class="stat-card__value" id="statEbooks">0</div>
+            <div class="stat-card__label">Ebooks</div>
           </div>
           <div class="stat-card">
             <div class="stat-card__icon">🏆</div>
@@ -447,9 +452,31 @@
           </div>
         </div>
 
+        <!-- Continue Learning (based on saved progress) -->
+        <h2 class="dashboard__section-title">▶️ Continue Learning</h2>
+        <div id="dashContinue"></div>
+
         <!-- My Courses -->
         <h2 class="dashboard__section-title">🎬 My Courses</h2>
         <div id="dashCourses"></div>
+
+        <!-- My Ebooks -->
+        <h2 class="dashboard__section-title">📖 My Ebooks</h2>
+        <div id="dashEbooks"></div>
+
+        <!-- My Library (other digital products) -->
+        <h2 class="dashboard__section-title">🗂️ My Library</h2>
+        <div id="dashLibrary"></div>
+
+        <!-- Browse Store / empty state -->
+        <div id="dashEmpty" style="display:none">
+          <div class="empty-state">
+            <div class="empty-state__icon">📭</div>
+            <h3 class="empty-state__title">You haven't purchased anything yet.</h3>
+            <p class="empty-state__text">Explore the store and your purchases will appear here automatically.</p>
+            <a href="store.html" class="empty-state__btn">🛍️ Browse Store</a>
+          </div>
+        </div>
 
         <!-- Browse More -->
         <h2 class="dashboard__section-title" style="margin-top:48px">🛍️ Explore More</h2>
@@ -500,6 +527,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/store-data.js"></script>
+  <script src="js/user-system.js"></script>
   <script src="js/auth.js"></script>
 
   <script>
@@ -509,6 +537,15 @@
     var loading = document.getElementById('dashLoading');
     var loginPrompt = document.getElementById('dashLoginPrompt');
     var dashContent = document.getElementById('dashContent');
+
+    var currentUid = null;
+    var currentUser = null;
+    var progressCache = {};
+
+    function esc(value) {
+      return String(value === null || value === undefined ? '' : value)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
 
     // Wait for Firebase Auth to be ready
     function waitForAuth() {
@@ -534,84 +571,218 @@
         var firstName = name.split(' ')[0].split('@')[0];
         document.getElementById('dashGreeting').textContent = 'Welcome back, ' + firstName + '! 👋';
 
-        // Load purchases from Firebase
-        loadPurchases(user.uid);
+        currentUid = user.uid;
+        currentUser = user;
+        loadDashboard(user);
       });
+
+      // When Firebase product data / images finish syncing, refresh the dashboard
+      if (window.StoreEngine && StoreEngine.subscribe) {
+        StoreEngine.subscribe(function() {
+          if (currentUser) loadDashboard(currentUser);
+          else if (currentUid) loadDashboard({ uid: currentUid });
+        });
+      }
     }
 
-    function loadPurchases(uid) {
-      var purchasesRef = window.FirebaseDatabase.ref('users/' + uid + '/purchases');
+    function loadDashboard(user) {
+      Promise.all([
+        UserSystem.getPurchasedIds(user.uid),
+        UserSystem.getProgressForUser(user.uid)
+      ]).then(function(results) {
+        var purchasedIds = results[0];
+        var allProgress = results[1] || {};
+        progressCache = allProgress;
 
-      purchasesRef.once('value').then(function(snapshot) {
-        var purchases = snapshot.val() || {};
-        var purchasedIds = Object.keys(purchases).filter(function(k) { return purchases[k] === true; });
-
-        // Update stats
-        document.getElementById('statCourses').textContent = purchasedIds.length;
-        document.getElementById('statHours').textContent = (purchasedIds.length * 2) + 'h';
-        if (purchasedIds.length >= 3) {
-          document.getElementById('statStatus').textContent = 'Pro Learner';
-        } else if (purchasedIds.length >= 1) {
-          document.getElementById('statStatus').textContent = 'Active Learner';
-        }
-
-        // Get all products
         var allProducts = [];
         try { allProducts = StoreEngine.getProducts(); } catch(e) {}
 
-        // Render purchased courses
-        renderPurchasedCourses(purchasedIds, allProducts);
+        var library = UserSystem.classifyPurchases(allProducts, purchasedIds);
+        var totalOwned = purchasedIds.length;
 
-        // Render explore section
+        // Stats
+        document.getElementById('statCourses').textContent = totalOwned;
+        document.getElementById('statVideo').textContent = library.courses.length;
+        document.getElementById('statEbooks').textContent = library.ebooks.length;
+        if (totalOwned >= 3) document.getElementById('statStatus').textContent = 'Pro Learner';
+        else if (totalOwned >= 1) document.getElementById('statStatus').textContent = 'Active Learner';
+
+        // Empty state (no purchases at all)
+        document.getElementById('dashEmpty').style.display = totalOwned === 0 ? '' : 'none';
+
+        renderContinue(library.courses);
+        renderCourses(library.courses, user);
+        renderEbooks(library.ebooks, user);
+        renderLibrary(library.digital, user);
         renderExplore(purchasedIds, allProducts);
-
       }).catch(function(err) {
         console.error('[Dashboard] Error loading purchases:', err);
-        // Still show empty state
-        renderPurchasedCourses([], []);
+        document.getElementById('statCourses').textContent = '0';
+        document.getElementById('dashEmpty').style.display = '';
+        renderCourses([], user);
+        renderEbooks([], user);
+        renderLibrary([], user);
         renderExplore([], []);
       });
     }
 
-    function renderPurchasedCourses(purchasedIds, allProducts) {
-      var container = document.getElementById('dashCourses');
+    // ── Continue Learning ──
+    function renderContinue(courses) {
+      var container = document.getElementById('dashContinue');
+      var html = '';
+      var any = false;
 
-      if (purchasedIds.length === 0) {
-        container.innerHTML = '<div class="empty-state">' +
-          '<div class="empty-state__icon">📭</div>' +
+      courses.forEach(function(c) {
+        var prog = progressCache[c.id];
+        if (!prog || !prog.lastTimestamp) return;
+        any = true;
+        var t = UserSystem.formatTimestamp(prog.lastTimestamp, true);
+        var lessonLabel = prog.lastLessonTitle ? ' — ' + esc(prog.lastLessonTitle) : '';
+        var href = 'course-player.html?id=' + encodeURIComponent(c.id) + '&t=' + Math.floor(prog.lastTimestamp) + (prog.lastLessonId ? '&lesson=' + encodeURIComponent(prog.lastLessonId) : '');
+
+        html += '<div class="course-card" style="cursor:pointer" onclick="window.location.href=\'' + href + '\'">' +
+          '<div class="course-card__banner">' +
+          '<span class="course-card__emoji">' + (c.emoji || '▶️') + '</span>' +
+          '<span class="course-card__badge" style="background:rgba(34,197,94,0.9)">Continue ▶</span>' +
+          '</div>' +
+          '<div class="course-card__body">' +
+          '<div class="course-card__type">Continue Learning</div>' +
+          '<h3 class="course-card__title">' + esc(c.title || c.id) + '</h3>' +
+          '<div class="course-card__meta"><span>⏱️ Continue from ' + t + lessonLabel + '</span></div>' +
+          '<a href="' + href + '" class="course-card__btn">▶️ Continue Learning</a>' +
+          '</div>' +
+          '</div>';
+      });
+
+      if (!any) {
+        html = '<div class="empty-state" style="padding:44px 20px">' +
+          '<div class="empty-state__icon">🎬</div>' +
+          '<h3 class="empty-state__title">Nothing to resume yet</h3>' +
+          '<p class="empty-state__text">Start a course and we\'ll remember exactly where you left off.</p>' +
+          '</div>';
+      }
+      container.innerHTML = html;
+    }
+
+    // ── My Courses ──
+    function renderCourses(courses, user) {
+      var container = document.getElementById('dashCourses');
+      if (!courses.length) {
+        container.innerHTML = '<div class="empty-state" style="padding:44px 20px">' +
+          '<div class="empty-state__icon">🎥</div>' +
           '<h3 class="empty-state__title">No courses yet</h3>' +
-          '<p class="empty-state__text">You haven\'t purchased any courses yet. Check out our store to start your learning journey!</p>' +
-          '<a href="store.html" class="empty-state__btn">🛍️ Browse Store</a>' +
+          '<p class="empty-state__text">Courses you purchase will appear here with the in-site video player.</p>' +
           '</div>';
         return;
       }
 
       var html = '<div class="course-grid">';
-      purchasedIds.forEach(function(pid) {
-        // Find product info
-        var product = allProducts.find(function(p) { return p.id === pid; });
-        if (!product) {
-          // Still show a basic card
-          product = { id: pid, title: pid, emoji: '📚', type: 'course', duration: '', description: 'Purchased course' };
-        }
-
-        var isVideo = product.type === 'video-course';
-        var actionUrl = isVideo ? 'course-player.html?id=' + product.id : 'course-detail.html?id=' + product.id;
-        var actionText = isVideo ? '▶️ Watch Course' : '📖 View Details';
+      courses.forEach(function(p) {
+        var prog = progressCache[p.id];
+        var continueBtn = (prog && prog.lastTimestamp)
+          ? '▶️ Continue Course'
+          : '▶️ Watch Course';
+        var actionUrl = 'course-player.html?id=' + encodeURIComponent(p.id);
+        var progressHtml = (prog && prog.updatedAt)
+          ? '<div class="course-card__meta"><span>🕐 Last watched ' + (prog.lastLessonTitle ? esc(prog.lastLessonTitle) : '') + '</span></div>'
+          : '<div class="course-card__meta"><span>👨‍🏫 ' + (p.instructor || 'Deepak Patel') + '</span><span>⏱️ ' + (p.duration || 'Lifetime Access') + '</span></div>';
 
         html += '<div class="course-card" onclick="window.location.href=\'' + actionUrl + '\'">' +
           '<div class="course-card__banner">' +
-          '<span class="course-card__emoji">' + (product.emoji || '📚') + '</span>' +
+          '<span class="course-card__emoji">' + (p.emoji || '🎬') + '</span>' +
           '<span class="course-card__badge">Purchased ✓</span>' +
           '</div>' +
           '<div class="course-card__body">' +
-          '<div class="course-card__type">' + (product.type || 'course') + '</div>' +
-          '<h3 class="course-card__title">' + product.title + '</h3>' +
-          '<div class="course-card__meta">' +
-          '<span>👨‍🏫 ' + (product.instructor || 'Deepak Patel') + '</span>' +
-          '<span>⏱️ ' + (product.duration || 'Lifetime Access') + '</span>' +
+          '<div class="course-card__type">Course</div>' +
+          '<h3 class="course-card__title">' + esc(p.title || p.id) + '</h3>' +
+          progressHtml +
+          '<a href="' + actionUrl + '" class="course-card__btn">' + continueBtn + '</a>' +
           '</div>' +
-          '<a href="' + actionUrl + '" class="course-card__btn">' + actionText + '</a>' +
+          '</div>';
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // ── My Ebooks / My Library (Read/Download with ownership verification) ──
+    function openOwnedProduct(pid) {
+      if (!currentUid || !window.UserSystem) return;
+      UserSystem.isPurchased(currentUid, pid).then(function(owned) {
+        if (!owned) {
+          alert('Access Denied. You do not own this product.');
+          return;
+        }
+        var p = null;
+        try { p = StoreEngine.getProduct(pid); } catch(e) {}
+        if (!p) { window.location.href = 'course-detail.html?id=' + encodeURIComponent(pid); return; }
+        var urls = [];
+        if (p.variants && p.variants.length) {
+          p.variants.forEach(function(v) { if (v.downloadUrl) urls.push(v.downloadUrl); });
+        }
+        if (p.downloadUrl) urls.push(p.downloadUrl);
+        if (urls.length) {
+          urls.forEach(function(u) { window.open(u, '_blank'); });
+        } else {
+          window.location.href = 'course-detail.html?id=' + encodeURIComponent(pid);
+        }
+      });
+    }
+
+    function renderEbooks(ebooks, user) {
+      var container = document.getElementById('dashEbooks');
+      if (!ebooks.length) {
+        container.innerHTML = '<div class="empty-state" style="padding:44px 20px">' +
+          '<div class="empty-state__icon">📖</div>' +
+          '<h3 class="empty-state__title">No ebooks yet</h3>' +
+          '<p class="empty-state__text">Ebooks you purchase will appear here for reading / downloading.</p>' +
+          '</div>';
+        return;
+      }
+
+      var html = '<div class="course-grid">';
+      ebooks.forEach(function(p) {
+        var actionUrl = 'course-detail.html?id=' + encodeURIComponent(p.id);
+        html += '<div class="course-card" onclick="window.location.href=\'' + actionUrl + '\'">' +
+          '<div class="course-card__banner">' +
+          '<span class="course-card__emoji">' + (p.emoji || '📖') + '</span>' +
+          '<span class="course-card__badge">Owned ✓</span>' +
+          '</div>' +
+          '<div class="course-card__body">' +
+          '<div class="course-card__type">Ebook</div>' +
+          '<h3 class="course-card__title">' + esc(p.title || p.id) + '</h3>' +
+          '<div class="course-card__meta"><span>📄 ' + (p.duration || 'Digital Book') + '</span></div>' +
+          '<button class="course-card__btn" onclick="event.stopPropagation(); openOwnedProduct(\'' + p.id + '\')">📄 Read / Download</button>' +
+          '</div>' +
+          '</div>';
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    function renderLibrary(digital, user) {
+      var container = document.getElementById('dashLibrary');
+      if (!digital.length) {
+        container.innerHTML = '<div class="empty-state" style="padding:44px 20px">' +
+          '<div class="empty-state__icon">🗂️</div>' +
+          '<h3 class="empty-state__title">Your library is empty</h3>' +
+          '<p class="empty-state__text">Prompts, methods and other digital products you buy will be stored here.</p>' +
+          '</div>';
+        return;
+      }
+
+      var html = '<div class="course-grid">';
+      digital.forEach(function(p) {
+        var actionUrl = 'course-detail.html?id=' + encodeURIComponent(p.id);
+        html += '<div class="course-card" onclick="window.location.href=\'' + actionUrl + '\'">' +
+          '<div class="course-card__banner">' +
+          '<span class="course-card__emoji">' + (p.emoji || '📦') + '</span>' +
+          '<span class="course-card__badge">Owned ✓</span>' +
+          '</div>' +
+          '<div class="course-card__body">' +
+          '<div class="course-card__type">' + (p.category || 'Digital') + '</div>' +
+          '<h3 class="course-card__title">' + esc(p.title || p.id) + '</h3>' +
+          '<div class="course-card__meta"><span>' + (p.duration || 'Digital Product') + '</span></div>' +
+          '<button class="course-card__btn" onclick="event.stopPropagation(); openOwnedProduct(\'' + p.id + '\')">📂 Open</button>' +
           '</div>' +
           '</div>';
       });
@@ -622,14 +793,14 @@
     function renderExplore(purchasedIds, allProducts) {
       var container = document.getElementById('dashExplore');
       var unpurchased = allProducts.filter(function(p) {
-        return p.active && !purchasedIds.includes(p.id) && p.price > 0;
+        return p.active && purchasedIds.indexOf(p.id) === -1 && p.price > 0;
       });
 
       if (unpurchased.length === 0) {
         container.innerHTML = '<div class="empty-state" style="padding:40px">' +
           '<div class="empty-state__icon">🎉</div>' +
           '<h3 class="empty-state__title">You own everything!</h3>' +
-          '<p class="empty-state__text">You\'ve purchased all available courses. Stay tuned for new releases!</p>' +
+          '<p class="empty-state__text">You\'ve purchased all available products. Stay tuned for new releases!</p>' +
           '</div>';
         return;
       }
@@ -645,7 +816,7 @@
           '</div>' +
           '<div class="course-card__body">' +
           '<div class="course-card__type">' + (p.type || 'course') + '</div>' +
-          '<h3 class="course-card__title">' + p.title + '</h3>' +
+          '<h3 class="course-card__title">' + esc(p.title || p.id) + '</h3>' +
           '<div class="course-card__meta">' +
           '<span>₹' + p.price + (p.originalPrice > p.price ? ' <del style="color:#555">₹' + p.originalPrice + '</del>' : '') + '</span>' +
           '<span>⏱️ ' + (p.duration || '') + '</span>' +
@@ -656,6 +827,9 @@
       });
       container.innerHTML = html;
     }
+
+    // Expose for inline onclick handlers
+    window.openOwnedProduct = openOwnedProduct;
 
     waitForAuth();
   })();

@@ -67,6 +67,9 @@
   let modalOpen = false;
   let phoneVerificationInProgress = false;
   let confirmationResult = null;
+  let initStarted = false;
+  let initRetries = 0;
+  let loginWaiters = [];
 
   // ── DOM Elements ──
   let loginBtn = null;
@@ -130,8 +133,20 @@
 
   // ── Initialize Auth ──
   function initAuth() {
+    if (initStarted) return;
+    initStarted = true;
+
     // Wait for Firebase to be ready
     if (!window.FirebaseAuth) {
+      initRetries++;
+      // Keep retrying while the page is alive (page start-up race), but warn after a while.
+      if (initRetries > 600) {
+        console.warn('[Auth] Firebase Auth still not available after ' + initRetries + ' attempts. Reload to retry.');
+        initStarted = false;
+        initRetries = 0;
+        return;
+      }
+      initStarted = false;
       setTimeout(initAuth, 100);
       return;
     }
@@ -140,6 +155,8 @@
 
     if (!auth) {
       console.warn('[Auth] Firebase Auth not available');
+      initStarted = false;
+      setTimeout(initAuth, 100);
       return;
     }
 
@@ -155,19 +172,14 @@
     // Cache DOM elements
     cacheElements();
 
-    // Set up event listeners
-    // On course-detail page, skip auth modal form listeners (it has its own inline handler)
-    // but still attach the profile dropdown toggle
-    var isCourseDetail = window.location.pathname.indexOf('course-detail') !== -1;
-    if (!isCourseDetail) {
-      setupEventListeners();
-    } else {
-      // Still attach dropdown + logout even on course-detail
-      setupDropdownListeners();
-    }
+    // Set up event listeners. Pages that bundle a static auth modal get the
+    // same handlers here; auth.js injects the modal when none exists.
+    setupEventListeners();
 
     // Auth state observer
     auth.onAuthStateChanged(handleAuthStateChanged);
+
+    resolveLoginWaiters();
 
     console.log('[Auth] Initialized');
   }
@@ -281,31 +293,45 @@
     }
   }
 
-  // ── Dropdown-only listeners (for pages like course-detail that have their own auth modal) ──
-  function setupDropdownListeners() {
-    // User dropdown toggle
-    if (userProfileBtn) {
-      userProfileBtn.addEventListener('click', toggleUserDropdown);
-    }
-
-    // Close dropdown on outside click
-    document.addEventListener('click', (e) => {
-      if (userDropdown && userProfileBtn && !userProfileBtn.contains(e.target) && !userDropdown.contains(e.target)) {
-        userDropdown.classList.remove('is-open');
-      }
-    });
-
-    // Logout button
-    const logoutBtn = document.getElementById('navLogoutBtn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', handleSignOut);
-    }
-  }
-
   // ── Auth State Handler ──
   function handleAuthStateChanged(user) {
     currentUser = user;
     updateNavUI(user);
+    if (user) resolveLoginWaiters();
+    else rejectLoginWaiters();
+  }
+
+  function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // Waits until the user is signed in, then resolves with the user object.
+  // Rejects (resolves with null) if the modal is closed without signing in.
+  function requireLogin() {
+    if (auth && auth.currentUser) return Promise.resolve(auth.currentUser);
+    return new Promise(function (resolve) {
+      loginWaiters.push({ resolve: resolve, active: true });
+      openAuthModal();
+    });
+  }
+
+  function resolveLoginWaiters() {
+    if (!auth || !auth.currentUser) return;
+    var waiters = loginWaiters;
+    loginWaiters = [];
+    waiters.forEach(function (w) { w.resolve(auth.currentUser); });
+  }
+
+  function rejectLoginWaiters() {
+    var waiters = loginWaiters;
+    loginWaiters = [];
+    waiters.forEach(function (w) { w.resolve(null); });
   }
 
   function updateNavUI(user) {
@@ -320,21 +346,21 @@
 
       // Update user name/email/avatar in dropdown.
       // Support both naming schemes across pages (navUserName / navUserNameLg).
-      const displayName = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
-      const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
+      const displayName = escapeHtml(user.displayName || (user.email ? user.email.split('@')[0] : 'User'));
+      const initial = escapeHtml((user.displayName || user.email || 'U')[0].toUpperCase());
 
       ['navUserName', 'navUserNameLg'].forEach(function (id) {
         const el = document.getElementById(id);
         if (el) el.textContent = displayName;
       });
       const userEmailEl = document.getElementById('navUserEmail');
-      if (userEmailEl) userEmailEl.textContent = user.email || '';
+      if (userEmailEl) userEmailEl.textContent = escapeHtml(user.email || '');
 
       ['navUserAvatar', 'navUserAvatarLg'].forEach(function (id) {
         const el = document.getElementById(id);
         if (!el) return;
         if (user.photoURL) {
-          el.innerHTML = `<img src="${user.photoURL}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+          el.innerHTML = `<img src="${escapeHtml(user.photoURL)}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
         } else {
           el.textContent = initial;
         }
@@ -491,14 +517,16 @@
     } catch (error) {
       console.error('[Auth] Sign-In error:', error);
       let message = 'Sign-in failed. Please check your credentials.';
-      if (error.code === 'auth/user-not-found') {
-        message = 'No account found with this email.';
-      } else if (error.code === 'auth/wrong-password') {
-        message = 'Incorrect password.';
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+        message = 'No account found or incorrect password. Please check your credentials.';
       } else if (error.code === 'auth/invalid-email') {
         message = 'Invalid email address.';
       } else if (error.code === 'auth/too-many-requests') {
         message = 'Too many attempts. Please try again later.';
+      } else if (error.code === 'auth/network-request-failed') {
+        message = 'Network error. Check your connection and try again.';
+      } else if (error.code === 'auth/user-disabled') {
+        message = 'This account has been disabled.';
       }
       showError(message);
     } finally {
@@ -726,10 +754,12 @@
   window.TDVAuth = {
     openAuthModal: openAuthModal,
     closeAuthModal: closeAuthModal,
-    getCurrentUser: function () { return currentUser; }
+    getCurrentUser: function () { return currentUser; },
+    requireLogin: requireLogin
   };
-  // Convenience global used by some inline handlers
+  // Convenience globals used by some inline handlers
   window.openAuthModal = openAuthModal;
+  window.requireLogin = requireLogin;
 
   // ── Initialize ──
   if (document.readyState === 'loading') {

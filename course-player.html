@@ -232,6 +232,44 @@
             color: var(--text-muted);
         }
 
+        .chapter-desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: background 0.2s ease;
+            position: sticky;
+            top: 0;
+        }
+
+        .module-header:hover {
+            background: rgba(212, 175, 55, 0.06);
+        }
+
+        .module-toggle {
+            color: var(--gold);
+            font-size: 0.9rem;
+            width: 16px;
+            flex-shrink: 0;
+        }
+
+        .module-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-left: auto;
+            white-space: nowrap;
+        }
+
         /* Loading Overlay */
         #loadingOverlay {
             position: fixed;
@@ -333,6 +371,7 @@
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/store-data.js"></script>
+  <script src="js/user-system.js"></script>
     
     <!-- YouTube IFrame API -->
     <script src="https://www.youtube.com/iframe_api"></script>
@@ -340,11 +379,22 @@
     <script>
         let player;
         let productData = null;
+        let productKey = null;
         let duration = 0;
-        let progressInterval;
-        let currentChapterIndex = -1;
+        let progressTimer = null;
+        let saveTimer = null;
+        let currentLesson = null;
+        let lessonStartTime = 0;
+        let modules = [];
+        let lessonIndex = [];   // flat published lessons: { moduleIndex, moduleTitle, ...lesson }
+        let completedLessons = {};
+        let currentUid = null;
+        let progressLoaded = false;
+        let pendingResumeTime = -1;   // -1 = no resume seek
 
-        const products = typeof StoreEngine !== 'undefined' ? StoreEngine.getProducts() : [];
+        const US = window.UserSystem;
+
+        function formatT(sec) { return US ? US.formatTimestamp(sec, false) : formatTime(sec); }
 
         function formatTime(seconds) {
             const m = Math.floor(seconds / 60);
@@ -352,9 +402,33 @@
             return `${m}:${s < 10 ? '0' : ''}${s}`;
         }
 
+        function parseDur(text) { return US ? US.parseTimestamp(text) : 0; }
+
+        function lastSaved() {
+            if (!currentUid || !productKey) return;
+            US.saveProgress(currentUid, productKey, {
+                lastLessonId: (currentLesson && currentLesson.id) || '',
+                lastLessonTitle: (currentLesson && currentLesson.title) || '',
+                lastTimestamp: player && player.getCurrentTime ? Math.floor(player.getCurrentTime()) : 0,
+                completedLessons: completedLessons
+            }).catch(function (e) { console.error('[progress] save failed', e); });
+        }
+
+        function buildLessonIndex() {
+            lessonIndex = [];
+            modules.forEach(function (m, mi) {
+                (m.lessons || []).forEach(function (l) {
+                    if (l.published === false) return;
+                    lessonIndex.push({ moduleIndex: mi, moduleTitle: m.title, lesson: l });
+                });
+            });
+        }
+
         async function initPlayer() {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
+            const resumeLesson = urlParams.get('lesson');
+            const resumeTime = urlParams.get('t');
 
             if (!productId) {
                 alert("No course specified.");
@@ -362,31 +436,56 @@
                 return;
             }
 
+            const products = typeof StoreEngine !== 'undefined' ? StoreEngine.getProducts() : [];
             productData = products.find(p => p.id === productId);
             if (!productData || !productData.videoId) {
                 alert("Course not found or has no video content.");
                 window.location.href = 'store.html';
                 return;
             }
+            productKey = productId;
 
             firebase.auth().onAuthStateChanged(async (user) => {
                 if (!user) {
                     window.location.href = 'index.html';
                     return;
                 }
+                currentUid = user.uid;
 
                 try {
-                    const purchaseRef = window.FirebaseDatabase.ref(`users/${user.uid}/purchases/${productId}`);
-                    const snapshot = await purchaseRef.once('value');
-                    
-                    if (!snapshot.exists() || snapshot.val() !== true) {
+                    const owned = await US.isPurchased(user.uid, productId);
+                    if (!owned) {
                         alert("Access Denied. You do not own this course.");
                         window.location.href = 'store.html';
                         return;
                     }
 
+                    modules = await US.getCurriculum(productData);
+                    if (!modules || !modules.length) {
+                        modules = US.seedCurriculum(productData);
+                    }
+                    buildLessonIndex();
+
+                    const progress = await US.getProgress(user.uid, productId);
+                    if (progress) {
+                        completedLessons = progress.completedLessons || {};
+                        if (!resumeLesson && !resumeTime && progress.lastLessonId) {
+                            const target = lessonIndex.find(x => x.lesson.id === progress.lastLessonId);
+                            if (target) {
+                                document.getElementById('topCourseTitle').textContent =
+                                    `Continue Learning: ${target.lesson.title}`;
+                                pendingResumeTime = progress.lastTimestamp || 0;
+                                setupPage(resumeLesson || progress.lastLessonId, progress.lastTimestamp || 0);
+                                document.getElementById('loadingOverlay').style.display = 'none';
+                                loadYouTubeVideo();
+                                return;
+                            }
+                        }
+                    }
+                    progressLoaded = true;
+
                     document.getElementById('loadingOverlay').style.display = 'none';
-                    setupPage();
+                    setupPage(resumeLesson, resumeTime ? parseInt(resumeTime, 10) : 0);
                     loadYouTubeVideo();
                 } catch (error) {
                     console.error("Error verifying access:", error);
@@ -396,31 +495,109 @@
             });
         }
 
-        function setupPage() {
-            document.getElementById('topCourseTitle').textContent = productData.name || 'Course Player';
-            
+        function setupPage(resumeLessonId, resumeTimeSec) {
+            document.getElementById('topCourseTitle').textContent = productData.title || productData.name || 'Course Player';
+
             const listEl = document.getElementById('chaptersList');
-            if (productData.chapters && productData.chapters.length > 0) {
-                productData.chapters.forEach((ch, idx) => {
+            listEl.innerHTML = '';
+
+            if (!lessonIndex.length) {
+                listEl.innerHTML = '<li class="chapter-item"><div class="chapter-info"><span class="chapter-title">Curriculum is being prepared. Please check back soon.</span></div></li>';
+                return;
+            }
+
+            const groups = modules;
+
+            groups.forEach((mod, mi) => {
+                // Module header (accordion toggle)
+                const head = document.createElement('div');
+                head.className = 'module-header';
+                head.id = `module-head-${mi}`;
+                head.innerHTML = `
+                    <span class="module-toggle">▸</span>
+                    <span class="chapter-title">${(mod.title || 'Module ' + (mi + 1)).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</span>
+                    <span class="module-meta">${(mod.lessons || []).length} lessons</span>
+                `;
+                head.addEventListener('click', () => toggleModule(mi));
+
+                const body = document.createElement('div');
+                body.className = 'module-body';
+                body.id = `module-body-${mi}`;
+                body.style.display = 'none';
+
+                const ul = document.createElement('ul');
+                ul.className = 'chapters-list';
+
+                (mod.lessons || []).forEach((l) => {
+                    if (l.published === false) return;
                     const li = document.createElement('li');
                     li.className = 'chapter-item';
-                    li.id = `chapter-${idx}`;
-                    li.onclick = () => seekToChapter(ch.time);
+                    li.dataset.lessonId = l.id;
+                    li.onclick = () => playLesson(mi, l.id);
+
+                    const done = completedLessons[l.id];
+                    const icon = done ? 'fa-solid fa-circle-check' : (parseDur(l.duration) === 0 ? 'fa-solid fa-circle-play' : 'fa-solid fa-play');
+                    const timeLabel = l.timeText || formatT(l.timestamp);
+                    const durLabel = l.duration ? ` • ${l.duration}` : '';
 
                     li.innerHTML = `
                         <div class="chapter-icon">
-                            <i class="${ch.icon || 'fa-solid fa-play'}"></i>
+                            <i class="${icon}"></i>
                         </div>
                         <div class="chapter-info">
-                            <span class="chapter-title">${ch.title}</span>
-                            <span class="chapter-time">${formatTime(ch.time)}</span>
+                            <span class="chapter-title">${(l.title || 'Lesson').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</span>
+                            <span class="chapter-time">${timeLabel}${durLabel}</span>
+                            ${l.description ? `<span class="chapter-desc">${l.description.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</span>` : ''}
                         </div>
                     `;
-                    listEl.appendChild(li);
+                    ul.appendChild(li);
                 });
-            } else {
-                listEl.innerHTML = '<li class="chapter-item"><div class="chapter-info"><span class="chapter-title">No chapters available</span></div></li>';
+
+                body.appendChild(ul);
+                listEl.appendChild(head);
+                listEl.appendChild(body);
+            });
+
+            // Auto-open first module, or open the module containing the resume lesson
+            let openTarget = 0;
+            if (resumeLessonId) {
+                const stack = skillIndexFor(resumeLessonId);
+                if (stack) openTarget = stack.moduleIndex;
             }
+            toggleModule(openTarget, true);
+
+            if (resumeLessonId) {
+                const target = lessonIndex.find(x => x.lesson.id === resumeLessonId);
+                if (target) {
+                    // highlight
+                    const all = listEl.querySelectorAll('.chapter-item');
+                    all.forEach(el => { if (el.dataset.lessonId === resumeLessonId) el.classList.add('active'); });
+                }
+            }
+        }
+
+        function skillIndexFor(id) {
+            return lessonIndex.find(x => x.lesson.id === id) || null;
+        }
+
+        function toggleModule(mi, forceOpen) {
+            const body = document.getElementById(`module-body-${mi}`);
+            const head = document.getElementById(`module-head-${mi}`);
+            if (!body || !head) return;
+            const willOpen = forceOpen !== undefined ? forceOpen : body.style.display === 'none';
+            body.style.display = willOpen ? '' : 'none';
+            const tri = head.querySelector('.module-toggle');
+            if (tri) tri.textContent = willOpen ? '▾' : '▸';
+        }
+
+        function playLesson(mi, lessonId) {
+            const entry = lessonIndex.find(x => x.lesson.id === lessonId);
+            if (!entry) return;
+            seekToLesson(entry.lesson);
+            // highlight
+            document.querySelectorAll('.chapter-item').forEach(el => el.classList.toggle('active', el.dataset.lessonId === lessonId));
+            // ensure module open
+            toggleModule(mi, true);
         }
 
         function loadYouTubeVideo() {
@@ -441,7 +618,7 @@
                     'fs': 1,
                     'playsinline': 1,
                     'controls': 1,
-                    'disablekb': 1
+                    'disablekb': 0
                 },
                 events: {
                     'onReady': onPlayerReady,
@@ -450,62 +627,80 @@
             });
         }
 
+        function startTimers() {
+            if (!progressTimer) progressTimer = setInterval(updateProgress, 2000);
+            if (saveTimer) clearInterval(saveTimer);
+            saveTimer = setInterval(lastSaved, 15000);
+        }
+
         function onPlayerReady(event) {
             duration = player.getDuration();
-            progressInterval = setInterval(updateProgress, 1000);
+            startTimers();
+            const params = new URLSearchParams(window.location.search);
+            const resumeTime = params.get('t');
+            if (resumeTime) {
+                pendingResumeTime = parseInt(resumeTime, 10) || 0;
+            }
+            if (pendingResumeTime >= 0) {
+                player.seekTo(pendingResumeTime, true);
+                player.playVideo();
+            }
         }
 
         function onPlayerStateChange(event) {
-            if (event.data == YT.PlayerState.PLAYING) {
-                if (!progressInterval) {
-                    progressInterval = setInterval(updateProgress, 1000);
-                }
-            } else {
-                clearInterval(progressInterval);
-                progressInterval = null;
+            if (event.data === YT.PlayerState.PLAYING) {
+                startTimers();
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                lastSaved();
+            } else if (event.data === YT.PlayerState.ENDED) {
+                lastSaved();
+                clearInterval(progressTimer);
+                progressTimer = null;
             }
         }
 
         function updateProgress() {
             if (!player || !player.getCurrentTime) return;
-            
-            const currentTime = player.getCurrentTime();
+            const t = player.getCurrentTime();
             if (duration > 0) {
-                const perc = (currentTime / duration) * 100;
-                document.getElementById('progressBar').style.width = perc + '%';
+                document.getElementById('progressBar').style.width = ((t / duration) * 100) + '%';
             }
 
-            if (productData.chapters && productData.chapters.length > 0) {
-                let activeIdx = -1;
-                for (let i = 0; i < productData.chapters.length; i++) {
-                    if (currentTime >= productData.chapters[i].time) {
-                        activeIdx = i;
-                    } else {
-                        break;
-                    }
+            // Determine the active lesson by timestamp
+            let active = null;
+            for (let i = 0; i < lessonIndex.length; i++) {
+                if (t >= lessonIndex[i].lesson.timestamp) active = lessonIndex[i];
+                else break;
+            }
+            if (active && active.lesson.timestamp > 0) {
+                if (!currentLesson || currentLesson.id !== active.lesson.id) {
+                    currentLesson = active.lesson;
+                    lessonStartTime = t;
+                    const all = document.querySelectorAll('.chapter-item');
+                    all.forEach(el => el.classList.toggle('active', el.dataset.lessonId === active.lesson.id));
                 }
-
-                if (activeIdx !== currentChapterIndex && activeIdx !== -1) {
-                    if (currentChapterIndex !== -1) {
-                        const oldActive = document.getElementById(`chapter-${currentChapterIndex}`);
-                        if (oldActive) oldActive.classList.remove('active');
-                    }
-                    const newActive = document.getElementById(`chapter-${activeIdx}`);
-                    if (newActive) {
-                        newActive.classList.add('active');
-                        currentChapterIndex = activeIdx;
-                        newActive.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+                // Mark completed once watched past lesson's implied end (its duration, or 45s default)
+                const durSec = parseDur(active.lesson.duration) || 45;
+                if (t - lessonStartTime >= Math.min(durSec, 180) && !completedLessons[active.lesson.id]) {
+                    completedLessons[active.lesson.id] = true;
+                    const li = document.querySelector(`.chapter-item[data-lesson-id="${active.lesson.id}"] .chapter-icon i`);
+                    if (li) li.className = 'fa-solid fa-circle-check';
+                    lastSaved();
                 }
             }
         }
 
-        function seekToChapter(timeSeconds) {
-            if (player && player.seekTo) {
-                player.seekTo(timeSeconds, true);
-                player.playVideo();
-            }
+        function seekToLesson(lesson) {
+            if (!player || !player.seekTo) return;
+            currentLesson = lesson;
+            lessonStartTime = player.getCurrentTime();
+            player.seekTo(lesson.timestamp, true);
+            player.playVideo();
         }
+
+        // Save on leaving the page or tab hidden
+        window.addEventListener('beforeunload', function () { if (currentUid && productKey) lastSaved(); });
+        document.addEventListener('visibilitychange', function () { if (document.hidden) lastSaved(); });
 
         window.addEventListener('load', initPlayer);
 

@@ -220,16 +220,14 @@
             <button type="button" class="btn btn--primary btn--md auth-form__submit" id="sendCodeBtn" style="width:100%;margin-top:8px;">Send Verification Code</button>
           </div>
         </div>
-        <div id="verificationCodeGroup" style="display:none;">
+        <div id="verificationSection" style="display:none;">
           <div class="auth-form__group">
             <label class="auth-form__label" for="verificationCode">Verification Code</label>
             <input type="text" class="auth-form__input" id="verificationCode" placeholder="Enter 6-digit code" required>
           </div>
-          <div class="auth-form__group" id="resendCodeGroup" style="display:none;margin-top:8px;text-align:center;">
-            <button type="button" class="btn btn--link btn--sm" id="resendCodeBtn">Didn't receive the code? Resend</button>
-          </div>
+          <button type="button" class="btn btn--link btn--sm" id="resendCodeBtn" style="margin-top:8px;">Didn't receive the code? Resend</button>
         </div>
-        <button type="submit" class="btn btn--primary btn--md auth-form__submit" id="verifyPhoneBtn" style="width:100%;margin-top:16px;">Verify &amp; Sign In</button>
+        <button type="button" class="btn btn--primary btn--md auth-form__submit" id="verifyPhoneBtn" style="width:100%;margin-top:16px;">Verify &amp; Sign In</button>
         <p class="auth-form__footer">Or sign in with <span class="auth-switch-tab" data-tab="signin">Email</span> instead</p>
       </form>
       <div class="auth-divider"><span>Or continue with</span></div>
@@ -279,195 +277,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/store-data.js"></script>
+  <script src="js/user-system.js"></script>
   <script src="js/auth.js"></script>
-
-  <!-- INLINE AUTH HANDLER (backup - guaranteed to work) -->
-  <script>
-  (function() {
-    // Wait for Firebase
-    function waitForAuth(cb) {
-      if (window.FirebaseAuth) { cb(window.FirebaseAuth); return; }
-      var tries = 0;
-      var interval = setInterval(function() {
-        tries++;
-        if (window.FirebaseAuth) { clearInterval(interval); cb(window.FirebaseAuth); }
-        else if (tries > 50) { clearInterval(interval); }
-      }, 100);
-    }
-
-    function showAuthError(msg) {
-      var el = document.getElementById('authError');
-      if (el) { el.textContent = msg; el.style.display = 'block'; }
-      else { alert(msg); }
-    }
-
-    function clearAuthError() {
-      var el = document.getElementById('authError');
-      if (el) { el.textContent = ''; el.style.display = 'none'; }
-    }
-
-    function closeModal() {
-      var m = document.getElementById('authModal');
-      if (m) m.style.display = 'none';
-      document.body.style.overflow = '';
-    }
-
-    // Tab switching
-    document.addEventListener('click', function(e) {
-      if (e.target.classList.contains('auth-switch-tab')) {
-        var tab = e.target.getAttribute('data-tab');
-        var signIn = document.getElementById('formSignIn');
-        var signUp = document.getElementById('formSignUp');
-        var tabSignIn = document.getElementById('tabSignIn');
-        var tabSignUp = document.getElementById('tabSignUp');
-        if (tab === 'signup') {
-          if (signIn) signIn.style.display = 'none';
-          if (signUp) signUp.style.display = 'block';
-          if (tabSignIn) tabSignIn.classList.remove('is-active');
-          if (tabSignUp) tabSignUp.classList.add('is-active');
-        } else if (tab === 'signin') {
-          if (signIn) signIn.style.display = 'block';
-          if (signUp) signUp.style.display = 'none';
-          if (tabSignIn) tabSignIn.classList.add('is-active');
-          if (tabSignUp) tabSignUp.classList.remove('is-active');
-        }
-      }
-    });
-
-    // Sign Up handler
-    var signUpForm = document.getElementById('formSignUp');
-    if (signUpForm) {
-      signUpForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        clearAuthError();
-        var name = document.getElementById('signUpName').value.trim();
-        var email = document.getElementById('signUpEmail').value.trim();
-        var pass = document.getElementById('signUpPassword').value;
-        var confirmPass = document.getElementById('signUpConfirmPassword').value;
-
-        if (!name || !email || !pass) { showAuthError('Please fill in all fields.'); return; }
-        if (pass.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
-        if (pass !== confirmPass) { showAuthError('Passwords do not match.'); return; }
-
-        waitForAuth(function(auth) {
-          auth.createUserWithEmailAndPassword(email, pass)
-            .then(function(result) {
-              if (result.user && name) {
-                result.user.updateProfile({ displayName: name });
-              }
-              closeModal();
-              alert('Account created! Welcome to TheDeepVerse! 🎉');
-              location.reload();
-            })
-            .catch(function(err) {
-              var msg = 'Sign up failed.';
-              if (err.code === 'auth/email-already-in-use') msg = 'This email is already registered. Try Sign In.';
-              else if (err.code === 'auth/invalid-email') msg = 'Invalid email address.';
-              else if (err.code === 'auth/weak-password') msg = 'Password is too weak.';
-              else msg = err.message;
-              showAuthError(msg);
-            });
-        });
-      });
-    }
-
-    // Sign In handler
-    var signInForm = document.getElementById('formSignIn');
-    if (signInForm) {
-      signInForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        clearAuthError();
-        var email = document.getElementById('signInEmail').value.trim();
-        var pass = document.getElementById('signInPassword').value;
-        if (!email || !pass) { showAuthError('Please enter email and password.'); return; }
-
-        waitForAuth(function(auth) {
-          auth.signInWithEmailAndPassword(email, pass)
-            .then(function() {
-              closeModal();
-              alert('Welcome back! 👋');
-              location.reload();
-            })
-            .catch(function(err) {
-              var msg = 'Sign in failed.';
-              if (err.code === 'auth/user-not-found') msg = 'No account found. Try Sign Up.';
-              else if (err.code === 'auth/wrong-password') msg = 'Wrong password.';
-              else if (err.code === 'auth/invalid-email') msg = 'Invalid email.';
-              else msg = err.message;
-              showAuthError(msg);
-            });
-        });
-      });
-    }
-
-    // Google Sign In handler
-    var googleBtn = document.getElementById('googleSignInBtn');
-    if (googleBtn) {
-      googleBtn.addEventListener('click', function() {
-        clearAuthError();
-        waitForAuth(function(auth) {
-          var provider = new firebase.auth.GoogleAuthProvider();
-          provider.setCustomParameters({ prompt: 'select_account' });
-          auth.signInWithPopup(provider)
-            .then(function() {
-              closeModal();
-              alert('Welcome to TheDeepVerse! 🎉');
-              location.reload();
-            })
-            .catch(function(err) {
-              if (err.code !== 'auth/popup-closed-by-user') {
-                showAuthError(err.message);
-              }
-            });
-        });
-      });
-    }
-
-    // Login button opens modal
-    var loginBtn = document.getElementById('navLoginBtn');
-    if (loginBtn) {
-      loginBtn.addEventListener('click', function() {
-        var modal = document.getElementById('authModal');
-        if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-      });
-    }
-
-    // Close modal
-    var closeBtn = document.getElementById('authModalClose');
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    var backdrop = document.getElementById('authModalBackdrop');
-    if (backdrop) backdrop.addEventListener('click', closeModal);
-
-    // Auth state: show/hide login button
-    waitForAuth(function(auth) {
-      auth.onAuthStateChanged(function(user) {
-        var loginBtn = document.getElementById('navLoginBtn');
-        var navCta = loginBtn ? loginBtn.parentElement : null;
-        var navUser = document.getElementById('navUser');
-        if (user) {
-          if (loginBtn) loginBtn.style.display = 'none';
-          if (navUser) {
-            navUser.style.display = 'flex';
-            var nameEl = document.getElementById('navUserName');
-            var nameLgEl = document.getElementById('navUserNameLg');
-            var emailEl = document.getElementById('navUserEmail');
-            if (nameEl) nameEl.textContent = user.displayName || 'User';
-            if (nameLgEl) nameLgEl.textContent = user.displayName || 'User';
-            if (emailEl) emailEl.textContent = user.email || '';
-          }
-        }
-      });
-    });
-
-    // Logout
-    var logoutBtn = document.getElementById('navLogoutBtn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', function() {
-        waitForAuth(function(auth) { auth.signOut().then(function() { location.reload(); }); });
-      });
-    }
-  })();
-  </script>
 
   <script>
   (function() {
@@ -752,6 +563,15 @@
       return savedSettings.razorpayKey || 'rzp_live_T8fCgJ0kFyrOYl';
     }
 
+    // Ensures a signed-in user before a paid purchase. The purchase is recorded
+    // against their Firebase UID so it shows up in My Courses / My Ebooks / My Library.
+    function ensureLoggedIn() {
+      var user = (window.FirebaseAuth && window.FirebaseAuth.currentUser) ? window.FirebaseAuth.currentUser : null;
+      if (user) return Promise.resolve(user);
+      if (window.TDVAuth && window.TDVAuth.requireLogin) return window.TDVAuth.requireLogin();
+      return Promise.resolve(null);
+    }
+
     // Buy a specific edition (variant)
     window.buyEdition = function(index) {
       if (!currentProduct || !currentProduct.variants || !currentProduct.variants[index]) {
@@ -761,12 +581,15 @@
       var v = currentProduct.variants[index];
       var dlUrl = v.downloadUrl || '';
       if (!dlUrl) { alert('Download link not set yet.'); return; }
-      
+
       if (v.price === 0) {
         window.open(dlUrl, '_blank');
         return;
       }
-      processPayment(currentProduct.id + '_' + (v.id || v.name.replace(/[^a-zA-Z0-9]/g, '')), v.price, v.name, [dlUrl]);
+      ensureLoggedIn().then(function(user) {
+        if (!user) return; // user cancelled the login
+        processPayment(currentProduct.id + '_' + (v.id || v.name.replace(/[^a-zA-Z0-9]/g, '')), v.price, v.name, [dlUrl]);
+      });
     };
 
     // Buy combo (all variants)
@@ -774,36 +597,33 @@
       if (!currentProduct || !currentProduct.variants) return;
       var allUrls = currentProduct.variants.map(function(v) { return v.downloadUrl; }).filter(Boolean);
       if (allUrls.length === 0) { alert('Download links not set yet.'); return; }
-      var count = currentProduct.variants.length;
-      var comboLabel = count === 2 ? 'Combo — Both' : 'Combo — All ' + count;
-      processPayment(currentProduct.id + '_combo', currentProduct.comboPrice || 99, comboLabel, allUrls);
+      ensureLoggedIn().then(function(user) {
+        if (!user) return;
+        var count = currentProduct.variants.length;
+        var comboLabel = count === 2 ? 'Combo — Both' : 'Combo — All ' + count;
+        processPayment(currentProduct.id + '_combo', currentProduct.comboPrice || 99, comboLabel, allUrls);
+      });
     };
 
     // Buy simple product (no variants)
     window.buySimple = function() {
       if (!currentProduct) return;
 
-      // Video courses require login
-      if (currentProduct.type === 'video-course') {
-        if (!window.FirebaseAuth || !window.FirebaseAuth.currentUser) {
-          alert('Please login first to purchase this video course.');
-          if (window.TDVAuth) window.TDVAuth.openAuthModal();
-          else if (document.getElementById('navLoginBtn')) document.getElementById('navLoginBtn').click();
-          return;
-        }
-        processPayment(currentProduct.id, currentProduct.price, currentProduct.title, []);
-        return;
-      }
-
       var dlUrl = currentProduct.downloadUrl || '';
-      if (!dlUrl && currentProduct.price > 0) { alert('Download link not set yet.'); return; }
-      
+
+      // Free product — direct download, no account needed
       if (currentProduct.price === 0) {
         if (dlUrl) window.open(dlUrl, '_blank');
         else alert('Download link not set for this free product.');
         return;
       }
-      processPayment(currentProduct.id, currentProduct.price, currentProduct.title, [dlUrl]);
+
+      // Paid products require login so the purchase is saved to the account
+      ensureLoggedIn().then(function(user) {
+        if (!user) return; // user cancelled the login
+        if (!dlUrl && currentProduct.type !== 'video-course') { alert('Download link not set yet.'); return; }
+        processPayment(currentProduct.id, currentProduct.price, currentProduct.title, dlUrl ? [dlUrl] : []);
+      });
     };
 
     // Convert Google Drive view links to direct download links
@@ -926,7 +746,9 @@
               // Save purchase to Firebase and redirect to player
               savePurchaseToFirebase(currentProduct.id, response.razorpay_payment_id);
             } else {
-              // Show download section on the page — NO popup, NO alert
+              // Record the purchase against the logged-in user (if any) so it
+              // appears in My Ebooks / My Library, then show the download section.
+              recordProductPurchase(currentProduct.id, response.razorpay_payment_id);
               showDownloadSection(response.razorpay_payment_id, description, downloadUrls);
             }
           },
@@ -979,6 +801,25 @@
         console.error('[Purchase] Error:', e);
         alert('Payment successful! Please go to your Dashboard to access the course.');
         window.location.href = 'dashboard.html';
+      }
+    }
+
+    // Records a non-video (ebook / digital) purchase against the logged-in user.
+    function recordProductPurchase(productId, paymentId) {
+      if (window.UserSystem && window.FirebaseAuth && window.FirebaseAuth.currentUser) {
+        var u = window.FirebaseAuth.currentUser;
+        window.UserSystem.recordPurchase(u, productId, {
+          paymentId: paymentId,
+          purchasedAt: new Date().toISOString(),
+          email: u.email || '',
+          name: u.displayName || ''
+        }).then(function(ok) {
+          console.log('[Purchase] Recorded for user: ' + (ok ? 'yes' : 'no'));
+        }).catch(function(err) {
+          console.error('[Purchase] Record error:', err);
+        });
+      } else {
+        console.warn('[Purchase] Not logged in — purchase not recorded to an account.');
       }
     }
 
@@ -1110,14 +951,20 @@
                 onApprove: function(data, actions) {
                   return actions.order.capture().then(function(details) {
                     var payId = 'PAYPAL-' + details.id;
+                    // Record purchase against the logged-in user (all product types)
+                    try {
+                      var user = window.FirebaseAuth ? window.FirebaseAuth.currentUser : null;
+                      if (user && window.UserSystem) {
+                        window.UserSystem.recordPurchase(user, product.id, {
+                          paymentId: payId,
+                          purchasedAt: new Date().toISOString(),
+                          email: user.email || '',
+                          name: user.displayName || ''
+                        });
+                      }
+                    } catch(e) {}
                     if (product.type === 'video-course') {
-                      // Save purchase to Firebase
-                      try {
-                        var user = window.FirebaseAuth ? window.FirebaseAuth.currentUser : null;
-                        if (user) {
-                          window.FirebaseDatabase.ref('users/' + user.uid + '/purchases/' + product.id).set(true);
-                        }
-                      } catch(e) {}
+                      if (user) window.FirebaseDatabase.ref('users/' + user.uid + '/purchases/' + product.id).set(true);
                       alert('Payment successful! Go to Dashboard to access your course.');
                       window.location.href = 'dashboard.html';
                     } else {
