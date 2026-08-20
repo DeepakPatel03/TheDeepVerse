@@ -1,6 +1,56 @@
+// Centralized auth safety stubs — placed at top to avoid race conditions
+(function(){
+  try {
+    window.TDVAuth = window.TDVAuth || {};
+
+    if (typeof window.openAuthModal !== 'function') {
+      window.openAuthModal = function(){
+        try { var m = document.getElementById('authModal'); if (m) m.style.display = 'block'; }
+        catch(e){}
+      };
+      window.TDVAuth.openAuthModal = window.openAuthModal;
+    }
+
+    if (typeof window.closeAuthModal !== 'function') {
+      window.closeAuthModal = function(){
+        try { var m = document.getElementById('authModal'); if (m) m.style.display = 'none'; }
+        catch(e){}
+      };
+      window.TDVAuth.closeAuthModal = window.closeAuthModal;
+    }
+
+    if (!window.TDVAuth.getCurrentUser) {
+      window.TDVAuth.getCurrentUser = function(){ return (window.FirebaseAuth && window.FirebaseAuth.currentUser) || null; };
+    }
+
+    if (typeof window.requireLogin !== 'function') {
+      window.requireLogin = function(){
+        return new Promise(function(resolve){
+          try { window.openAuthModal(); } catch(e){}
+          var checks = 0;
+          var iv = setInterval(function(){
+            try {
+              if (window.FirebaseAuth && window.FirebaseAuth.currentUser) {
+                clearInterval(iv);
+                resolve(window.FirebaseAuth.currentUser);
+                return;
+              }
+            } catch(e){}
+            checks++;
+            if (checks > 300) { clearInterval(iv); resolve(null); }
+          }, 200);
+        });
+      };
+      window.TDVAuth.requireLogin = window.requireLogin;
+    }
+  } catch(e) { /* ignore */ }
+})();
+
 /* ═══════════════════════════════════════════════════
    AUTHENTICATION — TheDeepVerse
-   (updated safe global fallbacks)
+   ═══════════════════════════════════════════════════
+   Handles: Google Sign-In, Email/Password Auth,
+   Phone Number Auth, Auth State Observer, Login Modal, User Profile UI
    ═══════════════════════════════════════════════════ */
 
 (function () {
@@ -100,7 +150,20 @@
       '.auth-modal{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;display:flex;align-items:center;justify-content:center}' +
       '.auth-modal__backdrop{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(5,5,5,0.85);backdrop-filter:blur(4px)}' +
       '.auth-modal__box{position:relative;background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:16px;width:100%;max-width:420px;margin:0 24px;max-height:90vh;overflow-y:auto}' +
-      '.auth-modal__close{position:absolute;top:12px;right:12px;width:24px;height:24px;background:transparent;border:none;font-size:1.5rem;color:#888;cursor:pointer;line-height:1;padding:0;z-inde[...';
+      '.auth-modal__close{position:absolute;top:12px;right:12px;width:24px;height:24px;background:transparent;border:none;font-size:1.5rem;color:#888;cursor:pointer;line-height:1;padding:0;z-index:2}' +
+      '.auth-modal__tabs{display:flex;gap:8px;padding:16px;border-bottom:1px solid rgba(255,255,255,0.02)}' +
+      '.auth-tab{background:transparent;border-radius:8px;padding:8px 12px;border:none;color:#ccc;cursor:pointer}' +
+      '.auth-tab.is-active{background:rgba(255,255,255,0.03);color:#fff}' +
+      '.auth-form{padding:16px}' +
+      '.auth-form__group{margin-bottom:12px}' +
+      '.auth-form__label{display:block;margin-bottom:6px;color:#aaa;font-size:0.85rem}' +
+      '.auth-form__input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:#fff}' +
+      '.auth-form__submit{display:block}' +
+      '.auth-form__footer{margin-top:12px;color:#888;font-size:0.9rem}' +
+      '.auth-divider{display:flex;align-items:center;gap:12px;padding:12px 16px;color:#888}' +
+      '.auth-error{color:#ff6b6b;padding:12px 16px}' +
+      '.auth-loading{padding:12px 16px}' +
+      '.auth-google-btn{display:flex;align-items:center;gap:8px;padding:12px 16px;margin:0 16px 16px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid rgba(255,255,255,0.03);color:#fff}' ;
     document.head.appendChild(style);
 
     const wrap = document.createElement('div');
@@ -288,53 +351,16 @@
     }
   }
 
-  // Export for global use (safe: reference fallbacks)
-  function _safeOpenAuthModal() {
-    try {
-      if (typeof openAuthModal === 'function') return openAuthModal();
-      // fallback: ensure modal exists and show it
-      ensureAuthModal();
-      var m = document.getElementById('authModal');
-      if (m) { m.style.display = 'block'; modalOpen = true; }
-      try { if (typeof switchTab === 'function') switchTab('signin'); } catch(e) {}
-    } catch (e) { console.warn('[Auth] safeOpenAuthModal failed', e); }
-  }
-
-  function _safeCloseAuthModal() {
-    try {
-      if (typeof closeAuthModal === 'function') return closeAuthModal();
-      var m = document.getElementById('authModal');
-      if (m) { m.style.display = 'none'; modalOpen = false; }
-    } catch (e) { console.warn('[Auth] safeCloseAuthModal failed', e); }
-  }
-
-  function _safeRequireLogin() {
-    return new Promise(function(resolve) {
-      _safeOpenAuthModal();
-      // wait for auth state change or timeout
-      var resolved = false;
-      function check() {
-        if (window.FirebaseAuth && window.FirebaseAuth.currentUser) {
-          resolved = true; resolve(window.FirebaseAuth.currentUser); return;
-        }
-        if (resolved) return;
-        setTimeout(check, 500);
-      }
-      check();
-      // fallback timeout
-      setTimeout(function() { if (!resolved) resolve(null); }, 60000);
-    });
-  }
-
+  // Export for global use
   window.TDVAuth = {
-    openAuthModal: _safeOpenAuthModal,
-    closeAuthModal: _safeCloseAuthModal,
+    openAuthModal: openAuthModal,
+    closeAuthModal: closeAuthModal,
     getCurrentUser: function () { return currentUser; },
-    requireLogin: _safeRequireLogin
+    requireLogin: requireLogin
   };
-  // Convenience globals used by some inline handlers (safe assignments)
-  if (typeof window.openAuthModal !== 'function') window.openAuthModal = _safeOpenAuthModal;
-  if (typeof window.requireLogin !== 'function') window.requireLogin = _safeRequireLogin;
+  // Convenience globals used by some inline handlers
+  window.openAuthModal = openAuthModal;
+  window.requireLogin = requireLogin;
 
   // ── Initialize ──
   if (document.readyState === 'loading') {
@@ -344,13 +370,3 @@
   }
 
 })();
-
-// Extra safety: if some pages load auth.js and earlier inline scripts expected openAuthModal immediately
-if (typeof window.openAuthModal !== 'function') {
-  window.openAuthModal = function() {
-    try { var m = document.getElementById('authModal'); if (m) m.style.display = 'block'; } catch(e){}
-  };
-}
-if (typeof window.requireLogin !== 'function') {
-  window.requireLogin = function() { return new Promise(function(res){ window.openAuthModal(); setTimeout(function(){ res(null); }, 60000); }); };
-}
