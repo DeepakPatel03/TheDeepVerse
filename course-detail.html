@@ -15,24 +15,54 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/course-detail.css">
 
-  <!-- Early fallback: ensure openAuthModal & requireLogin exist to avoid ReferenceError when inline scripts call them before auth.js loads -->
+  <!-- Early fallback: ensure openAuthModal, closeAuthModal & requireLogin exist to avoid ReferenceError when inline scripts call them before auth.js loads -->
   <script>
     (function(){
-      if (typeof window.openAuthModal !== 'function') {
-        window.openAuthModal = function(){
-          try { var m = document.getElementById('authModal'); if (m) m.style.display = 'block'; }
-          catch(e){}
-        };
-      }
-      if (typeof window.requireLogin !== 'function') {
-        window.requireLogin = function(){
-          return new Promise(function(resolve){
-            try { window.openAuthModal(); } catch(e){}
-            // Resolve null after 60s if not signed in — pages using this should handle null
-            setTimeout(function(){ resolve(null); }, 60000);
-          });
-        };
-      }
+      try {
+        if (!window.TDVAuth) window.TDVAuth = {};
+
+        if (typeof window.openAuthModal !== 'function') {
+          window.openAuthModal = function(){
+            try { var m = document.getElementById('authModal'); if (m) m.style.display = 'block'; }
+            catch(e){}
+          };
+          window.TDVAuth.openAuthModal = window.openAuthModal;
+        }
+
+        if (typeof window.closeAuthModal !== 'function') {
+          window.closeAuthModal = function(){
+            try { var m = document.getElementById('authModal'); if (m) m.style.display = 'none'; }
+            catch(e){}
+          };
+          window.TDVAuth.closeAuthModal = window.closeAuthModal;
+        }
+
+        if (typeof window.requireLogin !== 'function') {
+          window.requireLogin = function(){
+            return new Promise(function(resolve){
+              try { window.openAuthModal(); } catch(e){}
+              // Poll for FirebaseAuth.currentUser for up to 60s (300 * 200ms)
+              var checks = 0;
+              var iv = setInterval(function(){
+                try {
+                  if (window.FirebaseAuth && window.FirebaseAuth.currentUser) {
+                    clearInterval(iv);
+                    resolve(window.FirebaseAuth.currentUser);
+                    return;
+                  }
+                } catch(e){}
+                checks++;
+                if (checks > 300) { clearInterval(iv); resolve(null); }
+              }, 200);
+            });
+          };
+          window.TDVAuth.requireLogin = window.requireLogin;
+        }
+
+        if (!window.TDVAuth.getCurrentUser) {
+          window.TDVAuth.getCurrentUser = function(){ return (window.FirebaseAuth && window.FirebaseAuth.currentUser) || null; };
+        }
+      } catch(e) { /* silent */ }
     })();
   </script>
 
