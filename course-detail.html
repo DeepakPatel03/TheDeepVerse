@@ -15,6 +15,27 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/course-detail.css">
 
+  <!-- Early fallback: ensure openAuthModal & requireLogin exist to avoid ReferenceError when inline scripts call them before auth.js loads -->
+  <script>
+    (function(){
+      if (typeof window.openAuthModal !== 'function') {
+        window.openAuthModal = function(){
+          try { var m = document.getElementById('authModal'); if (m) m.style.display = 'block'; }
+          catch(e){}
+        };
+      }
+      if (typeof window.requireLogin !== 'function') {
+        window.requireLogin = function(){
+          return new Promise(function(resolve){
+            try { window.openAuthModal(); } catch(e){}
+            // Resolve null after 60s if not signed in — pages using this should handle null
+            setTimeout(function(){ resolve(null); }, 60000);
+          });
+        };
+      }
+    })();
+  </script>
+
   <!-- Razorpay -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
@@ -203,7 +224,7 @@
       }
 
       if (!product) {
-        document.getElementById('heroMain').innerHTML = '<div style="text-align:center;padding:80px 0"><h2 style="color:var(--text-primary);margin-bottom:12px">Product Not Found</h2><p style="col[...]';
+        document.getElementById('heroMain').innerHTML = '<div style="text-align:center;padding:80px 0"><h2 style="color:var(--text-primary);margin-bottom:12px">Product Not Found</h2><p style="col[...]</p></div>';
         return;
       }
 
@@ -269,134 +290,5 @@
       if (hasVariants && isLive) {
         // ── EDITION-BASED LAYOUT ──
         sidebarHtml += '<div style="padding:4px 0">';
-        sidebarHtml += '<div style="text-align:center;margin-bottom:16px"><span style="background:rgba(212,175,55,0.15);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.75rem;f[...]';
+        sidebarHtml += '<div style="text-align:center;margin-bottom:16px"><span style="background:rgba(212,175,55,0.15);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.75rem;f[...]
 
-        // Each variant as its own section
-        p.variants.forEach(function(v, i) {
-          sidebarHtml += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:12px">';
-          sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:12px">';
-          sidebarHtml += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:0.95rem;color:var(--text-primary);word-wrap:break-word;overflow-wrap:break-word">' + v.name + '</di[...]';
-          sidebarHtml += '<div style="text-align:right;flex-shrink:0"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + v.price + '</div>';
-          if (v.originalPrice && v.originalPrice > v.price) {
-            sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + v.originalPrice + '</div>';
-          }
-          sidebarHtml += '</div></div>';
-          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyEdition(' + i + ')" style="display:block;text-align:center;background:linear-gradient(135deg,#[...]';
-          sidebarHtml += '</div>';
-        });
-
-        // Combo Deal Section
-        if (p.comboPrice && p.variants.length >= 2) {
-          var comboLabel = p.variants.length === 2 ? 'Combo — Both' : 'Combo — All ' + p.variants.length;
-          var comboDesc = p.variants.map(function(v) { return v.name; }).join(' + ');
-          sidebarHtml += '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.02));border:2px solid rgba(212,175,55,0.3);border-radius:12px;padding:16px;margin-b[...]';
-          sidebarHtml += '<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:2px 12px;border-radius:10px;font-size:0.7rem;font[...]';
-          sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;margin-top:4px">';
-          sidebarHtml += '<div><div style="font-weight:700;font-size:1rem;color:var(--text-primary)">📦 ' + comboLabel + '</div>';
-          sidebarHtml += '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">' + comboDesc + '</div></div>';
-          sidebarHtml += '<div style="text-align:right"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + p.comboPrice + '</div>';
-          if (p.comboOriginalPrice && p.comboOriginalPrice > p.comboPrice) {
-            var savePct = Math.round((1 - p.comboPrice / p.comboOriginalPrice) * 100);
-            sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + p.comboOriginalPrice + '</div>';
-          }
-          sidebarHtml += '</div></div>';
-          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyCombo()" style="display:block;text-align:center;background:linear-gradient(135deg,#d4af37,#b89[...]';
-          sidebarHtml += '</div>';
-        }
-
-        sidebarHtml += '</div>';
-      } else if (isLive) {
-        // ── SIMPLE PRODUCT (no variants) ──
-        var priceH = p.price === 0
-          ? '<span class="purchase-card__price-free">Free</span>'
-          : '<span class="purchase-card__price-current">₹' + p.price.toLocaleString('en-IN') + '</span>' +
-            (p.originalPrice ? '<span class="purchase-card__price-original">₹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
-        sidebarHtml += '<div class="purchase-card__price">' + priceH + '</div>';
-        if (discount) sidebarHtml += '<div class="purchase-card__discount">🔥 ' + discount + '</div>';
-        if (p.price === 0) {
-          sidebarHtml += '<a href="#" class="purchase-card__buy purchase-card__buy--free" onclick="event.preventDefault(); buySimple()">🎁 Download Free</a>';
-        } else {
-          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buySimple()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700[...]';
-        }
-      } else {
-        // ── COMING SOON ──
-        sidebarHtml += '<a href="#" class="purchase-card__buy" style="opacity:0.65;cursor:not-allowed;background:rgba(251,146,60,0.15);color:#fb923c" onclick="event.preventDefault()">🔜 Coming [...]';
-      }
-
-      // Features
-      var featuresHtml = (p.features || []).map(function(f) { return '<li>' + f + '</li>'; }).join('');
-      if (featuresHtml) sidebarHtml += '<ul class="purchase-card__features">' + featuresHtml + '</ul>';
-      sidebarHtml += '<div class="purchase-card__guarantee"><span class="purchase-card__guarantee-icon">🔒</span>' + (isLive ? 'Secure payment via Razorpay. Instant download after purchase.' : '[...]');
-      sidebarHtml += '</div>';
-
-      document.getElementById('heroSidebar').innerHTML = sidebarHtml;
-    }
-
-    // ── Render Content Sections ──
-    function renderContent(p) {
-      document.getElementById('courseNav').style.display = '';
-      document.getElementById('courseContent').style.display = '';
-
-      var html = '';
-
-      // Overview
-      html += '<section class="course-section" id="section-overview">' +
-        '<h2 class="course-section__title"><span class="course-section__title-icon">📋</span> Overview</h2>' +
-        '<div class="course-overview">' + (p.overview || p.description) + '</div>' +
-      '</section>';
-
-      // Gallery
-      var galleryHtml = '';
-      if (p.images && p.images.length > 0) {
-        galleryHtml = p.images.map(function(img, i) {
-          return '<div class="course-gallery__item" onclick="openLightbox(\'' + img + '\')">' +
-            '<img src="' + img + '" alt="Preview ' + (i+1) + '" loading="lazy">' +
-          '</div>';
-        }).join('');
-      } else {
-        galleryHtml = '<div class="course-gallery__empty">📷 Preview images will be added soon. Check back later!</div>';
-      }
-      html += '<section class="course-section" id="section-gallery">' +
-        '<h2 class="course-section__title"><span class="course-section__title-icon">🖼️</span> Gallery</h2>' +
-        '<div class="course-gallery">' + galleryHtml + '</div>' +
-      '</section>';
-
-      // Curriculum
-      if (p.curriculum && p.curriculum.length > 0) {
-        var currHtml = p.curriculum.map(function(item) {
-          return '<li class="course-curriculum__item">' +
-            '<div class="course-curriculum__num"></div>' +
-            '<div class="course-curriculum__text">' + item + '</div>' +
-          '</li>';
-        }).join('');
-        html += '<section class="course-section" id="section-curriculum">' +
-          '<h2 class="course-section__title"><span class="course-section__title-icon">📚</span> What\'s Inside</h2>' +
-          '<ul class="course-curriculum">' + currHtml + '</ul>' +
-        '</section>';
-      }
-
-      // Method
-      if (p.method) {
-        var steps = p.method.split('\n').filter(function(s) { return s.trim(); });
-        var methodHtml = steps.map(function(step, i) {
-          var text = step.replace(/^Step \d+:\s*/i, '');
-          return '<div class="course-method__step">' +
-            '<div class="course-method__step-num">' + (i+1) + '</div>' +
-            '<div class="course-method__step-text">' + text + '</div>' +
-          '</div>';
-        }).join('');
-        html += '<section class="course-section" id="section-method">' +
-          '<h2 class="course-section__title"><span class="course-section__title-icon">🔧</span> How to Use</h2>' +
-          '<div class="course-method">' + methodHtml + '</div>' +
-        '</section>';
-      }
-
-      // Instructor
-      html += '<section class="course-section" id="section-instructor">' +
-        '<h2 class="course-section__title"><span class="course-section__title-icon">👨‍🏫</span> About the Instructor</h2>' +
-        '<div class="instructor-card">' +
-          '<div class="instructor-card__avatar">DP</div>' +
-          '<div>' +
-            '<div class="instructor-card__name">' + (p.instructor || 'Deepak Patel') + '</div>' +
-            '<div class="instructor-card__role">Creator of TheDeepVerse</div>' +
-            '<div class="instructor-card__bio">Deepak Patel is the creator of TheDeepVerse — a platform dedicated to decoding human psychology through cinematic storytelling. With a passion for[...]'</n,
