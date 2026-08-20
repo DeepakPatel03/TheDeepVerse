@@ -9,18 +9,12 @@ const StoreEngine = (function() {
 
   // ── Default Products (with full detail page data) ──
   const DEFAULT_PRODUCTS = [
-    
-        { id: 'hin', name: 'Hindi Edition (Manovigyan Ka Khatarnak Jal)', price: 65, originalPrice: 99, downloadUrl: 'https://drive.google.com/file/d/1L3i0_gV25u9sIeSWI1mtgufKRxwS0V0J/view?usp=drive_link' }
-      ],
-      comboPrice: 99,
-      comboOriginalPrice: 198,
-      instructor: 'Deepak Patel',
-      duration: 'Complete Book',
-      language: 'Hindi + English',
-      level: 'All Levels',
-      students: '100+',
-      lastUpdated: '2026-07-22',
-      createdAt: Date.now()
+    {
+      id: 'hin',
+      name: 'Hindi Edition (Manovigyan Ka Khatarnak Jal)',
+      price: 65,
+      originalPrice: 99,
+      downloadUrl: 'https://drive.google.com/file/d/1L3i0_gV25u9sIeSWI1mtgufKRxwS0V0J/view?usp=drive_link'
     },
     {
       id: 'ai-masterclass',
@@ -83,7 +77,7 @@ const StoreEngine = (function() {
         '🖤 Master Prompt 1 — Deep Black & White Cinematic Style, High Contrast Engraving Look, Psychological Documentary Style',
         '🎨 Master Prompt 2 — Same Engraving & Cinematic Style with Soft Natural Colors, Realistic Cinematic Feel'
       ],
-      method: 'Step 1: Purchase the course and login to your account.\\nStep 2: Open the Course Player from your Dashboard.\\nStep 3: Follow along with the video — pause and practice each step.\\nStep 4: Use the FREE Master Prompts to generate your own content.\\nStep 5: Create your first AI-powered video using the complete workflow.',
+      method: 'Step 1: Purchase the course and login to your account.\\nStep 2: Open the Course Player from your Dashboard.\\nStep 3: Follow along with the video — pause and practice each step.',
       price: 175,
       originalPrice: 499,
       tag: '65% OFF',
@@ -365,5 +359,3 @@ const StoreEngine = (function() {
     DEFAULT_PRODUCTS
   };
 })();
-
-
