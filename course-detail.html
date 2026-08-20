@@ -7,7 +7,7 @@
   <meta name="description" content="Premium psychology course by Deepak Patel. Learn what schools never teach you.">
   <meta name="robots" content="index, follow">
 
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23050505'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-size='18' font-weight='bold' fill='%23F5F5F5'%3ED%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23050505'/%3E%3Ctext x[...]">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -168,8 +168,6 @@
     </div>
   </footer>
 
-  
-
   <!-- Scripts -->
   <script src="js/main.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -205,7 +203,7 @@
       }
 
       if (!product) {
-        document.getElementById('heroMain').innerHTML = '<div style="text-align:center;padding:80px 0"><h2 style="color:var(--text-primary);margin-bottom:12px">Product Not Found</h2><p style="color:var(--text-muted)">This product doesn\'t exist.</p><a href="store.html" style="color:var(--accent-gold)">← Back to Store</a></div>';
+        document.getElementById('heroMain').innerHTML = '<div style="text-align:center;padding:80px 0"><h2 style="color:var(--text-primary);margin-bottom:12px">Product Not Found</h2><p style="col[...]';
         return;
       }
 
@@ -271,19 +269,19 @@
       if (hasVariants && isLive) {
         // ── EDITION-BASED LAYOUT ──
         sidebarHtml += '<div style="padding:4px 0">';
-        sidebarHtml += '<div style="text-align:center;margin-bottom:16px"><span style="background:rgba(212,175,55,0.15);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;letter-spacing:0.5px">📦 CHOOSE YOUR PREFERENCE</span></div>';
+        sidebarHtml += '<div style="text-align:center;margin-bottom:16px"><span style="background:rgba(212,175,55,0.15);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.75rem;f[...]';
 
         // Each variant as its own section
         p.variants.forEach(function(v, i) {
           sidebarHtml += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:12px">';
           sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:12px">';
-          sidebarHtml += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:0.95rem;color:var(--text-primary);word-wrap:break-word;overflow-wrap:break-word">' + v.name + '</div></div>';
+          sidebarHtml += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:0.95rem;color:var(--text-primary);word-wrap:break-word;overflow-wrap:break-word">' + v.name + '</di[...]';
           sidebarHtml += '<div style="text-align:right;flex-shrink:0"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + v.price + '</div>';
           if (v.originalPrice && v.originalPrice > v.price) {
             sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + v.originalPrice + '</div>';
           }
           sidebarHtml += '</div></div>';
-          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyEdition(' + i + ')" style="display:block;text-align:center;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:12px;border-radius:8px;text-decoration:none;font-size:0.95rem;box-shadow:0 4px 15px rgba(34,197,94,0.3);transition:all 0.2s">🛒 Buy & Download — ₹' + v.price + '</a>';
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyEdition(' + i + ')" style="display:block;text-align:center;background:linear-gradient(135deg,#[...]';
           sidebarHtml += '</div>';
         });
 
@@ -291,8 +289,8 @@
         if (p.comboPrice && p.variants.length >= 2) {
           var comboLabel = p.variants.length === 2 ? 'Combo — Both' : 'Combo — All ' + p.variants.length;
           var comboDesc = p.variants.map(function(v) { return v.name; }).join(' + ');
-          sidebarHtml += '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.02));border:2px solid rgba(212,175,55,0.3);border-radius:12px;padding:16px;margin-bottom:12px;position:relative">';
-          sidebarHtml += '<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:2px 12px;border-radius:10px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px">🔥 BEST DEAL</div>';
+          sidebarHtml += '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.02));border:2px solid rgba(212,175,55,0.3);border-radius:12px;padding:16px;margin-b[...]';
+          sidebarHtml += '<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:2px 12px;border-radius:10px;font-size:0.7rem;font[...]';
           sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;margin-top:4px">';
           sidebarHtml += '<div><div style="font-weight:700;font-size:1rem;color:var(--text-primary)">📦 ' + comboLabel + '</div>';
           sidebarHtml += '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">' + comboDesc + '</div></div>';
@@ -302,7 +300,7 @@
             sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + p.comboOriginalPrice + '</div>';
           }
           sidebarHtml += '</div></div>';
-          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyCombo()" style="display:block;text-align:center;background:linear-gradient(135deg,#d4af37,#b8962e);color:#000;font-weight:800;padding:12px;border-radius:8px;text-decoration:none;font-size:0.95rem;box-shadow:0 4px 15px rgba(212,175,55,0.4);transition:all 0.2s">🛒 Buy ' + comboLabel + ' — ₹' + p.comboPrice + (savePct ? ' (Save ' + savePct + '%)' : '') + '</a>';
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyCombo()" style="display:block;text-align:center;background:linear-gradient(135deg,#d4af37,#b89[...]';
           sidebarHtml += '</div>';
         }
 
@@ -318,17 +316,17 @@
         if (p.price === 0) {
           sidebarHtml += '<a href="#" class="purchase-card__buy purchase-card__buy--free" onclick="event.preventDefault(); buySimple()">🎁 Download Free</a>';
         } else {
-          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buySimple()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;box-shadow:0 4px 20px rgba(34,197,94,0.4)">🛒 Buy Now — ₹' + p.price.toLocaleString('en-IN') + '</a>';
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buySimple()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700[...]';
         }
       } else {
         // ── COMING SOON ──
-        sidebarHtml += '<a href="#" class="purchase-card__buy" style="opacity:0.65;cursor:not-allowed;background:rgba(251,146,60,0.15);color:#fb923c" onclick="event.preventDefault()">🔜 Coming Soon</a>';
+        sidebarHtml += '<a href="#" class="purchase-card__buy" style="opacity:0.65;cursor:not-allowed;background:rgba(251,146,60,0.15);color:#fb923c" onclick="event.preventDefault()">🔜 Coming [...]';
       }
 
       // Features
       var featuresHtml = (p.features || []).map(function(f) { return '<li>' + f + '</li>'; }).join('');
       if (featuresHtml) sidebarHtml += '<ul class="purchase-card__features">' + featuresHtml + '</ul>';
-      sidebarHtml += '<div class="purchase-card__guarantee"><span class="purchase-card__guarantee-icon">🔒</span>' + (isLive ? 'Secure payment via Razorpay. Instant download after purchase.' : 'This product is launching soon. Stay tuned!') + '</div>';
+      sidebarHtml += '<div class="purchase-card__guarantee"><span class="purchase-card__guarantee-icon">🔒</span>' + (isLive ? 'Secure payment via Razorpay. Instant download after purchase.' : '[...]');
       sidebarHtml += '</div>';
 
       document.getElementById('heroSidebar').innerHTML = sidebarHtml;
@@ -401,458 +399,4 @@
           '<div>' +
             '<div class="instructor-card__name">' + (p.instructor || 'Deepak Patel') + '</div>' +
             '<div class="instructor-card__role">Creator of TheDeepVerse</div>' +
-            '<div class="instructor-card__bio">Deepak Patel is the creator of TheDeepVerse — a platform dedicated to decoding human psychology through cinematic storytelling. With a passion for understanding the dark side of the human mind, Deepak creates documentary-style content that educates, inspires, and challenges the way people think about human behavior.</div>' +
-          '</div>' +
-        '</div>' +
-      '</section>';
-
-      document.getElementById('contentMain').innerHTML = html;
-
-      // Tab navigation
-      var tabs = document.querySelectorAll('.course-nav__tab');
-      tabs.forEach(function(tab) {
-        tab.addEventListener('click', function() {
-          tabs.forEach(function(t) { t.classList.remove('is-active'); });
-          tab.classList.add('is-active');
-          var target = document.getElementById('section-' + tab.dataset.target);
-          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-      });
-    }
-
-    // ── Render Related Products ──
-    function renderRelated(currentProduct) {
-      var products = StoreEngine.getProducts().filter(function(p) {
-        return p.active && p.id !== currentProduct.id;
-      }).slice(0, 3);
-
-      if (products.length === 0) return;
-
-      document.getElementById('relatedSection').style.display = '';
-      var grid = document.getElementById('relatedGrid');
-
-      grid.innerHTML = products.map(function(p) {
-        var priceHtml = p.price === 0
-          ? '<span style="color:#22c55e;font-weight:600">Free</span>'
-          : '<span style="font-weight:600">₹' + p.price.toLocaleString('en-IN') + '</span>' +
-            (p.originalPrice ? ' <span style="text-decoration:line-through;color:var(--text-muted);font-size:0.85em">₹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
-
-        return '<a href="course-detail.html?id=' + p.id + '" style="text-decoration:none;color:inherit">' +
-          '<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;transition:all 0.3s" onmouseover="this.style.borderColor=\'rgba(212,175,55,0.3)\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,0.06)\'">' +
-            '<div style="font-size:2rem;margin-bottom:12px">' + (p.emoji || '📦') + '</div>' +
-            '<div style="font-size:0.7rem;text-transform:uppercase;color:var(--accent-gold);letter-spacing:1px;margin-bottom:6px">' + p.category + '</div>' +
-            '<h3 style="font-size:1rem;color:var(--text-primary);margin-bottom:8px">' + p.title + '</h3>' +
-            '<div>' + priceHtml + '</div>' +
-          '</div>' +
-        '</a>';
-      }).join('');
-    }
-
-    // ── Initialize ──
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() { setTimeout(init, 100); });
-    } else {
-      setTimeout(init, 100);
-    }
-
-    // ── Buy Functions ──
-    // Get Razorpay key
-    function getRazorpayKey() {
-      var savedSettings = {};
-      try { savedSettings = JSON.parse(localStorage.getItem('tdv_settings') || '{}'); } catch(e) {}
-      return savedSettings.razorpayKey || 'rzp_live_T8fCgJ0kFyrOYl';
-    }
-
-    // Ensures a signed-in user before a paid purchase. The purchase is recorded
-    // against their Firebase UID so it shows up in My Courses / My Ebooks / My Library.
-    function ensureLoggedIn() {
-      var user = (window.FirebaseAuth && window.FirebaseAuth.currentUser) ? window.FirebaseAuth.currentUser : null;
-      if (user) return Promise.resolve(user);
-      if (window.TDVAuth && window.TDVAuth.requireLogin) return window.TDVAuth.requireLogin();
-      return Promise.resolve(null);
-    }
-
-    // Buy a specific edition (variant)
-    window.buyEdition = function(index) {
-      if (!currentProduct || !currentProduct.variants || !currentProduct.variants[index]) {
-        alert('Edition not found. Please refresh the page.');
-        return;
-      }
-      var v = currentProduct.variants[index];
-      var dlUrl = v.downloadUrl || '';
-      if (!dlUrl) { alert('Download link not set yet.'); return; }
-
-      if (v.price === 0) {
-        window.open(dlUrl, '_blank');
-        return;
-      }
-      ensureLoggedIn().then(function(user) {
-        if (!user) return; // user cancelled the login
-        processPayment(currentProduct.id + '_' + (v.id || v.name.replace(/[^a-zA-Z0-9]/g, '')), v.price, v.name, [dlUrl]);
-      });
-    };
-
-    // Buy combo (all variants)
-    window.buyCombo = function() {
-      if (!currentProduct || !currentProduct.variants) return;
-      var allUrls = currentProduct.variants.map(function(v) { return v.downloadUrl; }).filter(Boolean);
-      if (allUrls.length === 0) { alert('Download links not set yet.'); return; }
-      ensureLoggedIn().then(function(user) {
-        if (!user) return;
-        var count = currentProduct.variants.length;
-        var comboLabel = count === 2 ? 'Combo — Both' : 'Combo — All ' + count;
-        processPayment(currentProduct.id + '_combo', currentProduct.comboPrice || 99, comboLabel, allUrls);
-      });
-    };
-
-    // Buy simple product (no variants)
-    window.buySimple = function() {
-      if (!currentProduct) return;
-
-      var dlUrl = currentProduct.downloadUrl || '';
-
-      // Free product — direct download, no account needed
-      if (currentProduct.price === 0) {
-        if (dlUrl) window.open(dlUrl, '_blank');
-        else alert('Download link not set for this free product.');
-        return;
-      }
-
-      // Paid products require login so the purchase is saved to the account
-      ensureLoggedIn().then(function(user) {
-        if (!user) return; // user cancelled the login
-        if (!dlUrl && currentProduct.type !== 'video-course') { alert('Download link not set yet.'); return; }
-        processPayment(currentProduct.id, currentProduct.price, currentProduct.title, dlUrl ? [dlUrl] : []);
-      });
-    };
-
-    // Convert Google Drive view links to direct download links
-    function toDirectDownload(url) {
-      if (!url) return url;
-      // Match: drive.google.com/file/d/FILE_ID/view...
-      var match = url.match(/drive\.google\.com\/file\/d\/([^\/]+)/);
-      if (match && match[1]) {
-        return 'https://drive.google.com/uc?export=download&id=' + match[1];
-      }
-      // Match: drive.google.com/open?id=FILE_ID
-      var match2 = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
-      if (match2 && match2[1]) {
-        return 'https://drive.google.com/uc?export=download&id=' + match2[1];
-      }
-      return url;
-    }
-
-    // Show download section on the page after successful payment
-    function showDownloadSection(paymentId, description, downloadUrls) {
-      // Detect if URL is YouTube
-      function isYouTube(url) { return url && (url.indexOf('youtube.com') !== -1 || url.indexOf('youtu.be') !== -1); }
-
-      // Create download section HTML
-      var dlHtml = '<div id="postPaymentDownload" style="background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(34,197,94,0.03));border:2px solid rgba(34,197,94,0.4);border-radius:16px;padding:24px;margin:24px 0;text-align:center;animation:fadeIn 0.5s ease">';
-      dlHtml += '<div style="font-size:2.5rem;margin-bottom:8px">✅</div>';
-      dlHtml += '<h2 style="color:#22c55e;font-size:1.3rem;margin-bottom:4px">Payment Successful!</h2>';
-      dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:4px">Payment ID: ' + paymentId + '</p>';
-      dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">' + description + '</p>';
-      dlHtml += '<div style="display:flex;flex-direction:column;gap:10px;max-width:400px;margin:0 auto">';
-
-      // Get variant names for labels
-      var variantNames = [];
-      if (currentProduct && currentProduct.variants) {
-        variantNames = currentProduct.variants.map(function(v) { return v.name; });
-      }
-
-      downloadUrls.forEach(function(url, i) {
-        var label = variantNames[i] || (downloadUrls.length > 1 ? 'File ' + (i + 1) : 'Your File');
-        
-        if (isYouTube(url)) {
-    function showSuccessAndRedirect(paymentId, courseId) {
-      var successHtml = '<div id="postPaymentSuccess" style="background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(34,197,94,0.03));border:2px solid rgba(34,197,94,0.4);border-radius:16px;padding:32px 24px;margin:24px 0;text-align:center;animation:fadeIn 0.5s ease">';
-      successHtml += '<div style="font-size:3rem;margin-bottom:16px">✅</div>';
-      successHtml += '<h2 style="color:#22c55e;font-size:1.5rem;margin-bottom:8px">Purchase Successful!</h2>';
-      successHtml += '<p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:8px">Payment ID: ' + paymentId + '</p>';
-      successHtml += '<p style="color:var(--text-main);font-size:1rem;margin-bottom:24px">Your purchase has been securely saved to your account.</p>';
-      successHtml += '<a href="dashboard.html" style="display:inline-block;background:linear-gradient(135deg,#d4af37,#b8860b);color:#111;font-weight:700;padding:14px 24px;border-radius:10px;text-decoration:none;font-size:1.1rem;box-shadow:0 4px 15px rgba(212,175,55,0.3)">Go to My Courses ➔</a>';
-      successHtml += '</div>';
-
-      var heroSidebar = document.getElementById('heroSidebar');
-      if (heroSidebar) {
-        heroSidebar.innerHTML = successHtml;
-        heroSidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else {
-        alert('Purchase Successful! Redirecting to your dashboard...');
-        window.location.href = 'dashboard.html';
-      }
-    }
-
-    function savePurchaseAndRedirect(courseId, paymentId) {
-      try {
-        var user = window.FirebaseAuth ? window.FirebaseAuth.currentUser : null;
-        if (!user || !window.FirebaseDatabase) {
-          showSuccessAndRedirect(paymentId, courseId);
-          return;
-        }
-
-        var updates = {};
-        updates['users/' + user.uid + '/purchases/' + courseId] = true;
-        updates['users/' + user.uid + '/purchaseDetails/' + courseId] = {
-          paymentId: paymentId,
-          purchasedAt: new Date().toISOString(),
-          email: user.email || '',
-          name: user.displayName || ''
-        };
-
-        window.FirebaseDatabase.ref().update(updates).then(function() {
-          showSuccessAndRedirect(paymentId, courseId);
-        }).catch(function(err) {
-          console.error('[Purchase] Error saving to Firebase:', err);
-          showSuccessAndRedirect(paymentId, courseId);
-        });
-      } catch (e) {
-        console.error('[Purchase] Exception:', e);
-        showSuccessAndRedirect(paymentId, courseId);
-      }
-    }
-
-    function processPayment(productId, price, description, downloadUrls) {
-      try {
-        var user = null;
-        if (window.FirebaseAuth && window.FirebaseAuth.currentUser) {
-          user = window.FirebaseAuth.currentUser;
-        }
-
-        if (!user) {
-          if (window.TDVAuth) {
-            window.TDVAuth.openAuthModal();
-          } else if (window.openAuthModal) {
-            window.openAuthModal();
-          }
-          setTimeout(function() {
-            alert('Please Login or Sign Up first. Your purchase will be securely saved to your account so you can access it from My Courses/My Library.');
-          }, 300);
-          return;
-        }
-
-        var prefill = {
-          name: user.displayName || '',
-          email: user.email || '',
-          contact: user.phoneNumber || ''
-        };
-
-        var options = {
-          key: getRazorpayKey(),
-          amount: price * 100,
-          currency: 'INR',
-          name: 'TheDeepVerse',
-          description: description,
-          image: 'https://www.thedeepverse.in/assets/logo.png',
-          handler: function(response) {
-            savePurchaseAndRedirect(currentProduct.id, response.razorpay_payment_id);
-          },
-          prefill: prefill,
-          theme: { color: '#d4af37' },
-          modal: { ondismiss: function() { } }
-        };
-        var rzp = new Razorpay(options);
-        rzp.on('payment.failed', function (response){
-          alert('Payment failed: ' + response.error.description);
-        });
-        rzp.open();
-      } catch(e) {
-        alert('Payment error: ' + e.message + '. Please try again or contact us.');
-      }
-    }
-
-    // Records a non-video (ebook / digital) purchase against the logged-in user.
-    function recordProductPurchase(productId, paymentId) {
-      if (window.UserSystem && window.FirebaseAuth && window.FirebaseAuth.currentUser) {
-        var u = window.FirebaseAuth.currentUser;
-        window.UserSystem.recordPurchase(u, productId, {
-          paymentId: paymentId,
-          purchasedAt: new Date().toISOString(),
-          email: u.email || '',
-          name: u.displayName || ''
-        }).then(function(ok) {
-          console.log('[Purchase] Recorded for user: ' + (ok ? 'yes' : 'no'));
-        }).catch(function(err) {
-          console.error('[Purchase] Record error:', err);
-        });
-      } else {
-        console.warn('[Purchase] Not logged in — purchase not recorded to an account.');
-      }
-    }
-
-    // ── Share Link ──
-    window.copyShareLink = function() {
-      navigator.clipboard.writeText(window.location.href).then(function() {
-        var btn = document.querySelector('.share-btn');
-        if (btn) { btn.textContent = '✅ Link Copied!'; setTimeout(function() { btn.innerHTML = '📤 Share'; }, 2000); }
-      });
-    };
-
-    // ── Lightbox ──
-    window.openLightbox = function(src) {
-      document.getElementById('lightboxImg').src = src;
-      document.getElementById('lightbox').classList.add('is-open');
-      document.body.style.overflow = 'hidden';
-    };
-    window.closeLightbox = function() {
-      document.getElementById('lightbox').classList.remove('is-open');
-      document.body.style.overflow = '';
-    };
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeLightbox();
-    });
-
-  })();
-  </script>
-
-  <!-- PayPal SDK for international payments -->
-  <script src="https://www.paypal.com/sdk/js?client-id=BAArKqbNWhZR0TiQkI_tPiBpsY_ObNSkXdfzkbccl-O4JUw5ItnZkHWFt4801FsvhCmcyhntC24pNgkf_w&currency=USD" data-sdk-integration-source="button-factory"></script>
-
-  <script>
-  // PayPal International Payment Enhancement (separate from main code)
-  (function() {
-    var isIndia = true;
-
-    // Detect country
-    try {
-      fetch('https://ipapi.co/country_code/', { mode: 'cors' })
-        .then(function(r) { return r.text(); })
-        .then(function(code) {
-          code = (code || '').trim().toUpperCase();
-          if (code.length === 2 && code !== 'IN') {
-            isIndia = false;
-            applyPayPal();
-          }
-        })
-        .catch(function() {});
-    } catch(e) {}
-
-    function applyPayPal() {
-      // Wait for product to load
-      var tries = 0;
-      function waitForProduct() {
-        var sidebar = document.getElementById('heroSidebar');
-        var buyBtn = sidebar ? sidebar.querySelector('.purchase-card__buy') : null;
-        if (!buyBtn || tries > 30) return;
-        if (!sidebar.innerHTML || sidebar.innerHTML.indexOf('purchase-card__buy') === -1) {
-          tries++;
-          setTimeout(waitForProduct, 300);
-          return;
-        }
-
-        // Get product info from the page
-        var params = new URLSearchParams(window.location.search);
-        var productId = params.get('id');
-        if (!productId) return;
-
-        var product = null;
-        try { product = StoreEngine.getProduct(productId); } catch(e) {}
-        if (!product && StoreEngine.DEFAULT_PRODUCTS) {
-          product = StoreEngine.DEFAULT_PRODUCTS.find(function(p) { return p.id === productId; });
-        }
-        if (!product) return;
-
-        // Replace buy buttons with PayPal
-        var allBuyBtns = sidebar.querySelectorAll('.purchase-card__buy');
-        allBuyBtns.forEach(function(btn) {
-          // Create PayPal container
-          var container = document.createElement('div');
-          container.id = 'paypal-btn-' + Math.random().toString(36).substr(2, 6);
-          container.style.marginTop = '8px';
-
-          // Get price from button text or product
-          var priceUSD = product.priceUSD || 3;
-          var description = product.title || 'TheDeepVerse Product';
-
-          // Check if this is a combo button
-          var isCombo = btn.textContent.indexOf('Combo') !== -1;
-          if (isCombo) {
-            priceUSD = product.comboPriceUSD || 3;
-            description = product.title + ' — Combo';
-          }
-
-          // Check if this is a variant button
-          var btnText = btn.textContent;
-          if (product.variants && product.variants.length > 0) {
-            product.variants.forEach(function(v, i) {
-              if (btnText.indexOf(v.price) !== -1 && !isCombo) {
-                priceUSD = v.priceUSD || 2;
-                description = v.name || product.title;
-              }
-            });
-          }
-
-          // Update price display
-          var priceEls = sidebar.querySelectorAll('.purchase-card__price-current');
-          priceEls.forEach(function(el) {
-            el.textContent = '$' + priceUSD;
-          });
-          var origEls = sidebar.querySelectorAll('.purchase-card__price-original');
-          origEls.forEach(function(el) {
-            el.style.display = 'none';
-          });
-
-          // Replace button with PayPal
-          btn.style.display = 'none';
-          btn.parentNode.insertBefore(container, btn.nextSibling);
-
-          if (typeof paypal !== 'undefined') {
-            try {
-              paypal.Buttons({
-                style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 40 },
-                createOrder: function(data, actions) {
-                  return actions.order.create({
-                    purchase_units: [{ description: description, amount: { value: String(priceUSD), currency_code: 'USD' } }]
-                  });
-                },
-                onApprove: function(data, actions) {
-                  return actions.order.capture().then(function(details) {
-                    var payId = 'PAYPAL-' + details.id;
-                    // Record purchase against the logged-in user (all product types)
-                    try {
-                      var user = window.FirebaseAuth ? window.FirebaseAuth.currentUser : null;
-                      if (user && window.UserSystem) {
-                        window.UserSystem.recordPurchase(user, product.id, {
-                          paymentId: payId,
-                          purchasedAt: new Date().toISOString(),
-                          email: user.email || '',
-                          name: user.displayName || ''
-                        });
-                      }
-                    } catch(e) {}
-                    if (product.type === 'video-course') {
-                      if (user) window.FirebaseDatabase.ref('users/' + user.uid + '/purchases/' + product.id).set(true);
-                      alert('Payment successful! Go to Dashboard to access your course.');
-                      window.location.href = 'dashboard.html';
-                    } else {
-                      var dl = product.downloadUrl || '';
-                      if (isCombo && product.variants) {
-                        var urls = product.variants.map(function(v) { return v.downloadUrl; }).filter(Boolean);
-                        urls.forEach(function(u) { window.open(u, '_blank'); });
-                      } else if (dl) {
-                        window.open(dl, '_blank');
-                      }
-                      alert('Payment successful! Payment ID: ' + payId);
-                    }
-                  });
-                },
-                onError: function(err) { alert('Payment failed. Please try again.'); }
-              }).render('#' + container.id);
-            } catch(e) {}
-          }
-        });
-
-        // Update guarantee text
-        var guarantee = sidebar.querySelector('.purchase-card__guarantee');
-        if (guarantee) {
-          guarantee.innerHTML = '<span class="purchase-card__guarantee-icon">🔒</span>Secure payment via PayPal. Instant access after purchase.';
-        }
-      }
-      waitForProduct();
-    }
-  })();
-  </script>
-
-</body>
-</html>
+            '<div class="instructor-card__bio">Deepak Patel is the creator of TheDeepVerse — a platform dedicated to decoding human psychology through cinematic storytelling. With a passion for[...]'</n,
