@@ -7,64 +7,13 @@
   <meta name="description" content="Premium psychology course by Deepak Patel. Learn what schools never teach you.">
   <meta name="robots" content="index, follow">
 
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23050505'/%3E%3Ctext x[...]">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23050505'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-size='18' font-weight='bold' fill='%23F5F5F5'%3ED%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/course-detail.css">
-
-  <!-- Early fallback: ensure openAuthModal, closeAuthModal & requireLogin exist to avoid ReferenceError when inline scripts call them before auth.js loads -->
-  <script>
-    (function(){
-      try {
-        if (!window.TDVAuth) window.TDVAuth = {};
-
-        if (typeof window.openAuthModal !== 'function') {
-          window.openAuthModal = function(){
-            try { var m = document.getElementById('authModal'); if (m) m.style.display = 'block'; }
-            catch(e){}
-          };
-          window.TDVAuth.openAuthModal = window.openAuthModal;
-        }
-
-        if (typeof window.closeAuthModal !== 'function') {
-          window.closeAuthModal = function(){
-            try { var m = document.getElementById('authModal'); if (m) m.style.display = 'none'; }
-            catch(e){}
-          };
-          window.TDVAuth.closeAuthModal = window.closeAuthModal;
-        }
-
-        if (typeof window.requireLogin !== 'function') {
-          window.requireLogin = function(){
-            return new Promise(function(resolve){
-              try { window.openAuthModal(); } catch(e){}
-              // Poll for FirebaseAuth.currentUser for up to 60s (300 * 200ms)
-              var checks = 0;
-              var iv = setInterval(function(){
-                try {
-                  if (window.FirebaseAuth && window.FirebaseAuth.currentUser) {
-                    clearInterval(iv);
-                    resolve(window.FirebaseAuth.currentUser);
-                    return;
-                  }
-                } catch(e){}
-                checks++;
-                if (checks > 300) { clearInterval(iv); resolve(null); }
-              }, 200);
-            });
-          };
-          window.TDVAuth.requireLogin = window.requireLogin;
-        }
-
-        if (!window.TDVAuth.getCurrentUser) {
-          window.TDVAuth.getCurrentUser = function(){ return (window.FirebaseAuth && window.FirebaseAuth.currentUser) || null; };
-        }
-      } catch(e) { /* silent */ }
-    })();
-  </script>
 
   <!-- Razorpay -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -219,6 +168,108 @@
     </div>
   </footer>
 
+  <!-- AUTH MODAL -->
+  <div class="auth-modal" id="authModal" style="display:none;">
+    <div class="auth-modal__backdrop" id="authModalBackdrop"></div>
+    <div class="auth-modal__box">
+      <button class="auth-modal__close" id="authModalClose">&times;</button>
+      <div class="auth-modal__tabs">
+        <button class="auth-tab is-active" id="tabSignIn">Sign In</button>
+        <button class="auth-tab" id="tabSignUp">Sign Up</button>
+        <button class="auth-tab" id="tabPhone">Phone</button>
+      </div>
+      <form class="auth-form" id="formSignIn">
+        <div class="auth-form__group">
+          <label class="auth-form__label" for="signInEmail">Email</label>
+          <input type="email" class="auth-form__input" id="signInEmail" placeholder="you@example.com" required>
+        </div>
+        <div class="auth-form__group">
+          <label class="auth-form__label" for="signInPassword">Password</label>
+          <input type="password" class="auth-form__input" id="signInPassword" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn--primary btn--md auth-form__submit" style="width:100%;margin-top:16px;">Sign In</button>
+        <p class="auth-form__footer">Don't have an account? <span class="auth-switch-tab" data-tab="signup">Sign Up</span></p>
+      </form>
+      <form class="auth-form" id="formSignUp" style="display:none;">
+        <div class="auth-form__group">
+          <label class="auth-form__label" for="signUpName">Full Name</label>
+          <input type="text" class="auth-form__input" id="signUpName" placeholder="Your Name" required>
+        </div>
+        <div class="auth-form__group">
+          <label class="auth-form__label" for="signUpEmail">Email</label>
+          <input type="email" class="auth-form__input" id="signUpEmail" placeholder="you@example.com" required>
+        </div>
+        <div class="auth-form__group">
+          <label class="auth-form__label" for="signUpPassword">Password</label>
+          <input type="password" class="auth-form__input" id="signUpPassword" placeholder="••••••••" minlength="6" required>
+        </div>
+        <div class="auth-form__group">
+          <label class="auth-form__label" for="signUpConfirmPassword">Confirm Password</label>
+          <input type="password" class="auth-form__input" id="signUpConfirmPassword" placeholder="••••••••" minlength="6" required>
+        </div>
+        <button type="submit" class="btn btn--primary btn--md auth-form__submit" style="width:100%;margin-top:16px;">Create Account</button>
+        <p class="auth-form__footer">Already have an account? <span class="auth-switch-tab" data-tab="signin">Sign In</span></p>
+      </form>
+      <form class="auth-form" id="formPhone" style="display:none;">
+        <div id="phoneNumberSection">
+          <div class="auth-form__group">
+            <label class="auth-form__label" for="phoneNumber">Phone Number</label>
+            <input type="tel" class="auth-form__input" id="phoneNumber" placeholder="+91 98765 43210" required>
+          </div>
+          <div class="auth-form__group">
+            <button type="button" class="btn btn--primary btn--md auth-form__submit" id="sendCodeBtn" style="width:100%;margin-top:8px;">Send Verification Code</button>
+          </div>
+        </div>
+        <div id="verificationSection" style="display:none;">
+          <div class="auth-form__group">
+            <label class="auth-form__label" for="verificationCode">Verification Code</label>
+            <input type="text" class="auth-form__input" id="verificationCode" placeholder="Enter 6-digit code" required>
+          </div>
+          <button type="button" class="btn btn--link btn--sm" id="resendCodeBtn" style="margin-top:8px;">Didn't receive the code? Resend</button>
+        </div>
+        <button type="button" class="btn btn--primary btn--md auth-form__submit" id="verifyPhoneBtn" style="width:100%;margin-top:16px;">Verify &amp; Sign In</button>
+        <p class="auth-form__footer">Or sign in with <span class="auth-switch-tab" data-tab="signin">Email</span> instead</p>
+      </form>
+      <div class="auth-divider"><span>Or continue with</span></div>
+      <button type="button" class="btn btn--secondary btn--md auth-google-btn" id="googleSignInBtn" style="width:100%;margin:0 0 16px;padding:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <div class="auth-error" id="authError" style="display:none;"></div>
+      <div class="auth-loading" id="authLoading" style="display:none;justify-content:center;align-items:center;">
+        <div class="spinner" style="width:24px;height:24px;border:2px solid rgba(255,255,255,0.1);border-top-color:#d4af37;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+        <span style="margin-left:8px;">Signing in...</span>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .auth-modal{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;display:flex;align-items:center;justify-content:center}
+    .auth-modal__backdrop{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(5,5,5,0.85);backdrop-filter:blur(4px)}
+    .auth-modal__box{position:relative;background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:16px;width:100%;max-width:420px;margin:0 24px;max-height:90vh;overflow-y:auto}
+    .auth-modal__close{position:absolute;top:12px;right:12px;width:24px;height:24px;background:transparent;border:none;font-size:1.5rem;color:#888;cursor:pointer;line-height:1;padding:0;z-index:1}
+    .auth-modal__close:hover{color:#f5f5f5}
+    .auth-modal__tabs{display:flex;border-bottom:1px solid rgba(255,255,255,0.08)}
+    .auth-tab{flex:1;padding:16px;font-size:0.85rem;font-weight:500;color:#888;background:transparent;border:none;cursor:pointer;text-align:center}
+    .auth-tab.is-active{color:#f5f5f5;border-bottom:2px solid #d4af37}
+    .auth-tab:hover:not(.is-active){color:#aaa}
+    .auth-form{padding:24px}
+    .auth-form__group{margin-bottom:16px}
+    .auth-form__label{display:block;margin-bottom:8px;font-size:0.75rem;font-weight:500;color:#888}
+    .auth-form__input{width:100%;padding:10px 16px;background:#050505;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#f5f5f5;font-size:0.85rem;box-sizing:border-box}
+    .auth-form__input:focus{outline:none;border-color:#d4af37;box-shadow:0 0 0 3px rgba(212,175,55,0.15)}
+    .auth-form__input::placeholder{color:#555}
+    .auth-form__footer{margin-top:16px;text-align:center;font-size:0.75rem;color:#888}
+    .auth-switch-tab{color:#d4af37;cursor:pointer;text-decoration:underline}
+    .auth-divider{display:flex;align-items:center;margin:0 24px;color:#555;font-size:0.75rem}
+    .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.08)}
+    .auth-divider span{padding:0 16px}
+    .auth-google-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:#f5f5f5;font-size:0.85rem;font-weight:500;border-radius:8px;cursor:pointer;margin:16px 24px 24px !important;width:calc(100% - 48px) !important}
+    .auth-google-btn:hover{border-color:#f5f5f5;background:rgba(255,255,255,0.04)}
+    .auth-error{margin:16px 24px;padding:10px 16px;background:rgba(255,69,0,0.1);border:1px solid rgba(255,69,0,0.3);border-radius:8px;color:#ff4500;font-size:0.75rem}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+
   <!-- Scripts -->
   <script src="js/main.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -254,7 +305,7 @@
       }
 
       if (!product) {
-        document.getElementById('heroMain').innerHTML = '<div style="text-align:center;padding:80px 0"><h2 style="color:var(--text-primary);margin-bottom:12px">Product Not Found</h2><p style="col[...]</p></div>';
+        document.getElementById('heroMain').innerHTML = '<div style="text-align:center;padding:80px 0"><h2 style="color:var(--text-primary);margin-bottom:12px">Product Not Found</h2><p style="color:var(--text-muted)">This product doesn\'t exist.</p><a href="store.html" style="color:var(--accent-gold)">← Back to Store</a></div>';
         return;
       }
 
@@ -320,5 +371,630 @@
       if (hasVariants && isLive) {
         // ── EDITION-BASED LAYOUT ──
         sidebarHtml += '<div style="padding:4px 0">';
-        sidebarHtml += '<div style="text-align:center;margin-bottom:16px"><span style="background:rgba(212,175,55,0.15);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.75rem;f[...]
+        sidebarHtml += '<div style="text-align:center;margin-bottom:16px"><span style="background:rgba(212,175,55,0.15);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;letter-spacing:0.5px">📦 CHOOSE YOUR PREFERENCE</span></div>';
 
+        // Each variant as its own section
+        p.variants.forEach(function(v, i) {
+          sidebarHtml += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:12px">';
+          sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:12px">';
+          sidebarHtml += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:0.95rem;color:var(--text-primary);word-wrap:break-word;overflow-wrap:break-word">' + v.name + '</div></div>';
+          sidebarHtml += '<div style="text-align:right;flex-shrink:0"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + v.price + '</div>';
+          if (v.originalPrice && v.originalPrice > v.price) {
+            sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + v.originalPrice + '</div>';
+          }
+          sidebarHtml += '</div></div>';
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyEdition(' + i + ')" style="display:block;text-align:center;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:12px;border-radius:8px;text-decoration:none;font-size:0.95rem;box-shadow:0 4px 15px rgba(34,197,94,0.3);transition:all 0.2s">🛒 Buy & Download — ₹' + v.price + '</a>';
+          sidebarHtml += '</div>';
+        });
+
+        // Combo Deal Section
+        if (p.comboPrice && p.variants.length >= 2) {
+          var comboLabel = p.variants.length === 2 ? 'Combo — Both' : 'Combo — All ' + p.variants.length;
+          var comboDesc = p.variants.map(function(v) { return v.name; }).join(' + ');
+          sidebarHtml += '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.02));border:2px solid rgba(212,175,55,0.3);border-radius:12px;padding:16px;margin-bottom:12px;position:relative">';
+          sidebarHtml += '<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:2px 12px;border-radius:10px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px">🔥 BEST DEAL</div>';
+          sidebarHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;margin-top:4px">';
+          sidebarHtml += '<div><div style="font-weight:700;font-size:1rem;color:var(--text-primary)">📦 ' + comboLabel + '</div>';
+          sidebarHtml += '<div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">' + comboDesc + '</div></div>';
+          sidebarHtml += '<div style="text-align:right"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">₹' + p.comboPrice + '</div>';
+          if (p.comboOriginalPrice && p.comboOriginalPrice > p.comboPrice) {
+            var savePct = Math.round((1 - p.comboPrice / p.comboOriginalPrice) * 100);
+            sidebarHtml += '<div style="font-size:0.8rem;text-decoration:line-through;color:var(--text-muted)">₹' + p.comboOriginalPrice + '</div>';
+          }
+          sidebarHtml += '</div></div>';
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buyCombo()" style="display:block;text-align:center;background:linear-gradient(135deg,#d4af37,#b8962e);color:#000;font-weight:800;padding:12px;border-radius:8px;text-decoration:none;font-size:0.95rem;box-shadow:0 4px 15px rgba(212,175,55,0.4);transition:all 0.2s">🛒 Buy ' + comboLabel + ' — ₹' + p.comboPrice + (savePct ? ' (Save ' + savePct + '%)' : '') + '</a>';
+          sidebarHtml += '</div>';
+        }
+
+        sidebarHtml += '</div>';
+      } else if (isLive) {
+        // ── SIMPLE PRODUCT (no variants) ──
+        var priceH = p.price === 0
+          ? '<span class="purchase-card__price-free">Free</span>'
+          : '<span class="purchase-card__price-current">₹' + p.price.toLocaleString('en-IN') + '</span>' +
+            (p.originalPrice ? '<span class="purchase-card__price-original">₹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
+        sidebarHtml += '<div class="purchase-card__price">' + priceH + '</div>';
+        if (discount) sidebarHtml += '<div class="purchase-card__discount">🔥 ' + discount + '</div>';
+        if (p.price === 0) {
+          sidebarHtml += '<a href="#" class="purchase-card__buy purchase-card__buy--free" onclick="event.preventDefault(); buySimple()">🎁 Download Free</a>';
+        } else {
+          sidebarHtml += '<a href="#" class="purchase-card__buy" onclick="event.preventDefault(); buySimple()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;box-shadow:0 4px 20px rgba(34,197,94,0.4)">🛒 Buy Now — ₹' + p.price.toLocaleString('en-IN') + '</a>';
+        }
+      } else {
+        // ── COMING SOON ──
+        sidebarHtml += '<a href="#" class="purchase-card__buy" style="opacity:0.65;cursor:not-allowed;background:rgba(251,146,60,0.15);color:#fb923c" onclick="event.preventDefault()">🔜 Coming Soon</a>';
+      }
+
+      // Features
+      var featuresHtml = (p.features || []).map(function(f) { return '<li>' + f + '</li>'; }).join('');
+      if (featuresHtml) sidebarHtml += '<ul class="purchase-card__features">' + featuresHtml + '</ul>';
+      sidebarHtml += '<div class="purchase-card__guarantee"><span class="purchase-card__guarantee-icon">🔒</span>' + (isLive ? 'Secure payment via Razorpay. Instant download after purchase.' : 'This product is launching soon. Stay tuned!') + '</div>';
+      sidebarHtml += '</div>';
+
+      document.getElementById('heroSidebar').innerHTML = sidebarHtml;
+    }
+
+    // ── Render Content Sections ──
+    function renderContent(p) {
+      document.getElementById('courseNav').style.display = '';
+      document.getElementById('courseContent').style.display = '';
+
+      var html = '';
+
+      // Overview
+      html += '<section class="course-section" id="section-overview">' +
+        '<h2 class="course-section__title"><span class="course-section__title-icon">📋</span> Overview</h2>' +
+        '<div class="course-overview">' + (p.overview || p.description) + '</div>' +
+      '</section>';
+
+      // Gallery
+      var galleryHtml = '';
+      if (p.images && p.images.length > 0) {
+        galleryHtml = p.images.map(function(img, i) {
+          return '<div class="course-gallery__item" onclick="openLightbox(\'' + img + '\')">' +
+            '<img src="' + img + '" alt="Preview ' + (i+1) + '" loading="lazy">' +
+          '</div>';
+        }).join('');
+      } else {
+        galleryHtml = '<div class="course-gallery__empty">📷 Preview images will be added soon. Check back later!</div>';
+      }
+      html += '<section class="course-section" id="section-gallery">' +
+        '<h2 class="course-section__title"><span class="course-section__title-icon">🖼️</span> Gallery</h2>' +
+        '<div class="course-gallery">' + galleryHtml + '</div>' +
+      '</section>';
+
+      // Curriculum
+      if (p.curriculum && p.curriculum.length > 0) {
+        var currHtml = p.curriculum.map(function(item) {
+          return '<li class="course-curriculum__item">' +
+            '<div class="course-curriculum__num"></div>' +
+            '<div class="course-curriculum__text">' + item + '</div>' +
+          '</li>';
+        }).join('');
+        html += '<section class="course-section" id="section-curriculum">' +
+          '<h2 class="course-section__title"><span class="course-section__title-icon">📚</span> What\'s Inside</h2>' +
+          '<ul class="course-curriculum">' + currHtml + '</ul>' +
+        '</section>';
+      }
+
+      // Method
+      if (p.method) {
+        var steps = p.method.split('\n').filter(function(s) { return s.trim(); });
+        var methodHtml = steps.map(function(step, i) {
+          var text = step.replace(/^Step \d+:\s*/i, '');
+          return '<div class="course-method__step">' +
+            '<div class="course-method__step-num">' + (i+1) + '</div>' +
+            '<div class="course-method__step-text">' + text + '</div>' +
+          '</div>';
+        }).join('');
+        html += '<section class="course-section" id="section-method">' +
+          '<h2 class="course-section__title"><span class="course-section__title-icon">🔧</span> How to Use</h2>' +
+          '<div class="course-method">' + methodHtml + '</div>' +
+        '</section>';
+      }
+
+      // Instructor
+      html += '<section class="course-section" id="section-instructor">' +
+        '<h2 class="course-section__title"><span class="course-section__title-icon">👨‍🏫</span> About the Instructor</h2>' +
+        '<div class="instructor-card">' +
+          '<div class="instructor-card__avatar">DP</div>' +
+          '<div>' +
+            '<div class="instructor-card__name">' + (p.instructor || 'Deepak Patel') + '</div>' +
+            '<div class="instructor-card__role">Creator of TheDeepVerse</div>' +
+            '<div class="instructor-card__bio">Deepak Patel is the creator of TheDeepVerse — a platform dedicated to decoding human psychology through cinematic storytelling. With a passion for understanding the dark side of the human mind, Deepak creates documentary-style content that educates, inspires, and challenges the way people think about human behavior.</div>' +
+          '</div>' +
+        '</div>' +
+      '</section>';
+
+      document.getElementById('contentMain').innerHTML = html;
+
+      // Tab navigation
+      var tabs = document.querySelectorAll('.course-nav__tab');
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          tabs.forEach(function(t) { t.classList.remove('is-active'); });
+          tab.classList.add('is-active');
+          var target = document.getElementById('section-' + tab.dataset.target);
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
+
+    // ── Render Related Products ──
+    function renderRelated(currentProduct) {
+      var products = StoreEngine.getProducts().filter(function(p) {
+        return p.active && p.id !== currentProduct.id;
+      }).slice(0, 3);
+
+      if (products.length === 0) return;
+
+      document.getElementById('relatedSection').style.display = '';
+      var grid = document.getElementById('relatedGrid');
+
+      grid.innerHTML = products.map(function(p) {
+        var priceHtml = p.price === 0
+          ? '<span style="color:#22c55e;font-weight:600">Free</span>'
+          : '<span style="font-weight:600">₹' + p.price.toLocaleString('en-IN') + '</span>' +
+            (p.originalPrice ? ' <span style="text-decoration:line-through;color:var(--text-muted);font-size:0.85em">₹' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '');
+
+        return '<a href="course-detail.html?id=' + p.id + '" style="text-decoration:none;color:inherit">' +
+          '<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;transition:all 0.3s" onmouseover="this.style.borderColor=\'rgba(212,175,55,0.3)\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,0.06)\'">' +
+            '<div style="font-size:2rem;margin-bottom:12px">' + (p.emoji || '📦') + '</div>' +
+            '<div style="font-size:0.7rem;text-transform:uppercase;color:var(--accent-gold);letter-spacing:1px;margin-bottom:6px">' + p.category + '</div>' +
+            '<h3 style="font-size:1rem;color:var(--text-primary);margin-bottom:8px">' + p.title + '</h3>' +
+            '<div>' + priceHtml + '</div>' +
+          '</div>' +
+        '</a>';
+      }).join('');
+    }
+
+    // ── Initialize ──
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() { setTimeout(init, 100); });
+    } else {
+      setTimeout(init, 100);
+    }
+
+    // ── Buy Functions ──
+    // Get Razorpay key
+    function getRazorpayKey() {
+      var savedSettings = {};
+      try { savedSettings = JSON.parse(localStorage.getItem('tdv_settings') || '{}'); } catch(e) {}
+      return savedSettings.razorpayKey || 'rzp_live_T8fCgJ0kFyrOYl';
+    }
+
+    // Ensures a signed-in user before a paid purchase. The purchase is recorded
+    // against their Firebase UID so it shows up in My Courses / My Ebooks / My Library.
+    function ensureLoggedIn() {
+      var user = (window.FirebaseAuth && window.FirebaseAuth.currentUser) ? window.FirebaseAuth.currentUser : null;
+      if (user) return Promise.resolve(user);
+      if (window.TDVAuth && window.TDVAuth.requireLogin) return window.TDVAuth.requireLogin();
+      return Promise.resolve(null);
+    }
+
+    // Buy a specific edition (variant)
+    window.buyEdition = function(index) {
+      if (!currentProduct || !currentProduct.variants || !currentProduct.variants[index]) {
+        alert('Edition not found. Please refresh the page.');
+        return;
+      }
+      var v = currentProduct.variants[index];
+      var dlUrl = v.downloadUrl || '';
+      if (!dlUrl) { alert('Download link not set yet.'); return; }
+
+      if (v.price === 0) {
+        window.open(dlUrl, '_blank');
+        return;
+      }
+      ensureLoggedIn().then(function(user) {
+        if (!user) return; // user cancelled the login
+        processPayment(currentProduct.id + '_' + (v.id || v.name.replace(/[^a-zA-Z0-9]/g, '')), v.price, v.name, [dlUrl]);
+      });
+    };
+
+    // Buy combo (all variants)
+    window.buyCombo = function() {
+      if (!currentProduct || !currentProduct.variants) return;
+      var allUrls = currentProduct.variants.map(function(v) { return v.downloadUrl; }).filter(Boolean);
+      if (allUrls.length === 0) { alert('Download links not set yet.'); return; }
+      ensureLoggedIn().then(function(user) {
+        if (!user) return;
+        var count = currentProduct.variants.length;
+        var comboLabel = count === 2 ? 'Combo — Both' : 'Combo — All ' + count;
+        processPayment(currentProduct.id + '_combo', currentProduct.comboPrice || 99, comboLabel, allUrls);
+      });
+    };
+
+    // Buy simple product (no variants)
+    window.buySimple = function() {
+      if (!currentProduct) return;
+
+      var dlUrl = currentProduct.downloadUrl || '';
+
+      // Free product — direct download, no account needed
+      if (currentProduct.price === 0) {
+        if (dlUrl) window.open(dlUrl, '_blank');
+        else alert('Download link not set for this free product.');
+        return;
+      }
+
+      // Paid products require login so the purchase is saved to the account
+      ensureLoggedIn().then(function(user) {
+        if (!user) return; // user cancelled the login
+        if (!dlUrl && currentProduct.type !== 'video-course') { alert('Download link not set yet.'); return; }
+        processPayment(currentProduct.id, currentProduct.price, currentProduct.title, dlUrl ? [dlUrl] : []);
+      });
+    };
+
+    // Convert Google Drive view links to direct download links
+    function toDirectDownload(url) {
+      if (!url) return url;
+      // Match: drive.google.com/file/d/FILE_ID/view...
+      var match = url.match(/drive\.google\.com\/file\/d\/([^\/]+)/);
+      if (match && match[1]) {
+        return 'https://drive.google.com/uc?export=download&id=' + match[1];
+      }
+      // Match: drive.google.com/open?id=FILE_ID
+      var match2 = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+      if (match2 && match2[1]) {
+        return 'https://drive.google.com/uc?export=download&id=' + match2[1];
+      }
+      return url;
+    }
+
+    // Show download section on the page after successful payment
+    function showDownloadSection(paymentId, description, downloadUrls) {
+      // Detect if URL is YouTube
+      function isYouTube(url) { return url && (url.indexOf('youtube.com') !== -1 || url.indexOf('youtu.be') !== -1); }
+
+      // Create download section HTML
+      var dlHtml = '<div id="postPaymentDownload" style="background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(34,197,94,0.03));border:2px solid rgba(34,197,94,0.4);border-radius:16px;padding:24px;margin:24px 0;text-align:center;animation:fadeIn 0.5s ease">';
+      dlHtml += '<div style="font-size:2.5rem;margin-bottom:8px">✅</div>';
+      dlHtml += '<h2 style="color:#22c55e;font-size:1.3rem;margin-bottom:4px">Payment Successful!</h2>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:4px">Payment ID: ' + paymentId + '</p>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">' + description + '</p>';
+      dlHtml += '<div style="display:flex;flex-direction:column;gap:10px;max-width:400px;margin:0 auto">';
+
+      // Get variant names for labels
+      var variantNames = [];
+      if (currentProduct && currentProduct.variants) {
+        variantNames = currentProduct.variants.map(function(v) { return v.name; });
+      }
+
+      downloadUrls.forEach(function(url, i) {
+        var label = variantNames[i] || (downloadUrls.length > 1 ? 'File ' + (i + 1) : 'Your File');
+        
+        if (isYouTube(url)) {
+          // YouTube video — Watch button + Copy button
+          dlHtml += '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px">';
+          dlHtml += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:8px">🎬 ' + label + '</div>';
+          dlHtml += '<a href="' + url + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:700;padding:14px 20px;border-radius:10px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);margin-bottom:8px">▶️ Watch Video Now</a>';
+          dlHtml += '<button onclick="navigator.clipboard.writeText(\'' + url + '\').then(function(){this.textContent=\'✅ Link Copied!\'}.bind(this))" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary);padding:10px;border-radius:8px;cursor:pointer;font-size:0.85rem">📋 Copy Link (Save for Later)</button>';
+          dlHtml += '<p style="color:#f59e0b;font-size:0.75rem;margin-top:6px">⚠️ Ye link save kar lo — isse UNLIMITED baar video dekh sakte ho!</p>';
+          dlHtml += '</div>';
+        } else {
+          // Regular file — Download button + Copy button
+          var directUrl = toDirectDownload(url);
+          dlHtml += '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px">';
+          dlHtml += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:8px">📄 ' + label + '</div>';
+          dlHtml += '<a href="' + directUrl + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:14px 20px;border-radius:10px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(34,197,94,0.4);margin-bottom:8px">📥 Download Now</a>';
+          dlHtml += '<button onclick="navigator.clipboard.writeText(\'' + url + '\').then(function(){this.textContent=\'✅ Link Copied!\'}.bind(this))" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary);padding:10px;border-radius:8px;cursor:pointer;font-size:0.85rem">📋 Copy Link (Save for Later)</button>';
+          dlHtml += '</div>';
+        }
+      });
+
+      dlHtml += '</div>';
+      dlHtml += '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:12px;margin-top:16px;max-width:400px;margin-left:auto;margin-right:auto">';
+      dlHtml += '<p style="color:#f59e0b;font-size:0.85rem;font-weight:600;margin-bottom:4px">💡 Important:</p>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.8rem;margin:0">Sab links copy karke safe jagah save kar lo (Notes/WhatsApp). Ye links expire nahi hote — kabhi bhi access kar sakte ho!</p>';
+      dlHtml += '</div>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.75rem;margin-top:12px">Koi problem ho toh <a href="contact.html" style="color:var(--accent)">Contact Us</a> par payment ID ke saath message karo</p>';
+      dlHtml += '</div>';
+
+      // Insert after the hero section
+      var heroSidebar = document.getElementById('heroSidebar');
+      if (heroSidebar) {
+        heroSidebar.innerHTML = dlHtml;
+        heroSidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Process Razorpay payment and download
+    function processPayment(productId, price, description, downloadUrls) {
+      try {
+        var isVideoCourse = currentProduct && currentProduct.type === 'video-course';
+        var user = null;
+
+        if (window.FirebaseAuth && window.FirebaseAuth.currentUser) {
+          user = window.FirebaseAuth.currentUser;
+        }
+
+        // 🛑 Enforce login for video courses BEFORE payment
+        if (isVideoCourse && !user) {
+          // Open auth modal first, then show message
+          if (window.TDVAuth) {
+            window.TDVAuth.openAuthModal();
+          } else if (window.openAuthModal) {
+            window.openAuthModal();
+          } else {
+            var modal = document.getElementById('authModal');
+            if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+          }
+          setTimeout(function() {
+            alert('Please Login or Sign Up first to purchase this course. Your purchase will be saved to your account so you can access it anytime from My Courses.');
+          }, 300);
+          return; // Stop payment process
+        }
+
+        // Pre-fill user info if logged in
+        var prefill = { name: '', email: '', contact: '' };
+        if (user) {
+          prefill.name = user.displayName || '';
+          prefill.email = user.email || '';
+          prefill.contact = user.phoneNumber || '';
+        }
+
+        var options = {
+          key: getRazorpayKey(),
+          amount: price * 100, // paise
+          currency: 'INR',
+          name: 'TheDeepVerse',
+          description: 'Purchase: ' + description,
+          image: currentProduct.thumbnail || currentProduct.thumbnailUrl || '',
+          handler: function(response) {
+            if (isVideoCourse) {
+              // Save purchase to Firebase and redirect to player
+              savePurchaseToFirebase(currentProduct.id, response.razorpay_payment_id);
+            } else {
+              // Record the purchase against the logged-in user (if any) so it
+              // appears in My Ebooks / My Library, then show the download section.
+              recordProductPurchase(currentProduct.id, response.razorpay_payment_id);
+              showDownloadSection(response.razorpay_payment_id, description, downloadUrls);
+            }
+          },
+          prefill: prefill,
+          theme: { color: '#d4af37' },
+          modal: {
+            ondismiss: function() {
+              // User closed Razorpay without paying
+            }
+          }
+        };
+        var rzp = new Razorpay(options);
+        rzp.on('payment.failed', function(response) {
+          alert('❌ Payment failed: ' + response.error.description + '\n\nPlease try again.');
+        });
+        rzp.open();
+      } catch(e) {
+        alert('Payment error: ' + e.message + '. Please try again or contact us.');
+        console.error('Razorpay error:', e);
+      }
+    }
+
+    // Save video course purchase to Firebase
+    function savePurchaseToFirebase(courseId, paymentId) {
+      try {
+        var user = window.FirebaseAuth.currentUser;
+        if (!user || !window.FirebaseDatabase) {
+          alert('Purchase successful! Payment ID: ' + paymentId + '. Please login to access your course.');
+          return;
+        }
+
+        var updates = {};
+        updates['users/' + user.uid + '/purchases/' + courseId] = true;
+        updates['users/' + user.uid + '/purchaseDetails/' + courseId] = {
+          paymentId: paymentId,
+          purchasedAt: new Date().toISOString(),
+          email: user.email || '',
+          name: user.displayName || ''
+        };
+
+        window.FirebaseDatabase.ref().update(updates).then(function() {
+          // Redirect to course player
+          window.location.href = 'course-player.html?id=' + courseId;
+        }).catch(function(err) {
+          console.error('[Purchase] Firebase save error:', err);
+          alert('Payment successful (ID: ' + paymentId + ')! Your course access will be available shortly. If not, please contact support.');
+          window.location.href = 'dashboard.html';
+        });
+      } catch(e) {
+        console.error('[Purchase] Error:', e);
+        alert('Payment successful! Please go to your Dashboard to access the course.');
+        window.location.href = 'dashboard.html';
+      }
+    }
+
+    // Records a non-video (ebook / digital) purchase against the logged-in user.
+    function recordProductPurchase(productId, paymentId) {
+      if (window.UserSystem && window.FirebaseAuth && window.FirebaseAuth.currentUser) {
+        var u = window.FirebaseAuth.currentUser;
+        window.UserSystem.recordPurchase(u, productId, {
+          paymentId: paymentId,
+          purchasedAt: new Date().toISOString(),
+          email: u.email || '',
+          name: u.displayName || ''
+        }).then(function(ok) {
+          console.log('[Purchase] Recorded for user: ' + (ok ? 'yes' : 'no'));
+        }).catch(function(err) {
+          console.error('[Purchase] Record error:', err);
+        });
+      } else {
+        console.warn('[Purchase] Not logged in — purchase not recorded to an account.');
+      }
+    }
+
+    // ── Share Link ──
+    window.copyShareLink = function() {
+      navigator.clipboard.writeText(window.location.href).then(function() {
+        var btn = document.querySelector('.share-btn');
+        if (btn) { btn.textContent = '✅ Link Copied!'; setTimeout(function() { btn.innerHTML = '📤 Share'; }, 2000); }
+      });
+    };
+
+    // ── Lightbox ──
+    window.openLightbox = function(src) {
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightbox').classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    };
+    window.closeLightbox = function() {
+      document.getElementById('lightbox').classList.remove('is-open');
+      document.body.style.overflow = '';
+    };
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+  })();
+  </script>
+
+  <!-- PayPal SDK for international payments -->
+  <script src="https://www.paypal.com/sdk/js?client-id=BAArKqbNWhZR0TiQkI_tPiBpsY_ObNSkXdfzkbccl-O4JUw5ItnZkHWFt4801FsvhCmcyhntC24pNgkf_w&currency=USD" data-sdk-integration-source="button-factory"></script>
+
+  <script>
+  // PayPal International Payment Enhancement (separate from main code)
+  (function() {
+    var isIndia = true;
+
+    // Detect country
+    try {
+      fetch('https://ipapi.co/country_code/', { mode: 'cors' })
+        .then(function(r) { return r.text(); })
+        .then(function(code) {
+          code = (code || '').trim().toUpperCase();
+          if (code.length === 2 && code !== 'IN') {
+            isIndia = false;
+            applyPayPal();
+          }
+        })
+        .catch(function() {});
+    } catch(e) {}
+
+    function applyPayPal() {
+      // Wait for product to load
+      var tries = 0;
+      function waitForProduct() {
+        var sidebar = document.getElementById('heroSidebar');
+        var buyBtn = sidebar ? sidebar.querySelector('.purchase-card__buy') : null;
+        if (!buyBtn || tries > 30) return;
+        if (!sidebar.innerHTML || sidebar.innerHTML.indexOf('purchase-card__buy') === -1) {
+          tries++;
+          setTimeout(waitForProduct, 300);
+          return;
+        }
+
+        // Get product info from the page
+        var params = new URLSearchParams(window.location.search);
+        var productId = params.get('id');
+        if (!productId) return;
+
+        var product = null;
+        try { product = StoreEngine.getProduct(productId); } catch(e) {}
+        if (!product && StoreEngine.DEFAULT_PRODUCTS) {
+          product = StoreEngine.DEFAULT_PRODUCTS.find(function(p) { return p.id === productId; });
+        }
+        if (!product) return;
+
+        // Replace buy buttons with PayPal
+        var allBuyBtns = sidebar.querySelectorAll('.purchase-card__buy');
+        allBuyBtns.forEach(function(btn) {
+          // Create PayPal container
+          var container = document.createElement('div');
+          container.id = 'paypal-btn-' + Math.random().toString(36).substr(2, 6);
+          container.style.marginTop = '8px';
+
+          // Get price from button text or product
+          var priceUSD = product.priceUSD || 3;
+          var description = product.title || 'TheDeepVerse Product';
+
+          // Check if this is a combo button
+          var isCombo = btn.textContent.indexOf('Combo') !== -1;
+          if (isCombo) {
+            priceUSD = product.comboPriceUSD || 3;
+            description = product.title + ' — Combo';
+          }
+
+          // Check if this is a variant button
+          var btnText = btn.textContent;
+          if (product.variants && product.variants.length > 0) {
+            product.variants.forEach(function(v, i) {
+              if (btnText.indexOf(v.price) !== -1 && !isCombo) {
+                priceUSD = v.priceUSD || 2;
+                description = v.name || product.title;
+              }
+            });
+          }
+
+          // Update price display
+          var priceEls = sidebar.querySelectorAll('.purchase-card__price-current');
+          priceEls.forEach(function(el) {
+            el.textContent = '$' + priceUSD;
+          });
+          var origEls = sidebar.querySelectorAll('.purchase-card__price-original');
+          origEls.forEach(function(el) {
+            el.style.display = 'none';
+          });
+
+          // Replace button with PayPal
+          btn.style.display = 'none';
+          btn.parentNode.insertBefore(container, btn.nextSibling);
+
+          if (typeof paypal !== 'undefined') {
+            try {
+              paypal.Buttons({
+                style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 40 },
+                createOrder: function(data, actions) {
+                  return actions.order.create({
+                    purchase_units: [{ description: description, amount: { value: String(priceUSD), currency_code: 'USD' } }]
+                  });
+                },
+                onApprove: function(data, actions) {
+                  return actions.order.capture().then(function(details) {
+                    var payId = 'PAYPAL-' + details.id;
+                    // Record purchase against the logged-in user (all product types)
+                    try {
+                      var user = window.FirebaseAuth ? window.FirebaseAuth.currentUser : null;
+                      if (user && window.UserSystem) {
+                        window.UserSystem.recordPurchase(user, product.id, {
+                          paymentId: payId,
+                          purchasedAt: new Date().toISOString(),
+                          email: user.email || '',
+                          name: user.displayName || ''
+                        });
+                      }
+                    } catch(e) {}
+                    if (product.type === 'video-course') {
+                      if (user) window.FirebaseDatabase.ref('users/' + user.uid + '/purchases/' + product.id).set(true);
+                      alert('Payment successful! Go to Dashboard to access your course.');
+                      window.location.href = 'dashboard.html';
+                    } else {
+                      var dl = product.downloadUrl || '';
+                      if (isCombo && product.variants) {
+                        var urls = product.variants.map(function(v) { return v.downloadUrl; }).filter(Boolean);
+                        urls.forEach(function(u) { window.open(u, '_blank'); });
+                      } else if (dl) {
+                        window.open(dl, '_blank');
+                      }
+                      alert('Payment successful! Payment ID: ' + payId);
+                    }
+                  });
+                },
+                onError: function(err) { alert('Payment failed. Please try again.'); }
+              }).render('#' + container.id);
+            } catch(e) {}
+          }
+        });
+
+        // Update guarantee text
+        var guarantee = sidebar.querySelector('.purchase-card__guarantee');
+        if (guarantee) {
+          guarantee.innerHTML = '<span class="purchase-card__guarantee-icon">🔒</span>Secure payment via PayPal. Instant access after purchase.';
+        }
+      }
+      waitForProduct();
+    }
+  })();
+  </script>
+
+</body>
+</html>

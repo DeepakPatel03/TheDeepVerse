@@ -10,11 +10,54 @@ const StoreEngine = (function() {
   // ── Default Products (with full detail page data) ──
   const DEFAULT_PRODUCTS = [
     {
-      id: 'hin',
-      name: 'Hindi Edition (Manovigyan Ka Khatarnak Jal)',
+      id: 'psychology-book',
+      type: 'ebook',
+      category: 'ebook',
+      title: 'The Dangerous Trap of Psychology',
+      description: 'Manovigyan Ka Khatarnak Jal — Available in both Hindi and English. Learn the hidden psychological traps that control human behavior, decision-making, and manipulation.',
+      overview: 'This book exposes the dangerous psychological traps that silently control our thoughts, decisions, and relationships. Written by Deepak Patel, it covers manipulation tactics, cognitive biases, emotional traps, and dark psychology patterns that most people never recognize. Available in both Hindi and English editions — or grab the Combo deal for both at a discounted price.',
+      curriculum: [
+        'Chapter 1: The Psychology of Control',
+        'Chapter 2: Hidden Manipulation Tactics',
+        'Chapter 3: Cognitive Bias Traps',
+        'Chapter 4: Emotional Manipulation Patterns',
+        'Chapter 5: Social Engineering & Influence',
+        'Chapter 6: Dark Psychology in Daily Life',
+        'Chapter 7: How to Defend Your Mind',
+        'Chapter 8: Breaking Free from Psychological Traps'
+      ],
+      method: 'Step 1: Choose your preferred edition (Hindi, English, or Combo).\nStep 2: Complete payment via Razorpay.\nStep 3: Download your PDF instantly after payment.\nStep 4: Read at your own pace — works on any device.',
       price: 65,
       originalPrice: 99,
-      downloadUrl: 'https://drive.google.com/file/d/1L3i0_gV25u9sIeSWI1mtgufKRxwS0V0J/view?usp=drive_link'
+      tag: 'New Launch',
+      tagColor: 'gold',
+      thumbnail: '',
+      thumbnailUrl: '',
+      emoji: '📖',
+      images: [],
+      features: [
+        'Available in Hindi & English',
+        'PDF format — read on any device',
+        'Combo deal: Both editions for ₹99',
+        'Instant download after payment',
+        'Written by Deepak Patel'
+      ],
+      featured: false,
+      active: true,
+      downloadUrl: 'https://drive.google.com/file/d/1sjbMKaaFCE-lWQd-B-aEmdBj559E_ipm/view?usp=drive_link',
+      variants: [
+        { id: 'eng', name: 'English Edition', price: 65, originalPrice: 99, downloadUrl: 'https://drive.google.com/file/d/1sjbMKaaFCE-lWQd-B-aEmdBj559E_ipm/view?usp=drive_link' },
+        { id: 'hin', name: 'Hindi Edition (Manovigyan Ka Khatarnak Jal)', price: 65, originalPrice: 99, downloadUrl: 'https://drive.google.com/file/d/1L3i0_gV25u9sIeSWI1mtgufKRxwS0V0J/view?usp=drive_link' }
+      ],
+      comboPrice: 99,
+      comboOriginalPrice: 198,
+      instructor: 'Deepak Patel',
+      duration: 'Complete Book',
+      language: 'Hindi + English',
+      level: 'All Levels',
+      students: '100+',
+      lastUpdated: '2026-07-22',
+      createdAt: Date.now()
     },
     {
       id: 'ai-masterclass',
@@ -40,44 +83,27 @@ const StoreEngine = (function() {
         '🎬 Second Video Practical — Advanced Workflow'
       ],
       videoId: 'SJ0RlWMPCXI',
-      modules: [
-        {
-          id: 'module-1', title: 'Section 1 - AI Content Creation', lessons: [
-            { id: 'l1-1', title: 'Introduction', timestamp: 0, timeText: '00:00' },
-            { id: 'l1-2', title: 'First Video Live Practical', timestamp: 179, timeText: '02:59' },
-            { id: 'l1-3', title: 'Master Prompt Copy Paste', timestamp: 181, timeText: '03:01' },
-            { id: 'l1-4', title: 'See the Magic of Master Prompt', timestamp: 312, timeText: '05:12' },
-            { id: 'l1-5', title: 'Script Writing', timestamp: 460, timeText: '07:40' },
-            { id: 'l1-6', title: 'Scene Breakdown', timestamp: 625, timeText: '10:25' }
-          ]
-        },
-        {
-          id: 'module-2', title: 'Section 2 - AI Generation', lessons: [
-            { id: 'l2-1', title: 'Image + Video Prompt', timestamp: 660, timeText: '11:00' },
-            { id: 'l2-2', title: 'Google Flow', timestamp: 713, timeText: '11:53' },
-            { id: 'l2-3', title: 'Same Character Idea', timestamp: 1145, timeText: '19:05' }
-          ]
-        },
-        {
-          id: 'module-3', title: 'Section 3 - Audio & Editing', lessons: [
-            { id: 'l3-1', title: 'Voice Generation (ElevenLabs)', timestamp: 1975, timeText: '32:55' },
-            { id: 'l3-2', title: 'Voice Editing', timestamp: 2161, timeText: '36:01' },
-            { id: 'l3-3', title: 'VPN Setup', timestamp: 2274, timeText: '37:54' },
-            { id: 'l3-4', title: 'Video Editing', timestamp: 2330, timeText: '38:50' }
-          ]
-        },
-        {
-          id: 'module-4', title: 'Section 4 - Final Steps', lessons: [
-            { id: 'l4-1', title: 'SEO', timestamp: 3505, timeText: '58:25' },
-            { id: 'l4-2', title: 'Second Video Practical', timestamp: 3660, timeText: '01:01:00' }
-          ]
-        }
+      chapters: [
+        { time: 179, title: 'First Video Live Practical', icon: '🎬' },
+        { time: 181, title: 'Master Prompt Copy Paste', icon: '📋' },
+        { time: 312, title: 'See the Magic of Master Prompt', icon: '✨' },
+        { time: 460, title: 'Script Writing', icon: '📝' },
+        { time: 625, title: 'Scene Breakdown', icon: '🎯' },
+        { time: 660, title: 'Image + Video Prompt', icon: '🖼️' },
+        { time: 713, title: 'Google Flow', icon: '🌊' },
+        { time: 1145, title: 'Same Character Idea', icon: '👤' },
+        { time: 1975, title: 'Voice Generation (ElevenLabs)', icon: '🎙️' },
+        { time: 2161, title: 'Voice Editing', icon: '🎵' },
+        { time: 2274, title: 'VPN Setup', icon: '🔐' },
+        { time: 2330, title: 'Video Editing', icon: '🎥' },
+        { time: 3505, title: 'SEO', icon: '📊' },
+        { time: 3660, title: 'Second Video Practical', icon: '🎬' }
       ],
       bonuses: [
         '🖤 Master Prompt 1 — Deep Black & White Cinematic Style, High Contrast Engraving Look, Psychological Documentary Style',
         '🎨 Master Prompt 2 — Same Engraving & Cinematic Style with Soft Natural Colors, Realistic Cinematic Feel'
       ],
-      method: 'Step 1: Purchase the course and login to your account.\\nStep 2: Open the Course Player from your Dashboard.\\nStep 3: Follow along with the video — pause and practice each step.',
+      method: 'Step 1: Purchase the course and login to your account.\\nStep 2: Open the Course Player from your Dashboard.\\nStep 3: Follow along with the video — pause and practice each step.\\nStep 4: Use the FREE Master Prompts to generate your own content.\\nStep 5: Create your first AI-powered video using the complete workflow.',
       price: 175,
       originalPrice: 499,
       tag: '65% OFF',
@@ -152,13 +178,6 @@ const StoreEngine = (function() {
           console.log('[StoreEngine] Products synced from Firebase (' + data.length + ')');
         }
       });
-      // Sync deleted products
-      firebaseDB.ref('deleted_products').on('value', function(snapshot) {
-        const data = snapshot.val();
-        if (data && Array.isArray(data)) {
-          localStorage.setItem('tdv_deleted_ids', JSON.stringify(data));
-        }
-      });
       // Check cacheVersion — if admin triggered Force Refresh, clear local cache
       firebaseDB.ref('cacheVersion').on('value', function(snapshot) {
         var serverVersion = snapshot.val();
@@ -194,32 +213,13 @@ const StoreEngine = (function() {
   }
 
   // ── Core Methods ──
-  function getDeletedIds() {
-    try {
-      return JSON.parse(localStorage.getItem('tdv_deleted_ids') || '[]');
-    } catch(e) { return []; }
-  }
-
-  function addDeletedId(id) {
-    var deleted = getDeletedIds();
-    if (deleted.indexOf(id) === -1) {
-      deleted.push(id);
-      localStorage.setItem('tdv_deleted_ids', JSON.stringify(deleted));
-      if (firebaseReady && firebaseDB) {
-        firebaseDB.ref('deleted_products').set(deleted).catch(function(){});
-      }
-    }
-  }
-
   function mergeNewDefaults(products) {
-    // If DEFAULT_PRODUCTS has new items not in the cached list (and not explicitly deleted), add them
+    // If DEFAULT_PRODUCTS has new items not in the cached list, add them
     var existingIds = {};
     products.forEach(function(p) { existingIds[p.id] = true; });
-    var deletedIds = getDeletedIds();
-    
     var added = false;
     DEFAULT_PRODUCTS.forEach(function(dp) {
-      if (!existingIds[dp.id] && deletedIds.indexOf(dp.id) === -1) {
+      if (!existingIds[dp.id]) {
         products.push({...dp});
         added = true;
       }
@@ -283,7 +283,6 @@ const StoreEngine = (function() {
   function deleteProduct(id) {
     const products = getProducts().filter(p => p.id !== id);
     saveProducts(products);
-    addDeletedId(id);
     return true;
   }
 

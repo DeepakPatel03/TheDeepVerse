@@ -1,51 +1,3 @@
-// Centralized auth safety stubs — placed at top to avoid race conditions
-(function(){
-  try {
-    window.TDVAuth = window.TDVAuth || {};
-
-    if (typeof window.openAuthModal !== 'function') {
-      window.openAuthModal = function(){
-        try { var m = document.getElementById('authModal'); if (m) m.style.display = 'block'; }
-        catch(e){}
-      };
-      window.TDVAuth.openAuthModal = window.openAuthModal;
-    }
-
-    if (typeof window.closeAuthModal !== 'function') {
-      window.closeAuthModal = function(){
-        try { var m = document.getElementById('authModal'); if (m) m.style.display = 'none'; }
-        catch(e){}
-      };
-      window.TDVAuth.closeAuthModal = window.closeAuthModal;
-    }
-
-    if (!window.TDVAuth.getCurrentUser) {
-      window.TDVAuth.getCurrentUser = function(){ return (window.FirebaseAuth && window.FirebaseAuth.currentUser) || null; };
-    }
-
-    if (typeof window.requireLogin !== 'function') {
-      window.requireLogin = function(){
-        return new Promise(function(resolve){
-          try { window.openAuthModal(); } catch(e){}
-          var checks = 0;
-          var iv = setInterval(function(){
-            try {
-              if (window.FirebaseAuth && window.FirebaseAuth.currentUser) {
-                clearInterval(iv);
-                resolve(window.FirebaseAuth.currentUser);
-                return;
-              }
-            } catch(e){}
-            checks++;
-            if (checks > 300) { clearInterval(iv); resolve(null); }
-          }, 200);
-        });
-      };
-      window.TDVAuth.requireLogin = window.requireLogin;
-    }
-  } catch(e) { /* ignore */ }
-})();
-
 /* ═══════════════════════════════════════════════════
    AUTHENTICATION — TheDeepVerse
    ═══════════════════════════════════════════════════
@@ -90,7 +42,7 @@
     '<form class="auth-form" id="formPhone" style="display:none;">',
     '<div id="phoneNumberSection"><div class="auth-form__group"><label class="auth-form__label" for="phoneNumber">Phone Number</label>',
     '<input type="tel" class="auth-form__input" id="phoneNumber" placeholder="+91 98765 43210" required></div>',
-    '<div class="auth-form__group"><button type="button" class="btn btn--primary btn--md auth-form__submit" id="sendCodeBtn" style="width:100%;margin-top:8px;">Send Verification Code</button></div>',
+    '<div class="auth-form__group"><button type="button" class="btn btn--primary btn--md auth-form__submit" id="sendCodeBtn" style="width:100%;margin-top:8px;">Send Verification Code</button></div></div>',
     '<div id="verificationSection" style="display:none;"><div class="auth-form__group"><label class="auth-form__label" for="verificationCode">Verification Code</label>',
     '<input type="text" class="auth-form__input" id="verificationCode" placeholder="Enter 6-digit code" required></div>',
     '<button type="button" class="btn btn--link btn--sm" id="resendCodeBtn" style="margin-top:8px;">Didn\'t receive the code? Resend</button></div>',
@@ -99,7 +51,7 @@
     '</form>',
     '<div class="auth-divider"><span>Or continue with</span></div>',
     '<button type="button" class="btn btn--secondary btn--md auth-google-btn" id="googleSignInBtn">',
-    '<svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/></svg>',
+    '<svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>',
     'Continue with Google</button>',
     '<div class="auth-error" id="authError" style="display:none;"></div>',
     '<div class="auth-loading" id="authLoading" style="display:none;justify-content:center;align-items:center;padding:0 24px 24px;">',
@@ -141,6 +93,8 @@
   let authLoading = null;
 
   // ── Inject shared auth modal + styles if the page doesn't already have them ──
+  // This keeps one source of truth: any page that loads auth.js gets a working
+  // login/signup modal, even if its HTML doesn't include the markup.
   function ensureAuthModal() {
     if (document.getElementById('authModal')) return;
 
@@ -150,20 +104,26 @@
       '.auth-modal{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;display:flex;align-items:center;justify-content:center}' +
       '.auth-modal__backdrop{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(5,5,5,0.85);backdrop-filter:blur(4px)}' +
       '.auth-modal__box{position:relative;background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:16px;width:100%;max-width:420px;margin:0 24px;max-height:90vh;overflow-y:auto}' +
-      '.auth-modal__close{position:absolute;top:12px;right:12px;width:24px;height:24px;background:transparent;border:none;font-size:1.5rem;color:#888;cursor:pointer;line-height:1;padding:0;z-index:2}' +
-      '.auth-modal__tabs{display:flex;gap:8px;padding:16px;border-bottom:1px solid rgba(255,255,255,0.02)}' +
-      '.auth-tab{background:transparent;border-radius:8px;padding:8px 12px;border:none;color:#ccc;cursor:pointer}' +
-      '.auth-tab.is-active{background:rgba(255,255,255,0.03);color:#fff}' +
-      '.auth-form{padding:16px}' +
-      '.auth-form__group{margin-bottom:12px}' +
-      '.auth-form__label{display:block;margin-bottom:6px;color:#aaa;font-size:0.85rem}' +
-      '.auth-form__input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:#fff}' +
-      '.auth-form__submit{display:block}' +
-      '.auth-form__footer{margin-top:12px;color:#888;font-size:0.9rem}' +
-      '.auth-divider{display:flex;align-items:center;gap:12px;padding:12px 16px;color:#888}' +
-      '.auth-error{color:#ff6b6b;padding:12px 16px}' +
-      '.auth-loading{padding:12px 16px}' +
-      '.auth-google-btn{display:flex;align-items:center;gap:8px;padding:12px 16px;margin:0 16px 16px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid rgba(255,255,255,0.03);color:#fff}' ;
+      '.auth-modal__close{position:absolute;top:12px;right:12px;width:24px;height:24px;background:transparent;border:none;font-size:1.5rem;color:#888;cursor:pointer;line-height:1;padding:0;z-index:1}' +
+      '.auth-modal__close:hover{color:#f5f5f5}' +
+      '.auth-modal__tabs{display:flex;border-bottom:1px solid rgba(255,255,255,0.08)}' +
+      '.auth-tab{flex:1;padding:16px;font-size:0.85rem;font-weight:500;color:#888;background:transparent;border:none;cursor:pointer;text-align:center}' +
+      '.auth-tab.is-active{color:#f5f5f5;border-bottom:2px solid #d4af37}' +
+      '.auth-tab:hover:not(.is-active){color:#aaa}' +
+      '.auth-form{padding:24px}.auth-form__group{margin-bottom:16px}' +
+      '.auth-form__label{display:block;margin-bottom:8px;font-size:0.75rem;font-weight:500;color:#888}' +
+      '.auth-form__input{width:100%;padding:10px 16px;background:#050505;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#f5f5f5;font-size:0.85rem;box-sizing:border-box}' +
+      '.auth-form__input:focus{outline:none;border-color:#d4af37;box-shadow:0 0 0 3px rgba(212,175,55,0.15)}' +
+      '.auth-form__input::placeholder{color:#555}' +
+      '.auth-form__footer{margin-top:16px;text-align:center;font-size:0.75rem;color:#888}' +
+      '.auth-switch-tab{color:#d4af37;cursor:pointer;text-decoration:underline}' +
+      '.auth-divider{display:flex;align-items:center;margin:0 24px;color:#555;font-size:0.75rem}' +
+      ".auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.08)}" +
+      '.auth-divider span{padding:0 16px}' +
+      '.auth-google-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:#f5f5f5;font-size:0.85rem;font-weight:500;border-radius:8px;cursor:pointer;padding:12px;margin:16px 24px 24px;width:calc(100% - 48px)}' +
+      '.auth-google-btn:hover{border-color:#f5f5f5;background:rgba(255,255,255,0.04)}' +
+      '.auth-error{margin:16px 24px;padding:10px 16px;background:rgba(255,69,0,0.1);border:1px solid rgba(255,69,0,0.3);border-radius:8px;color:#ff4500;font-size:0.75rem}' +
+      '@keyframes spin{to{transform:rotate(360deg)}}';
     document.head.appendChild(style);
 
     const wrap = document.createElement('div');
@@ -179,6 +139,7 @@
     // Wait for Firebase to be ready
     if (!window.FirebaseAuth) {
       initRetries++;
+      // Keep retrying while the page is alive (page start-up race), but warn after a while.
       if (initRetries > 600) {
         console.warn('[Auth] Firebase Auth still not available after ' + initRetries + ' attempts. Reload to retry.');
         initStarted = false;
@@ -285,9 +246,8 @@
     if (formSignUp) {
       formSignUp.addEventListener('submit', handleSignUp);
     }
-    // The phone form submit now delegates to a helper that decides whether to send code or verify
     if (formPhone) {
-      formPhone.addEventListener('submit', function(e) { e.preventDefault(); handlePhoneSignIn(); });
+      formPhone.addEventListener('submit', handlePhoneSignIn);
     }
 
     // Google Sign-In
@@ -295,7 +255,7 @@
       googleSignInBtn.addEventListener('click', handleGoogleSignIn);
     }
 
-    // Phone Sign-In (send code button)
+    // Phone Sign-In
     const sendCodeBtn = document.getElementById('sendCodeBtn');
     if (sendCodeBtn) {
       sendCodeBtn.addEventListener('click', handlePhoneSignInStart);
@@ -341,17 +301,456 @@
     else rejectLoginWaiters();
   }
 
-  // small helper: unified phone form submit handler
-  async function handlePhoneSignIn() {
-    // If verification not started, send code; otherwise try to verify
-    if (!phoneVerificationInProgress) {
-      await handlePhoneSignInStart();
+  function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // Waits until the user is signed in, then resolves with the user object.
+  // Rejects (resolves with null) if the modal is closed without signing in.
+  function requireLogin() {
+    if (auth && auth.currentUser) return Promise.resolve(auth.currentUser);
+    return new Promise(function (resolve) {
+      loginWaiters.push({ resolve: resolve, active: true });
+      openAuthModal();
+    });
+  }
+
+  function resolveLoginWaiters() {
+    if (!auth || !auth.currentUser) return;
+    var waiters = loginWaiters;
+    loginWaiters = [];
+    waiters.forEach(function (w) { w.resolve(auth.currentUser); });
+  }
+
+  function rejectLoginWaiters() {
+    var waiters = loginWaiters;
+    loginWaiters = [];
+    waiters.forEach(function (w) { w.resolve(null); });
+  }
+
+  function updateNavUI(user) {
+    // The visible user element is the wrapper (#navUser) when present,
+    // otherwise the profile button itself.
+    const userEl = navUser || userProfileBtn;
+
+    if (user) {
+      // User is signed in
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (userEl) userEl.style.display = 'flex';
+
+      // Update user name/email/avatar in dropdown.
+      // Support both naming schemes across pages (navUserName / navUserNameLg).
+      const displayName = escapeHtml(user.displayName || (user.email ? user.email.split('@')[0] : 'User'));
+      const initial = escapeHtml((user.displayName || user.email || 'U')[0].toUpperCase());
+
+      ['navUserName', 'navUserNameLg'].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = displayName;
+      });
+      const userEmailEl = document.getElementById('navUserEmail');
+      if (userEmailEl) userEmailEl.textContent = escapeHtml(user.email || '');
+
+      ['navUserAvatar', 'navUserAvatarLg'].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (user.photoURL) {
+          el.innerHTML = `<img src="${escapeHtml(user.photoURL)}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+        } else {
+          el.textContent = initial;
+        }
+      });
     } else {
-      await handleVerifyPhone();
+      // User is signed out
+      if (loginBtn) loginBtn.style.display = 'inline-flex';
+      if (userEl) userEl.style.display = 'none';
+      if (userDropdown) userDropdown.classList.remove('is-open');
     }
   }
 
-  // Export for global use
+  // ── Modal Controls ──
+  function openAuthModal() {
+    if (!authModal) return;
+    authModal.style.display = 'flex';
+    if (authModalBackdrop) authModalBackdrop.style.display = 'block';
+    modalOpen = true;
+    document.body.style.overflow = 'hidden';
+
+    // Reset to sign-in tab
+    switchTab('signin');
+    clearError();
+    resetForms();
+
+    // Focus email input
+    setTimeout(() => {
+      const emailInput = document.getElementById('signInEmail');
+      if (emailInput) emailInput.focus();
+    }, 100);
+  }
+
+  function closeAuthModal() {
+    if (!authModal) return;
+    authModal.style.display = 'none';
+    if (authModalBackdrop) authModalBackdrop.style.display = 'none';
+    modalOpen = false;
+    document.body.style.overflow = '';
+    clearError();
+    resetForms();
+    phoneVerificationInProgress = false;
+    confirmationResult = null;
+  }
+
+  function switchTab(tab) {
+    if (tab === 'signin') {
+      if (tabSignIn) tabSignIn.classList.add('is-active');
+      if (tabSignUp) tabSignUp.classList.remove('is-active');
+      if (tabPhone) tabPhone.classList.remove('is-active');
+      if (formSignIn) formSignIn.style.display = 'block';
+      if (formSignUp) formSignUp.style.display = 'none';
+      if (formPhone) formPhone.style.display = 'none';
+    } else if (tab === 'signup') {
+      if (tabSignIn) tabSignIn.classList.remove('is-active');
+      if (tabSignUp) tabSignUp.classList.add('is-active');
+      if (tabPhone) tabPhone.classList.remove('is-active');
+      if (formSignIn) formSignIn.style.display = 'none';
+      if (formSignUp) formSignUp.style.display = 'block';
+      if (formPhone) formPhone.style.display = 'none';
+    } else if (tab === 'phone') {
+      if (tabSignIn) tabSignIn.classList.remove('is-active');
+      if (tabSignUp) tabSignUp.classList.remove('is-active');
+      if (tabPhone) tabPhone.classList.add('is-active');
+      if (formSignIn) formSignIn.style.display = 'none';
+      if (formSignUp) formSignUp.style.display = 'none';
+      if (formPhone) formPhone.style.display = 'block';
+    }
+    clearError();
+  }
+
+  function clearError() {
+    if (authError) {
+      authError.textContent = '';
+      authError.style.display = 'none';
+    }
+  }
+
+  function showError(message) {
+    if (authError) {
+      authError.textContent = message;
+      authError.style.display = 'block';
+    }
+  }
+
+  function setLoading(loading) {
+    if (authLoading) {
+      authLoading.style.display = loading ? 'flex' : 'none';
+    }
+    if (googleSignInBtn) {
+      googleSignInBtn.disabled = loading;
+    }
+    if (phoneSignInBtn) {
+      phoneSignInBtn.disabled = loading;
+    }
+    const submitBtns = document.querySelectorAll('#formSignIn button[type="submit"], #formSignUp button[type="submit"], #formPhone button[type="submit"]');
+    submitBtns.forEach(btn => btn.disabled = loading);
+  }
+
+  function resetForms() {
+    if (formSignIn) formSignIn.reset();
+    if (formSignUp) formSignUp.reset();
+    if (formPhone) formPhone.reset();
+  }
+
+  // ── Authentication Handlers ──
+  async function handleGoogleSignIn() {
+    if (!auth || !googleProvider) return;
+
+    setLoading(true);
+    clearError();
+
+    try {
+      await auth.signInWithPopup(googleProvider);
+      closeAuthModal();
+      showToast('Welcome to TheDeepVerse! 🎉', 'success');
+    } catch (error) {
+      console.error('[Auth] Google Sign-In error:', error);
+      let message = 'Google sign-in failed. Please try again.';
+      if (error.code === 'auth/popup-blocked') {
+        message = 'Popup blocked. Please allow popups for this site.';
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        message = 'Sign-in cancelled.';
+      } else if (error.code === 'auth/unauthorized-domain') {
+        message = 'This domain is not authorized. Contact admin.';
+      }
+      showError(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSignIn(e) {
+    e.preventDefault();
+    if (!auth) {
+      showError('Authentication not ready. Please refresh the page and try again.');
+      return;
+    }
+
+    const email = document.getElementById('signInEmail').value.trim();
+    const password = document.getElementById('signInPassword').value;
+
+    if (!email || !password) {
+      showError('Please enter both email and password.');
+      return;
+    }
+
+    setLoading(true);
+    clearError();
+
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      closeAuthModal();
+      showToast('Welcome back! 👋', 'success');
+    } catch (error) {
+      console.error('[Auth] Sign-In error:', error);
+      let message = 'Sign-in failed. Please check your credentials.';
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+        message = 'No account found or incorrect password. Please check your credentials.';
+      } else if (error.code === 'auth/invalid-email') {
+        message = 'Invalid email address.';
+      } else if (error.code === 'auth/too-many-requests') {
+        message = 'Too many attempts. Please try again later.';
+      } else if (error.code === 'auth/network-request-failed') {
+        message = 'Network error. Check your connection and try again.';
+      } else if (error.code === 'auth/user-disabled') {
+        message = 'This account has been disabled.';
+      }
+      showError(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSignUp(e) {
+    e.preventDefault();
+    if (!auth) {
+      showError('Authentication not ready. Please refresh the page and try again.');
+      return;
+    }
+
+    const name = document.getElementById('signUpName').value.trim();
+    const email = document.getElementById('signUpEmail').value.trim();
+    const password = document.getElementById('signUpPassword').value;
+    const confirmPassword = document.getElementById('signUpConfirmPassword').value;
+
+    if (!name || !email || !password) {
+      showError('Please fill in all fields.');
+      return;
+    }
+
+    if (password.length < 6) {
+      showError('Password must be at least 6 characters.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showError('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+    clearError();
+
+    try {
+      const result = await auth.createUserWithEmailAndPassword(email, password);
+
+      // Update profile with name
+      if (result.user) {
+        await result.user.updateProfile({
+          displayName: name
+        });
+      }
+
+      closeAuthModal();
+      showToast('Account created! Welcome to TheDeepVerse 🎉', 'success');
+    } catch (error) {
+      console.error('[Auth] Sign-Up error:', error);
+      let message = 'Sign-up failed. Please try again.';
+      if (error.code === 'auth/email-already-in-use') {
+        message = 'This email is already registered. Try signing in.';
+      } else if (error.code === 'auth/invalid-email') {
+        message = 'Invalid email address.';
+      } else if (error.code === 'auth/weak-password') {
+        message = 'Password is too weak. Use at least 6 characters.';
+      }
+      showError(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Phone Authentication Handlers
+  async function handlePhoneSignInStart() {
+    if (!auth) return;
+
+    const phoneNumberInput = document.getElementById('phoneNumber');
+    const phoneNumber = phoneNumberInput.value.trim();
+
+    if (!phoneNumber) {
+      showError('Please enter your phone number.');
+      return;
+    }
+
+    // Basic phone number validation
+    if (!/^\+?[\d\s\-\(\)]+$/.test(phoneNumber) || phoneNumber.replace(/[\s\-\(\)]/g, '').length < 10) {
+      showError('Please enter a valid phone number.');
+      return;
+    }
+
+    setLoading(true);
+    clearError();
+
+    try {
+      // Send verification code
+      confirmationResult = await auth.signInWithPhoneNumber(phoneNumber);
+      phoneVerificationInProgress = true;
+
+      // Show verification code input
+      const verificationCodeInput = document.getElementById('verificationCode');
+      if (verificationCodeInput) {
+        verificationCodeInput.disabled = false;
+        verificationCodeInput.focus();
+      }
+
+      // Hide phone number input, show verification inputs
+      const phoneNumberSection = document.getElementById('phoneNumberSection');
+      const verificationSection = document.getElementById('verificationSection');
+      if (phoneNumberSection) phoneNumberSection.style.display = 'none';
+      if (verificationSection) verificationSection.style.display = 'block';
+
+      showError('Verification code sent. Please check your phone.');
+    } catch (error) {
+      console.error('[Auth] Phone Sign-In error:', error);
+      let message = 'Failed to send verification code.';
+      if (error.code === 'auth/invalid-phone-number') {
+        message = 'Invalid phone number format.';
+      } else if (error.code === 'auth/missing-phone-number') {
+        message = 'Please enter a phone number.';
+      } else if (error.code === 'auth/quota-exceeded') {
+        message = 'SMS quota exceeded. Please try again later.';
+      } else if (error.code === 'auth/unauthorized-domain') {
+        message = 'This domain is not authorized for phone authentication.';
+      }
+      showError(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleVerifyPhone() {
+    if (!auth || !phoneVerificationInProgress || !confirmationResult) return;
+
+    const verificationCodeInput = document.getElementById('verificationCode');
+    const verificationCode = verificationCodeInput.value.trim();
+
+    if (!verificationCode) {
+      showError('Please enter the verification code.');
+      return;
+    }
+
+    setLoading(true);
+    clearError();
+
+    try {
+      // Verify the code
+      await confirmationResult.confirm(verificationCode);
+      closeAuthModal();
+      showToast('Welcome to TheDeepVerse! 📱', 'success');
+    } catch (error) {
+      console.error('[Auth] Phone Verification error:', error);
+      let message = 'Invalid verification code.';
+      if (error.code === 'auth/invalid-verification-code') {
+        message = 'Invalid verification code. Please try again.';
+      } else if (error.code === 'auth/code-expired') {
+        message = 'Verification code has expired. Please request a new code.';
+      } else if (error.code === 'auth/missing-verification-code') {
+        message = 'Please enter the verification code.';
+      }
+      showError(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResendCode() {
+    if (!auth || !phoneVerificationInProgress || !confirmationResult) return;
+
+    setLoading(true);
+    clearError();
+
+    try {
+      // Resend the code
+      await confirmationResult.verifyPhoneNumber();
+      showError('Verification code resent. Please check your phone.');
+    } catch (error) {
+      console.error('[Auth] Resend Code error:', error);
+      let message = 'Failed to resend verification code.';
+      if (error.code === 'auth/quota-exceeded') {
+        message = 'SMS quota exceeded. Please try again later.';
+      }
+      showError(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSignOut() {
+    if (!auth) return;
+
+    try {
+      await auth.signOut();
+      if (userDropdown) userDropdown.classList.remove('is-open');
+      showToast('Signed out successfully', 'info');
+    } catch (error) {
+      console.error('[Auth] Sign-Out error:', error);
+      showToast('Failed to sign out', 'error');
+    }
+  }
+
+  function toggleUserDropdown() {
+    if (userDropdown) {
+      userDropdown.classList.toggle('is-open');
+    }
+  }
+
+  // ── Toast (reuses main.js showToast if available) ──
+  function showToast(message, type) {
+    if (window.showToast) {
+      window.showToast(message, type);
+    } else {
+      // Fallback toast
+      const existing = document.querySelector('.toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.className = `toast toast--${type}`;
+      toast.textContent = message;
+      toast.setAttribute('role', 'alert');
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => toast.classList.add('is-visible'));
+
+      setTimeout(() => {
+        toast.classList.remove('is-visible');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+  }
+
+  // ── Export for global use ──
   window.TDVAuth = {
     openAuthModal: openAuthModal,
     closeAuthModal: closeAuthModal,
