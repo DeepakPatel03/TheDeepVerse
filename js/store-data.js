@@ -259,34 +259,23 @@ const StoreEngine = (function() {
     var defaultsMap = {};
     DEFAULT_PRODUCTS.forEach(function(dp) { defaultsMap[dp.id] = dp; });
 
-    // For existing products that match a DEFAULT id, sync price fields
-    // so admin test-price changes don't persist permanently
-    var existingIds = {};
-    products.forEach(function(p, i) {
-      existingIds[p.id] = true;
-      if (defaultsMap[p.id]) {
-        var dp = defaultsMap[p.id];
-        products[i].price = dp.price;
-        products[i].originalPrice = dp.originalPrice;
-        // Also sync modules if they exist in defaults but not in cached product
-        if (dp.modules && (!products[i].modules || !products[i].modules.length)) {
-          products[i].modules = dp.modules;
-        }
+    // Separate user-created products (not in defaults) from default products
+    var userProducts = [];
+    products.forEach(function(p) {
+      if (!defaultsMap[p.id]) {
+        // This is a user-created product from admin — keep it as-is
+        userProducts.push(p);
       }
+      // Default products are replaced entirely from code (below)
     });
 
-    // Add any new defaults not yet in the list
-    var added = false;
-    DEFAULT_PRODUCTS.forEach(function(dp) {
-      if (!existingIds[dp.id]) {
-        products.push({...dp});
-        added = true;
-      }
-    });
-    if (added) {
-      cacheProductsLocal(products);
-    }
-    return products;
+    // Start with fresh DEFAULT_PRODUCTS (authoritative prices, modules, etc.)
+    var merged = DEFAULT_PRODUCTS.map(function(dp) { return {...dp}; });
+
+    // Append user-created products after defaults
+    userProducts.forEach(function(up) { merged.push(up); });
+
+    return merged;
   }
 
   function getProducts() {
