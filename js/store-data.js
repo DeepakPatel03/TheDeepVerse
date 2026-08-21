@@ -99,6 +99,47 @@ const StoreEngine = (function() {
         { time: 3505, title: 'SEO', icon: '📊' },
         { time: 3660, title: 'Second Video Practical', icon: '🎬' }
       ],
+      modules: [
+        {
+          id: 'section-1',
+          title: 'Section 1 — AI Content Creation',
+          lessons: [
+            { id: 's1-l1', title: 'Introduction', timestamp: 0, timeText: '00:00', description: '', duration: '', published: true },
+            { id: 's1-l2', title: 'First Video Live Practical', timestamp: 179, timeText: '02:59', description: '', duration: '', published: true },
+            { id: 's1-l3', title: 'Master Prompt Copy Paste', timestamp: 181, timeText: '03:01', description: '', duration: '', published: true },
+            { id: 's1-l4', title: 'See the Magic of Master Prompt', timestamp: 312, timeText: '05:12', description: '', duration: '', published: true }
+          ]
+        },
+        {
+          id: 'section-2',
+          title: 'Section 2 — AI Generation',
+          lessons: [
+            { id: 's2-l1', title: 'Script Writing', timestamp: 460, timeText: '07:40', description: '', duration: '', published: true },
+            { id: 's2-l2', title: 'Scene Breakdown', timestamp: 625, timeText: '10:25', description: '', duration: '', published: true },
+            { id: 's2-l3', title: 'Image + Video Prompt', timestamp: 660, timeText: '11:00', description: '', duration: '', published: true },
+            { id: 's2-l4', title: 'Google Flow', timestamp: 713, timeText: '11:53', description: '', duration: '', published: true },
+            { id: 's2-l5', title: 'Same Character Idea', timestamp: 1145, timeText: '19:05', description: '', duration: '', published: true }
+          ]
+        },
+        {
+          id: 'section-3',
+          title: 'Section 3 — Voice + Editing',
+          lessons: [
+            { id: 's3-l1', title: 'Voice Generation (ElevenLabs)', timestamp: 1975, timeText: '32:55', description: '', duration: '', published: true },
+            { id: 's3-l2', title: 'Voice Editing', timestamp: 2161, timeText: '36:01', description: '', duration: '', published: true },
+            { id: 's3-l3', title: 'VPN Setup', timestamp: 2274, timeText: '37:54', description: '', duration: '', published: true },
+            { id: 's3-l4', title: 'Video Editing', timestamp: 2330, timeText: '38:50', description: '', duration: '', published: true }
+          ]
+        },
+        {
+          id: 'section-4',
+          title: 'Section 4 — Publishing',
+          lessons: [
+            { id: 's4-l1', title: 'SEO', timestamp: 3505, timeText: '58:25', description: '', duration: '', published: true },
+            { id: 's4-l2', title: 'Second Video Practical', timestamp: 3660, timeText: '01:01:00', description: '', duration: '', published: true }
+          ]
+        }
+      ],
       bonuses: [
         '🖤 Master Prompt 1 — Deep Black & White Cinematic Style, High Contrast Engraving Look, Psychological Documentary Style',
         '🎨 Master Prompt 2 — Same Engraving & Cinematic Style with Soft Natural Colors, Realistic Cinematic Feel'
