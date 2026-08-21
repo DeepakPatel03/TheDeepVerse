@@ -176,7 +176,7 @@ const StoreEngine = (function() {
   ];
 
   // ── Data versioning ──
-  const DATA_VERSION = '2026-08-12-v4'; // v4: Firebase Storage for images, auth dropdown fix
+  const DATA_VERSION = '2026-08-21-v5'; // v5: fix stale price from admin override, add modules
   const VERSION_KEY = 'tdv_data_version';
 
   // ── Firebase ──
@@ -255,9 +255,27 @@ const StoreEngine = (function() {
 
   // ── Core Methods ──
   function mergeNewDefaults(products) {
-    // If DEFAULT_PRODUCTS has new items not in the cached list, add them
+    // Build a map of default product IDs to their canonical data
+    var defaultsMap = {};
+    DEFAULT_PRODUCTS.forEach(function(dp) { defaultsMap[dp.id] = dp; });
+
+    // For existing products that match a DEFAULT id, sync price fields
+    // so admin test-price changes don't persist permanently
     var existingIds = {};
-    products.forEach(function(p) { existingIds[p.id] = true; });
+    products.forEach(function(p, i) {
+      existingIds[p.id] = true;
+      if (defaultsMap[p.id]) {
+        var dp = defaultsMap[p.id];
+        products[i].price = dp.price;
+        products[i].originalPrice = dp.originalPrice;
+        // Also sync modules if they exist in defaults but not in cached product
+        if (dp.modules && (!products[i].modules || !products[i].modules.length)) {
+          products[i].modules = dp.modules;
+        }
+      }
+    });
+
+    // Add any new defaults not yet in the list
     var added = false;
     DEFAULT_PRODUCTS.forEach(function(dp) {
       if (!existingIds[dp.id]) {
