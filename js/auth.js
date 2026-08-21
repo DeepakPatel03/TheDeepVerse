@@ -593,6 +593,28 @@
   }
 
   // Phone Authentication Handlers
+  let recaptchaVerifier = null;
+
+  function ensureRecaptcha() {
+    // Create invisible reCAPTCHA if not already created
+    if (recaptchaVerifier) return;
+    // Ensure container exists
+    if (!document.getElementById('recaptcha-container')) {
+      var div = document.createElement('div');
+      div.id = 'recaptcha-container';
+      document.body.appendChild(div);
+    }
+    try {
+      recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'invisible',
+        'callback': function() { /* reCAPTCHA solved */ },
+        'expired-callback': function() { recaptchaVerifier = null; }
+      });
+    } catch(e) {
+      console.error('[Auth] RecaptchaVerifier error:', e);
+    }
+  }
+
   async function handlePhoneSignInStart() {
     if (!auth) return;
 
@@ -610,12 +632,26 @@
       return;
     }
 
+    // Add +91 prefix if not present
+    var formattedPhone = phoneNumber;
+    if (!formattedPhone.startsWith('+')) {
+      formattedPhone = '+91' + formattedPhone.replace(/^0+/, '');
+    }
+
     setLoading(true);
     clearError();
 
     try {
+      // Initialize reCAPTCHA verifier (required for phone auth)
+      ensureRecaptcha();
+      if (!recaptchaVerifier) {
+        showError('reCAPTCHA failed to load. Please refresh the page.');
+        setLoading(false);
+        return;
+      }
+
       // Send verification code
-      confirmationResult = await auth.signInWithPhoneNumber(phoneNumber);
+      confirmationResult = await auth.signInWithPhoneNumber(formattedPhone, recaptchaVerifier);
       phoneVerificationInProgress = true;
 
       // Show verification code input
@@ -631,18 +667,22 @@
       if (phoneNumberSection) phoneNumberSection.style.display = 'none';
       if (verificationSection) verificationSection.style.display = 'block';
 
-      showError('Verification code sent. Please check your phone.');
+      showError('Verification code sent! Check your phone.');
     } catch (error) {
       console.error('[Auth] Phone Sign-In error:', error);
+      // Reset reCAPTCHA on failure so it can be retried
+      recaptchaVerifier = null;
       let message = 'Failed to send verification code.';
       if (error.code === 'auth/invalid-phone-number') {
-        message = 'Invalid phone number format.';
+        message = 'Invalid phone number. Use format: +91 98765 43210';
       } else if (error.code === 'auth/missing-phone-number') {
         message = 'Please enter a phone number.';
       } else if (error.code === 'auth/quota-exceeded') {
-        message = 'SMS quota exceeded. Please try again later.';
+        message = 'SMS limit reached. Please try again later or use Email/Google login.';
       } else if (error.code === 'auth/unauthorized-domain') {
-        message = 'This domain is not authorized for phone authentication.';
+        message = 'This domain is not authorized. Please use Email or Google login.';
+      } else if (error.code === 'auth/too-many-requests') {
+        message = 'Too many attempts. Please wait and try again.';
       }
       showError(message);
     } finally {
