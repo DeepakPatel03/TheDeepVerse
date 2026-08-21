@@ -447,6 +447,12 @@
         <p id="forceRefreshStatus" style="color:#22c55e;font-size:0.85rem;margin-top:8px;display:none"></p>
       </div>
 
+      <div class="data-section" style="border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.05)">
+        <h3>🔁 Restore Default Products</h3>
+        <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Agar koi default product (Psychology Book, AI Masterclass) accidentally delete ho gaya ho ya show nahi ho raha ho — yeh button dabao. Sab wapas aayenge.</p>
+        <button class="btn-admin" onclick="clearDeleteHistory()" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-size:1rem;padding:12px 24px">🔁 Restore Missing Products</button>
+      </div>
+
       <div class="data-section">
         <h3>🔐 Admin Password</h3>
         <p style="color:var(--admin-text-2);font-size:0.85rem;margin-bottom:16px">Current password is set in <code style="color:var(--admin-accent)">js/store-data.js</code> → search for <code style="color:var(--admin-accent)">ADMIN_PASSWORD</code></p>
@@ -1270,6 +1276,23 @@ function forceRefreshAll() {
     }).catch(function(err) {
       showToast('Error: ' + err.message, 'error');
     });
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// Restore accidentally hidden/deleted default products
+function clearDeleteHistory() {
+  if (!confirm('Kya aap deleted products ka history clear karna chahte ho? Isse DEFAULT products (Psychology Book, AI Masterclass) wapas show honge.')) return;
+  try {
+    localStorage.removeItem('tdv_deleted_products');
+    localStorage.removeItem('tdv_products');
+    localStorage.removeItem('tdv_data_version');
+    if (window.FirebaseDatabase) {
+      FirebaseDatabase.ref('deleted_products').remove();
+    }
+    showToast('✅ Delete history cleared! Page reload ho raha hai...', 'success');
+    setTimeout(function() { location.reload(); }, 1500);
   } catch(e) {
     showToast('Error: ' + e.message, 'error');
   }
