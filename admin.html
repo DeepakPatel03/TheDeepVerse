@@ -654,7 +654,16 @@ function doLogout() {
 if (StoreEngine.isAuthenticated()) {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'flex';
-  setTimeout(loadDashboard, 50);
+  // Give Firebase time to connect before first render
+  setTimeout(loadDashboard, 300);
+  // Re-render automatically whenever Firebase syncs new product data
+  if (window.StoreEngine && StoreEngine.subscribe) {
+    StoreEngine.subscribe(function() {
+      renderStats();
+      renderProducts();
+      updateDBStatus();
+    });
+  }
 }
 
 // ═══ DASHBOARD ═══
@@ -662,6 +671,8 @@ function loadDashboard() {
   updateDBStatus();
   renderStats();
   renderProducts();
+  // Re-check DB status after 2s (Firebase may still be connecting)
+  setTimeout(updateDBStatus, 2000);
 }
 
 // ── Database Status Banner ──
