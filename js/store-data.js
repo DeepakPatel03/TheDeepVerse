@@ -144,7 +144,12 @@ const StoreEngine = (function() {
         '🖤 Master Prompt 1 — Deep Black & White Cinematic Style, High Contrast Engraving Look, Psychological Documentary Style',
         '🎨 Master Prompt 2 — Same Engraving & Cinematic Style with Soft Natural Colors, Realistic Cinematic Feel'
       ],
-      method: 'Step 1: Purchase the course and login to your account.\\nStep 2: Open the Course Player from your Dashboard.\\nStep 3: Follow along with the video — pause and practice each step.\\nStep 4: Use the FREE Master Prompts to generate your own content.\\nStep 5: Create your first AI-powered video using the complete workflow.',
+      variants: [
+        { id: 'master-prompt-1', name: 'Master Prompt 1 (everything in black and white)', price: 69, originalPrice: 99, downloadUrl: '' },
+        { id: 'master-prompt-2', name: 'Master Prompt 2 (character is in its natural colour)', price: 69, originalPrice: 99, downloadUrl: '' },
+        { id: 'ai-masterclass-full', name: 'AI Content Creation Masterclass', price: 149, originalPrice: 499, downloadUrl: '' }
+      ],
+      method: 'Step 1: Purchase the course and login to your account.\nStep 2: Open the Course Player from your Dashboard.\nStep 3: Follow along with the video — pause and practice each step.\nStep 4: Use the FREE Master Prompts to generate your own content.\nStep 5: Create your first AI-powered video using the complete workflow.',
       price: 175,
       originalPrice: 499,
       tag: '65% OFF',
@@ -255,10 +260,34 @@ const StoreEngine = (function() {
 
   // ── Core Methods ──
   function mergeNewDefaults(products) {
-    // Only add DEFAULT products that don't already exist in the list.
     // Firebase/admin data takes full priority for existing products.
+    // But we sync MISSING fields from defaults (e.g. variants, modules, comboPrice)
+    // so new code-defined features appear even if Firebase has older data.
+    var defaultsMap = {};
+    DEFAULT_PRODUCTS.forEach(function(dp) { defaultsMap[dp.id] = dp; });
+
     var existingIds = {};
-    products.forEach(function(p) { existingIds[p.id] = true; });
+    products.forEach(function(p, i) {
+      existingIds[p.id] = true;
+      if (defaultsMap[p.id]) {
+        var dp = defaultsMap[p.id];
+        // Sync variants if default has them but Firebase product doesn't
+        if (dp.variants && dp.variants.length > 0 && (!p.variants || !p.variants.length)) {
+          products[i].variants = dp.variants;
+        }
+        // Sync modules if default has them but Firebase product doesn't
+        if (dp.modules && dp.modules.length > 0 && (!p.modules || !p.modules.length)) {
+          products[i].modules = dp.modules;
+        }
+        // Sync comboPrice if default has it but Firebase product doesn't
+        if (dp.comboPrice && !p.comboPrice) {
+          products[i].comboPrice = dp.comboPrice;
+          if (dp.comboOriginalPrice) products[i].comboOriginalPrice = dp.comboOriginalPrice;
+        }
+      }
+    });
+
+    // Add any completely new defaults not yet in the list
     var added = false;
     DEFAULT_PRODUCTS.forEach(function(dp) {
       if (!existingIds[dp.id]) {
