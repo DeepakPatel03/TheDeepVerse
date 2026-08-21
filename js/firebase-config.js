@@ -33,8 +33,9 @@ if (FIREBASE_ENABLED && typeof firebase !== 'undefined') {
     } else {
       firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
     }
-    firebaseAuth = firebaseApp.auth();
-    firebaseDatabase = firebaseApp.database();
+    // Auth SDK may not be loaded on all pages (e.g. admin.html only loads database)
+    try { firebaseAuth = firebaseApp.auth(); } catch(_) { firebaseAuth = null; }
+    try { firebaseDatabase = firebaseApp.database(); } catch(_) { firebaseDatabase = null; }
     console.log('[Firebase] Initialized successfully');
   } catch (e) {
     console.error('[Firebase] Initialization error:', e);
