@@ -623,15 +623,18 @@
       }
       var v = currentProduct.variants[index];
       var dlUrl = v.downloadUrl || '';
-      if (!dlUrl) { alert('Download link not set yet.'); return; }
+      var isVideoCourse = currentProduct.type === 'video-course';
+
+      // For non-video products, download URL is required
+      if (!dlUrl && !isVideoCourse) { alert('Download link not set yet.'); return; }
 
       if (v.price === 0) {
-        window.open(dlUrl, '_blank');
+        if (dlUrl) window.open(dlUrl, '_blank');
         return;
       }
       ensureLoggedIn().then(function(user) {
-        if (!user) return; // user cancelled the login
-        processPayment(currentProduct.id + '_' + (v.id || v.name.replace(/[^a-zA-Z0-9]/g, '')), v.price, v.name, [dlUrl]);
+        if (!user) return;
+        processPayment(currentProduct.id + '_' + (v.id || v.name.replace(/[^a-zA-Z0-9]/g, '')), v.price, v.name, dlUrl ? [dlUrl] : []);
       });
     };
 
@@ -639,7 +642,8 @@
     window.buyCombo = function() {
       if (!currentProduct || !currentProduct.variants) return;
       var allUrls = currentProduct.variants.map(function(v) { return v.downloadUrl; }).filter(Boolean);
-      if (allUrls.length === 0) { alert('Download links not set yet.'); return; }
+      var isVideoCourse = currentProduct.type === 'video-course';
+      if (allUrls.length === 0 && !isVideoCourse) { alert('Download links not set yet.'); return; }
       ensureLoggedIn().then(function(user) {
         if (!user) return;
         var count = currentProduct.variants.length;
