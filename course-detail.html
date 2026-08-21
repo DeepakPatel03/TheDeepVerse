@@ -463,8 +463,51 @@
         '<div class="course-gallery">' + galleryHtml + '</div>' +
       '</section>';
 
-      // Curriculum
-      if (p.curriculum && p.curriculum.length > 0) {
+      // Curriculum / Course Modules
+      // If product has structured modules, show them as accordion sections
+      var hasModules = p.modules && p.modules.length > 0;
+      if (hasModules) {
+        var totalLessons = 0;
+        p.modules.forEach(function(m) { totalLessons += (m.lessons || []).length; });
+
+        var modulesHtml = '';
+        p.modules.forEach(function(mod, mi) {
+          var lessonCount = (mod.lessons || []).length;
+          var lessonsHtml = (mod.lessons || []).map(function(l) {
+            var timeLabel = l.timeText || '';
+            return '<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.03)">' +
+              '<span style="color:rgba(212,175,55,0.6);font-size:0.85rem;width:20px;text-align:center">🔒</span>' +
+              '<div style="flex:1;min-width:0">' +
+                '<div style="font-size:0.9rem;color:var(--text-primary)">' + (l.title || 'Lesson') + '</div>' +
+              '</div>' +
+              (timeLabel ? '<span style="font-size:0.75rem;color:var(--text-muted);flex-shrink:0">' + timeLabel + '</span>' : '') +
+            '</div>';
+          }).join('');
+
+          modulesHtml += '<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;margin-bottom:12px;overflow:hidden">' +
+            '<div onclick="this.parentElement.querySelector(\'.mod-body\').style.display=this.parentElement.querySelector(\'.mod-body\').style.display===\'none\'?\'\':\'none\';this.querySelector(\'.mod-arrow\').textContent=this.parentElement.querySelector(\'.mod-body\').style.display===\'none\'?\'▸\':\'▾\'" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;background:rgba(255,255,255,0.03)">' +
+              '<div style="display:flex;align-items:center;gap:10px">' +
+                '<span class="mod-arrow" style="color:var(--accent-gold);font-size:0.9rem">▾</span>' +
+                '<span style="font-weight:600;font-size:0.95rem;color:var(--text-primary)">' + (mod.title || 'Section ' + (mi+1)) + '</span>' +
+              '</div>' +
+              '<span style="font-size:0.75rem;color:var(--text-muted)">' + lessonCount + ' lessons</span>' +
+            '</div>' +
+            '<div class="mod-body">' + lessonsHtml + '</div>' +
+          '</div>';
+        });
+
+        html += '<section class="course-section" id="section-curriculum">' +
+          '<h2 class="course-section__title"><span class="course-section__title-icon">📚</span> Course Content</h2>' +
+          '<div style="display:flex;gap:16px;margin-bottom:16px;font-size:0.85rem;color:var(--text-muted)">' +
+            '<span>' + p.modules.length + ' Sections</span>' +
+            '<span>•</span>' +
+            '<span>' + totalLessons + ' Lessons</span>' +
+            (p.duration ? '<span>•</span><span>' + p.duration + '</span>' : '') +
+          '</div>' +
+          modulesHtml +
+        '</section>';
+      } else if (p.curriculum && p.curriculum.length > 0) {
+        // Fallback: simple curriculum list
         var currHtml = p.curriculum.map(function(item) {
           return '<li class="course-curriculum__item">' +
             '<div class="course-curriculum__num"></div>' +

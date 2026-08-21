@@ -255,27 +255,21 @@ const StoreEngine = (function() {
 
   // ── Core Methods ──
   function mergeNewDefaults(products) {
-    // Build a map of default product IDs to their canonical data
-    var defaultsMap = {};
-    DEFAULT_PRODUCTS.forEach(function(dp) { defaultsMap[dp.id] = dp; });
-
-    // Separate user-created products (not in defaults) from default products
-    var userProducts = [];
-    products.forEach(function(p) {
-      if (!defaultsMap[p.id]) {
-        // This is a user-created product from admin — keep it as-is
-        userProducts.push(p);
+    // Only add DEFAULT products that don't already exist in the list.
+    // Firebase/admin data takes full priority for existing products.
+    var existingIds = {};
+    products.forEach(function(p) { existingIds[p.id] = true; });
+    var added = false;
+    DEFAULT_PRODUCTS.forEach(function(dp) {
+      if (!existingIds[dp.id]) {
+        products.push({...dp});
+        added = true;
       }
-      // Default products are replaced entirely from code (below)
     });
-
-    // Start with fresh DEFAULT_PRODUCTS (authoritative prices, modules, etc.)
-    var merged = DEFAULT_PRODUCTS.map(function(dp) { return {...dp}; });
-
-    // Append user-created products after defaults
-    userProducts.forEach(function(up) { merged.push(up); });
-
-    return merged;
+    if (added) {
+      cacheProductsLocal(products);
+    }
+    return products;
   }
 
   function getProducts() {
