@@ -247,7 +247,7 @@
       formSignUp.addEventListener('submit', handleSignUp);
     }
     if (formPhone) {
-      formPhone.addEventListener('submit', handlePhoneSignIn);
+      formPhone.addEventListener('submit', function(e) { e.preventDefault(); handlePhoneSignInStart(); });
     }
 
     // Google Sign-In
@@ -403,6 +403,8 @@
     resetForms();
     phoneVerificationInProgress = false;
     confirmationResult = null;
+    // Resolve pending requireLogin() promises with null so buy buttons don't hang
+    rejectLoginWaiters();
   }
 
   function switchTab(tab) {
@@ -442,6 +444,17 @@
     if (authError) {
       authError.textContent = message;
       authError.style.display = 'block';
+      authError.style.color = '#ef4444';
+      authError.style.background = 'rgba(239,68,68,0.1)';
+    }
+  }
+
+  function showSuccess(message) {
+    if (authError) {
+      authError.textContent = message;
+      authError.style.display = 'block';
+      authError.style.color = '#22c55e';
+      authError.style.background = 'rgba(34,197,94,0.1)';
     }
   }
 
@@ -516,17 +529,19 @@
       showToast('Welcome back! 👋', 'success');
     } catch (error) {
       console.error('[Auth] Sign-In error:', error);
-      let message = 'Sign-in failed. Please check your credentials.';
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
-        message = 'No account found or incorrect password. Please check your credentials.';
+      let message = 'Sign-in failed. Please try again.';
+      if (error.code === 'auth/user-not-found') {
+        message = 'No account found with this email. Please sign up first.';
+      } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        message = 'Incorrect password. Please try again.';
       } else if (error.code === 'auth/invalid-email') {
         message = 'Invalid email address.';
       } else if (error.code === 'auth/too-many-requests') {
-        message = 'Too many attempts. Please try again later.';
+        message = 'Too many failed attempts. Please wait a few minutes and try again.';
       } else if (error.code === 'auth/network-request-failed') {
-        message = 'Network error. Check your connection and try again.';
+        message = 'Network error. Check your internet connection and try again.';
       } else if (error.code === 'auth/user-disabled') {
-        message = 'This account has been disabled.';
+        message = 'This account has been disabled. Contact support.';
       }
       showError(message);
     } finally {
@@ -667,7 +682,7 @@
       if (phoneNumberSection) phoneNumberSection.style.display = 'none';
       if (verificationSection) verificationSection.style.display = 'block';
 
-      showError('Verification code sent! Check your phone.');
+      showSuccess('✅ Verification code sent! Check your phone.');
     } catch (error) {
       console.error('[Auth] Phone Sign-In error:', error);
       // Reset reCAPTCHA on failure so it can be retried
@@ -734,7 +749,7 @@
     try {
       // Resend the code
       await confirmationResult.verifyPhoneNumber();
-      showError('Verification code resent. Please check your phone.');
+      showSuccess('✅ Verification code resent. Please check your phone.');
     } catch (error) {
       console.error('[Auth] Resend Code error:', error);
       let message = 'Failed to resend verification code.';

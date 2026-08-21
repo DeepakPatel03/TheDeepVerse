@@ -258,6 +258,18 @@ const StoreEngine = (function() {
     }
   }
 
+  // ── Delete Tracking ── (prevents deleted DEFAULT products from resurrecting)
+  var DELETED_KEY = 'tdv_deleted_products';
+  function getDeletedIds() {
+    try { return JSON.parse(localStorage.getItem(DELETED_KEY) || '[]'); } catch(e) { return []; }
+  }
+  function addDeletedId(id) {
+    var deleted = getDeletedIds();
+    if (deleted.indexOf(id) === -1) { deleted.push(id); localStorage.setItem(DELETED_KEY, JSON.stringify(deleted)); }
+    // Also save to Firebase so other devices see deletions
+    if (firebaseDB) { try { firebaseDB.ref('deleted_products').set(deleted); } catch(e) {} }
+  }
+
   // ── Core Methods ──
   function mergeNewDefaults(products) {
     // Firebase/admin data takes full priority for existing products.
@@ -265,6 +277,7 @@ const StoreEngine = (function() {
     // so new code-defined features appear even if Firebase has older data.
     var defaultsMap = {};
     DEFAULT_PRODUCTS.forEach(function(dp) { defaultsMap[dp.id] = dp; });
+    var deletedIds = getDeletedIds();
 
     var existingIds = {};
     products.forEach(function(p, i) {
@@ -287,10 +300,10 @@ const StoreEngine = (function() {
       }
     });
 
-    // Add any completely new defaults not yet in the list
+    // Add any completely new defaults not yet in the list (unless admin deleted them)
     var added = false;
     DEFAULT_PRODUCTS.forEach(function(dp) {
-      if (!existingIds[dp.id]) {
+      if (!existingIds[dp.id] && deletedIds.indexOf(dp.id) === -1) {
         products.push({...dp});
         added = true;
       }
@@ -335,6 +348,10 @@ const StoreEngine = (function() {
   function addProduct(product) {
     const products = getProducts();
     product.id = product.id || 'product-' + Date.now();
+    // Prevent duplicate IDs
+    if (products.some(p => p.id === product.id)) {
+      product.id = product.id + '-' + Date.now();
+    }
     product.createdAt = Date.now();
     product.active = product.active !== false;
     products.push(product);
@@ -354,6 +371,8 @@ const StoreEngine = (function() {
   function deleteProduct(id) {
     const products = getProducts().filter(p => p.id !== id);
     saveProducts(products);
+    // Track deletion so default products don't resurrect
+    addDeletedId(id);
     return true;
   }
 
