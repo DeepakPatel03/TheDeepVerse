@@ -464,8 +464,23 @@
       '</section>';
 
       // Curriculum / Course Modules
-      // If product has structured modules, show them as accordion sections
+      // Try p.modules first, then fall back to Firebase curriculum/{id} node
       var hasModules = p.modules && p.modules.length > 0;
+      if (!hasModules && window.FirebaseDatabase) {
+        // Try fetching from curriculum node (admin curriculum editor saves here)
+        window.FirebaseDatabase.ref('curriculum/' + p.id + '/modules').once('value').then(function(snap) {
+          var fbModules = snap.val();
+          if (fbModules) {
+            var mArr = Array.isArray(fbModules) ? fbModules : Object.values(fbModules);
+            mArr = mArr.filter(function(m) { return m && m.title; });
+            if (mArr.length > 0) {
+              p.modules = mArr;
+              // Re-render content with updated modules
+              renderContent(p);
+            }
+          }
+        }).catch(function() {});
+      }
       if (hasModules) {
         var totalLessons = 0;
         p.modules.forEach(function(m) { totalLessons += (m.lessons || []).length; });

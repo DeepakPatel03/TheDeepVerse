@@ -1858,10 +1858,14 @@ function saveCurriculum() {
       l.published = l.published !== false;
     });
   });
+
+  // Save to curriculum/{productId} node (for course player)
   window.UserSystem.saveCurriculum(curProduct.id, curModules).then(function() {
-    showToast('✅ Curriculum saved! Students will see updated lessons instantly.', 'success');
+    // ALSO update the product's modules field so course-detail.html shows updated content
+    StoreEngine.updateProduct(curProduct.id, { modules: curModules });
+    showToast('✅ Curriculum saved! Course content updated on website.', 'success');
     if (statusEl) {
-      statusEl.textContent = 'Saved at ' + new Date().toLocaleTimeString() + ' — students see updates automatically.';
+      statusEl.textContent = 'Saved at ' + new Date().toLocaleTimeString() + ' — course detail page updated.';
       statusEl.style.display = 'block';
       setTimeout(function() { statusEl.style.display = 'none'; }, 6000);
     }
