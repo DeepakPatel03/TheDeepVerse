@@ -181,7 +181,7 @@ const StoreEngine = (function() {
   ];
 
   // ── Data versioning ──
-  const DATA_VERSION = '2026-08-22-v6'; // v5: fix stale price from admin override, add modules
+  const DATA_VERSION = '2026-08-22-v7'; // v7: strip base64 from cache/Firebase, price fix
   const VERSION_KEY = 'tdv_data_version';
 
   // ── Firebase ──
@@ -255,19 +255,35 @@ const StoreEngine = (function() {
     }
   }
 
-  // Safely cache a product list. Base64 images can exceed localStorage quota,
-  // so we only cache when the serialized payload is reasonably small.
+  // Safely cache a product list.
+  // Base64 images are stripped before caching (Firebase keeps the full data).
+  // This ensures price/variant changes always get cached regardless of image size.
+  function stripBase64(products) {
+    return products.map(function(p) {
+      if (!p) return p;
+      var stripped = Object.assign({}, p);
+      // Remove base64 data URLs — keep only http/https URLs
+      if (stripped.thumbnail && stripped.thumbnail.startsWith('data:')) stripped.thumbnail = '';
+      if (stripped.thumbnailUrl && stripped.thumbnailUrl.startsWith('data:')) stripped.thumbnailUrl = '';
+      if (stripped.hdThumbnail && stripped.hdThumbnail.startsWith('data:')) stripped.hdThumbnail = '';
+      if (Array.isArray(stripped.images)) {
+        stripped.images = stripped.images.map(function(img) {
+          return (img && img.startsWith && img.startsWith('data:')) ? '' : img;
+        }).filter(Boolean);
+      }
+      return stripped;
+    });
+  }
+
   function cacheProductsLocal(data) {
     try {
-      var json = JSON.stringify(data);
-      // ~250 KB max cached payload; larger lists (with base64 images) are still
-      // served live from Firebase instead of localStorage.
-      if (json.length < 250000) {
-        localStorage.setItem(STORAGE_KEY, json);
-      }
+      // Strip base64 images so payload stays small regardless of thumbnails
+      var stripped = stripBase64(data);
+      var json = JSON.stringify(stripped);
+      localStorage.setItem(STORAGE_KEY, json);
     } catch(e) {
       try { localStorage.removeItem(STORAGE_KEY); } catch(_) {}
-      console.warn('[StoreEngine] Skipped localStorage cache (size/quota)', e.message);
+      console.warn('[StoreEngine] Skipped localStorage cache:', e.message);
     }
   }
 
@@ -355,11 +371,20 @@ const StoreEngine = (function() {
 
 
   function saveProducts(products) {
+    // Cache full data locally (images are already stripped in cacheProductsLocal)
     cacheProductsLocal(products);
     if (firebaseReady && firebaseDB) {
-      firebaseDB.ref('products').set(products)
-        .then(function() { console.log('[StoreEngine] Saved to Firebase ✅'); notifyChange(); })
-        .catch(function(e) { console.error('[StoreEngine] Firebase save failed:', e); });
+      // Strip base64 images before sending to Firebase — only URLs go to Firebase
+      // Base64 images are too large and cause Firebase write failures silently
+      var toSave = stripBase64(products);
+      firebaseDB.ref('products').set(toSave)
+        .then(function() {
+          console.log('[StoreEngine] Saved to Firebase ✅ (' + toSave.length + ' products)');
+          notifyChange();
+        })
+        .catch(function(e) {
+          console.error('[StoreEngine] Firebase save failed:', e.code, e.message);
+        });
     }
     return true;
   }

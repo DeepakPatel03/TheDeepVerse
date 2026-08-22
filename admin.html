@@ -170,8 +170,8 @@
                   </label>
                   <button type="button" class="btn-admin btn-admin--danger btn-admin--sm" onclick="clearThumbnail()" style="flex-shrink:0;">✕ Remove</button>
                 </div>
-                <input type="text" id="pThumbnail" placeholder="Or paste image URL here..." oninput="previewThumb()">
-                <small>Upload from device (recommended) or paste a direct image URL (.jpg/.png)</small>
+                <input type="text" id="pThumbnail" placeholder="Paste direct image URL — https://... (.jpg/.png/.webp)" oninput="previewThumb()">
+                <small style="color:#f59e0b">⚠️ <strong>Live website ke liye URL use karo</strong> — Google Drive → Share → Direct link ya ImgBB/Postimg URL. Device upload sirf local preview ke liye hai.</small>
               </div>
             </div>
           </div>
@@ -938,7 +938,8 @@ function handleImageUpload(event) {
     var img = new Image();
     img.onload = function() {
       var canvas = document.createElement('canvas');
-      var maxSize = 400;
+      // Max 200px for smaller payload — but ideally use an image URL!
+      var maxSize = 200;
       var w = img.width, h = img.height;
       if (w > maxSize || h > maxSize) {
         if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
@@ -948,10 +949,11 @@ function handleImageUpload(event) {
       canvas.height = h;
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, w, h);
-      var dataUrl = canvas.toDataURL('image/jpeg', 0.3);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.2);
       document.getElementById('pThumbnail').value = dataUrl;
       previewThumb();
-      showToast('✅ Thumbnail loaded! (' + w + 'x' + h + ')', 'success');
+      // Warn user: base64 images don't persist to Firebase
+      showToast('⚠️ Image loaded locally. For LIVE website, paste an image URL (Google Drive, etc.) instead!', 'error');
     };
     img.onerror = function() {
       showToast('Could not read image.', 'error');
