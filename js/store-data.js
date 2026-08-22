@@ -216,12 +216,25 @@ const StoreEngine = (function() {
       firebaseReady = true;
       console.log('[StoreEngine] Firebase connected ✅');
       firebaseDB.ref('products').on('value', function(snapshot) {
-        const data = snapshot.val();
-        if (data && Array.isArray(data)) {
-          firebaseProducts = data;
-          cacheProductsLocal(data);
+        var data = snapshot.val();
+        var products = null;
+
+        if (data) {
+          if (Array.isArray(data)) {
+            // Normal array format
+            products = data.filter(function(p) { return p && p.id; });
+          } else if (typeof data === 'object') {
+            // Firebase sometimes returns an object {0: {...}, 1: {...}} instead of array
+            // This happens when items were deleted and re-added
+            products = Object.values(data).filter(function(p) { return p && p.id; });
+          }
+        }
+
+        if (products && products.length > 0) {
+          firebaseProducts = products;
+          cacheProductsLocal(products);
           notifyChange();
-          console.log('[StoreEngine] Products synced from Firebase (' + data.length + ')');
+          console.log('[StoreEngine] Products synced from Firebase (' + products.length + ')');
         }
       });
       // Check cacheVersion — if admin triggered Force Refresh, clear local cache
