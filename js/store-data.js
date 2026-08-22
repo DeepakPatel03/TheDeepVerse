@@ -221,11 +221,8 @@ const StoreEngine = (function() {
 
         if (data) {
           if (Array.isArray(data)) {
-            // Normal array format
             products = data.filter(function(p) { return p && p.id; });
           } else if (typeof data === 'object') {
-            // Firebase sometimes returns an object {0: {...}, 1: {...}} instead of array
-            // This happens when items were deleted and re-added
             products = Object.values(data).filter(function(p) { return p && p.id; });
           }
         }
@@ -235,6 +232,9 @@ const StoreEngine = (function() {
           cacheProductsLocal(products);
           notifyChange();
           console.log('[StoreEngine] Products synced from Firebase (' + products.length + ')');
+        } else {
+          // Firebase is empty — seed default products (first install)
+          seedFirebaseIfEmpty(products);
         }
       });
       // Check cacheVersion — if admin triggered Force Refresh, clear local cache
@@ -284,67 +284,75 @@ const StoreEngine = (function() {
   }
 
   // ── Core Methods ──
+  // Firebase is the SINGLE SOURCE OF TRUTH.
+  // On first launch (empty Firebase), DEFAULT_PRODUCTS are seeded once.
+  // After that, admin controls everything — no code changes needed.
+  var firebaseSeeded = false;
+
+  function seedFirebaseIfEmpty(products) {
+    // Only seed if Firebase is connected and products array is empty
+    if (!firebaseDB || firebaseSeeded) return;
+    firebaseSeeded = true;
+    if (!products || products.length === 0) {
+      console.log('[StoreEngine] Firebase empty — seeding DEFAULT_PRODUCTS...');
+      firebaseDB.ref('products').set(DEFAULT_PRODUCTS)
+        .then(function() { console.log('[StoreEngine] Default products seeded to Firebase ✅'); })
+        .catch(function(e) { console.error('[StoreEngine] Seed failed:', e); });
+    }
+  }
+
   function mergeNewDefaults(products) {
-    // Firebase/admin data takes full priority for existing products.
-    // But we sync MISSING fields from defaults (e.g. variants, modules, comboPrice)
-    // so new code-defined features appear even if Firebase has older data.
+    // ONLY sync MISSING structural fields (variants, modules, comboPrice)
+    // from code defaults to Firebase products that are missing them.
+    // NEVER add or remove products — admin controls that.
     var defaultsMap = {};
     DEFAULT_PRODUCTS.forEach(function(dp) { defaultsMap[dp.id] = dp; });
-    var deletedIds = getDeletedIds();
 
-    var existingIds = {};
     products.forEach(function(p, i) {
-      existingIds[p.id] = true;
-      if (defaultsMap[p.id]) {
-        var dp = defaultsMap[p.id];
-        // Sync variants if default has them but Firebase product doesn't
-        if (dp.variants && dp.variants.length > 0 && (!p.variants || !p.variants.length)) {
-          products[i].variants = dp.variants;
-        }
-        // Sync modules if default has them but Firebase product doesn't
-        if (dp.modules && dp.modules.length > 0 && (!p.modules || !p.modules.length)) {
-          products[i].modules = dp.modules;
-        }
-        // Sync comboPrice if default has it but Firebase product doesn't
-        if (dp.comboPrice && !p.comboPrice) {
-          products[i].comboPrice = dp.comboPrice;
-          if (dp.comboOriginalPrice) products[i].comboOriginalPrice = dp.comboOriginalPrice;
-        }
+      if (!p || !p.id) return;
+      var dp = defaultsMap[p.id];
+      if (!dp) return;
+      // Sync variants only if Firebase product has none
+      if (dp.variants && dp.variants.length > 0 && (!p.variants || !p.variants.length)) {
+        products[i].variants = dp.variants;
+      }
+      // Sync modules only if Firebase product has none
+      if (dp.modules && dp.modules.length > 0 && (!p.modules || !p.modules.length)) {
+        products[i].modules = dp.modules;
+      }
+      // Sync comboPrice only if missing
+      if (dp.comboPrice && !p.comboPrice) {
+        products[i].comboPrice = dp.comboPrice;
+        if (dp.comboOriginalPrice) products[i].comboOriginalPrice = dp.comboOriginalPrice;
       }
     });
-
-    // Add any completely new defaults not yet in the list (unless admin deleted them)
-    var added = false;
-    DEFAULT_PRODUCTS.forEach(function(dp) {
-      if (!existingIds[dp.id] && deletedIds.indexOf(dp.id) === -1) {
-        products.push({...dp});
-        added = true;
-      }
-    });
-    if (added) {
-      cacheProductsLocal(products);
-    }
     return products;
   }
 
   function getProducts() {
-    var products = null;
+    // 1. Firebase is ready and has products — USE THEM (source of truth)
     if (firebaseProducts && firebaseProducts.length > 0) {
-      products = [...firebaseProducts];
-    } else {
-      try {
-        const storedVersion = localStorage.getItem(VERSION_KEY);
-        if (storedVersion !== DATA_VERSION) {
-          localStorage.removeItem(STORAGE_KEY);
-          localStorage.setItem(VERSION_KEY, DATA_VERSION);
-        }
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) products = JSON.parse(stored);
-      } catch(e) { console.error('StoreEngine: Error reading products', e); }
+      return mergeNewDefaults([...firebaseProducts]);
     }
-    if (!products || products.length === 0) return [...DEFAULT_PRODUCTS];
-    return mergeNewDefaults(products);
+    // 2. Firebase not yet connected — try localStorage cache
+    try {
+      var storedVersion = localStorage.getItem(VERSION_KEY);
+      if (storedVersion !== DATA_VERSION) {
+        // Version mismatch — clear stale cache
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(DELETED_KEY);
+        localStorage.setItem(VERSION_KEY, DATA_VERSION);
+      }
+      var stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        var cached = JSON.parse(stored);
+        if (cached && cached.length > 0) return mergeNewDefaults(cached);
+      }
+    } catch(e) { console.error('[StoreEngine] Cache read error:', e); }
+    // 3. Nothing available yet — return defaults as placeholder only
+    return [...DEFAULT_PRODUCTS];
   }
+
 
   function saveProducts(products) {
     cacheProductsLocal(products);
