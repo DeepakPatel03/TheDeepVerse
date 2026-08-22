@@ -181,7 +181,7 @@ const StoreEngine = (function() {
   ];
 
   // ── Data versioning ──
-  const DATA_VERSION = '2026-08-21-v5'; // v5: fix stale price from admin override, add modules
+  const DATA_VERSION = '2026-08-22-v6'; // v5: fix stale price from admin override, add modules
   const VERSION_KEY = 'tdv_data_version';
 
   // ── Firebase ──
