@@ -432,6 +432,63 @@
       sidebarHtml += '</div>';
 
       document.getElementById('heroSidebar').innerHTML = sidebarHtml;
+      checkAndRenderOwnedState(p);
+    }
+
+    // Displays an "Already Owned" card with direct downloads and video player link if student owns this
+    function checkAndRenderOwnedState(p) {
+      if (!p || !window.FirebaseAuth || !window.UserSystem) return;
+      var user = window.FirebaseAuth.currentUser;
+      if (!user) {
+        // Check again once auth state is ready
+        window.FirebaseAuth.onAuthStateChanged(function(u) {
+          if (u && currentProduct) checkAndRenderOwnedState(currentProduct);
+        });
+        return;
+      }
+
+      window.UserSystem.isPurchased(user.uid, p.id).then(function(owned) {
+        if (!owned) return;
+        var isVideoCourse = p.type === 'video-course' || p.type === 'course';
+        var resources = window.UserSystem.getCourseResources ? window.UserSystem.getCourseResources(p) : [];
+
+        var heroSidebar = document.getElementById('heroSidebar');
+        if (!heroSidebar) return;
+
+        var ownedBox = document.getElementById('alreadyOwnedBanner');
+        if (!ownedBox) {
+          ownedBox = document.createElement('div');
+          ownedBox.id = 'alreadyOwnedBanner';
+          ownedBox.style.cssText = 'background:linear-gradient(135deg,rgba(34,197,94,0.18),rgba(34,197,94,0.05));border:2px solid rgba(34,197,94,0.5);border-radius:14px;padding:20px;margin-bottom:18px;text-align:center;box-shadow:0 8px 25px rgba(34,197,94,0.15);animation:fadeIn 0.4s ease';
+          heroSidebar.insertBefore(ownedBox, heroSidebar.firstChild);
+        }
+
+        var h = '<div style="font-size:2.2rem;margin-bottom:6px">🎉</div>';
+        h += '<div style="color:#22c55e;font-size:1.15rem;font-weight:700;margin-bottom:4px">You Own This Course!</div>';
+        h += '<p style="color:var(--text-muted);font-size:0.82rem;margin:0 0 14px 0">All course lessons, master prompts, and files are permanently saved to your account.</p>';
+
+        if (isVideoCourse) {
+          h += '<a href="course-player.html?id=' + encodeURIComponent(p.id) + '" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#d4af37,#b8962e);color:#000;font-weight:800;padding:12px 20px;border-radius:8px;text-decoration:none;font-size:0.95rem;margin-bottom:12px;box-shadow:0 4px 15px rgba(212,175,55,0.4)">▶️ Open Course Video Player</a>';
+        }
+
+        if (resources && resources.length > 0) {
+          h += '<div style="text-align:left;background:rgba(0,0,0,0.3);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);margin-bottom:12px">';
+          h += '<div style="font-size:0.8rem;font-weight:700;color:var(--accent,#d4af37);margin-bottom:8px">📥 Download Master Prompts & Files:</div>';
+          h += '<div style="display:flex;flex-direction:column;gap:6px">';
+          resources.forEach(function(r) {
+            var isPrompt = r.type === 'prompt' || (r.name && r.name.toLowerCase().indexOf('prompt') !== -1);
+            h += '<a href="' + r.downloadUrl + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.06);padding:8px 12px;border-radius:6px;color:#fff;text-decoration:none;font-size:0.82rem;border:1px solid rgba(255,255,255,0.1)">';
+            h += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px">' + (isPrompt ? '⚡ ' : '📄 ') + (r.name || 'Material') + '</span>';
+            h += '<span style="color:#22c55e;font-weight:700;flex-shrink:0">Download ↗</span>';
+            h += '</a>';
+          });
+          h += '</div></div>';
+        }
+
+        h += '<a href="dashboard.html" style="display:inline-block;color:var(--accent,#d4af37);font-size:0.82rem;text-decoration:none">Go to My Courses in Dashboard →</a>';
+
+        ownedBox.innerHTML = h;
+      });
     }
 
     // ── Render Content Sections ──
@@ -705,55 +762,58 @@
     }
 
     // Show download section on the page after successful payment
-    function showDownloadSection(paymentId, description, downloadUrls) {
-      // Detect if URL is YouTube
+    function showDownloadSection(paymentId, description, downloadUrls, hasCourseAccess, courseId) {
       function isYouTube(url) { return url && (url.indexOf('youtube.com') !== -1 || url.indexOf('youtu.be') !== -1); }
 
-      // Create download section HTML
-      var dlHtml = '<div id="postPaymentDownload" style="background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(34,197,94,0.03));border:2px solid rgba(34,197,94,0.4);border-radius:16px;padding:24px;margin:24px 0;text-align:center;animation:fadeIn 0.5s ease">';
-      dlHtml += '<div style="font-size:2.5rem;margin-bottom:8px">✅</div>';
-      dlHtml += '<h2 style="color:#22c55e;font-size:1.3rem;margin-bottom:4px">Payment Successful!</h2>';
-      dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:4px">Payment ID: ' + paymentId + '</p>';
-      dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">' + description + '</p>';
-      dlHtml += '<div style="display:flex;flex-direction:column;gap:10px;max-width:400px;margin:0 auto">';
+      var dlHtml = '<div id="postPaymentDownload" style="background:linear-gradient(135deg,rgba(34,197,94,0.12),rgba(34,197,94,0.03));border:2px solid rgba(34,197,94,0.4);border-radius:16px;padding:24px;margin:24px 0;text-align:center;animation:fadeIn 0.5s ease">';
+      dlHtml += '<div style="font-size:2.8rem;margin-bottom:8px">🎉</div>';
+      dlHtml += '<h2 style="color:#22c55e;font-size:1.4rem;margin-bottom:4px">Payment Successful!</h2>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:4px">Payment ID: <code style="color:#d4af37">' + paymentId + '</code></p>';
+      dlHtml += '<p style="color:#fff;font-size:0.95rem;font-weight:600;margin-bottom:18px">' + description + '</p>';
 
-      // Get variant names for labels
-      var variantNames = [];
-      if (currentProduct && currentProduct.variants) {
-        variantNames = currentProduct.variants.map(function(v) { return v.name; });
+      if (hasCourseAccess && courseId) {
+        dlHtml += '<div style="margin-bottom:20px">';
+        dlHtml += '<a href="course-player.html?id=' + encodeURIComponent(courseId) + '&new_purchase=1" style="display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#d4af37,#b8962e);color:#000;font-weight:800;padding:15px 24px;border-radius:10px;text-decoration:none;font-size:1.05rem;box-shadow:0 6px 20px rgba(212,175,55,0.4);transition:transform 0.2s">';
+        dlHtml += '<span>▶️ Watch Video Course Now</span>';
+        dlHtml += '</a>';
+        dlHtml += '</div>';
       }
 
-      downloadUrls.forEach(function(url, i) {
-        var label = variantNames[i] || (downloadUrls.length > 1 ? 'File ' + (i + 1) : 'Your File');
-        
-        if (isYouTube(url)) {
-          // YouTube video — Watch button + Copy button
-          dlHtml += '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px">';
-          dlHtml += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:8px">🎬 ' + label + '</div>';
-          dlHtml += '<a href="' + url + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-weight:700;padding:14px 20px;border-radius:10px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);margin-bottom:8px">▶️ Watch Video Now</a>';
-          dlHtml += '<button onclick="navigator.clipboard.writeText(\'' + url + '\').then(function(){this.textContent=\'✅ Link Copied!\'}.bind(this))" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary);padding:10px;border-radius:8px;cursor:pointer;font-size:0.85rem">📋 Copy Link (Save for Later)</button>';
-          dlHtml += '<p style="color:#f59e0b;font-size:0.75rem;margin-top:6px">⚠️ Ye link save kar lo — isse UNLIMITED baar video dekh sakte ho!</p>';
-          dlHtml += '</div>';
-        } else {
-          // Regular file — Download button + Copy button
-          var directUrl = toDirectDownload(url);
-          dlHtml += '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px">';
-          dlHtml += '<div style="font-weight:700;color:var(--text-primary);margin-bottom:8px">📄 ' + label + '</div>';
-          dlHtml += '<a href="' + directUrl + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:14px 20px;border-radius:10px;text-decoration:none;font-size:1rem;box-shadow:0 4px 15px rgba(34,197,94,0.4);margin-bottom:8px">📥 Download Now</a>';
-          dlHtml += '<button onclick="navigator.clipboard.writeText(\'' + url + '\').then(function(){this.textContent=\'✅ Link Copied!\'}.bind(this))" style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary);padding:10px;border-radius:8px;cursor:pointer;font-size:0.85rem">📋 Copy Link (Save for Later)</button>';
-          dlHtml += '</div>';
+      if (downloadUrls && downloadUrls.length > 0) {
+        dlHtml += '<div style="font-weight:700;color:var(--accent,#d4af37);font-size:0.95rem;margin-bottom:12px;text-align:left">🎁 Your Included Master Prompts & Downloads:</div>';
+        dlHtml += '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">';
+
+        var variantNames = [];
+        if (currentProduct && currentProduct.variants) {
+          variantNames = currentProduct.variants.map(function(v) { return v.name; });
         }
-      });
 
+        downloadUrls.forEach(function(url, i) {
+          var label = variantNames[i] || (downloadUrls.length > 1 ? 'Resource ' + (i + 1) : 'Download Resource');
+          var isPrompt = label.toLowerCase().indexOf('prompt') !== -1;
+          var directUrl = toDirectDownload(url);
+
+          dlHtml += '<div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;flex-wrap:wrap">';
+          dlHtml += '<div style="flex:1;min-width:180px">';
+          dlHtml += '<div style="font-weight:700;color:#fff;font-size:0.92rem">' + (isPrompt ? '⚡ ' : '📄 ') + label + '</div>';
+          dlHtml += '<div style="font-size:0.75rem;color:var(--text-muted)">Permanent Google Drive Access</div>';
+          dlHtml += '</div>';
+          dlHtml += '<div style="display:flex;gap:8px;flex-shrink:0">';
+          dlHtml += '<a href="' + directUrl + '" target="_blank" rel="noopener" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:700;padding:10px 16px;border-radius:8px;text-decoration:none;font-size:0.85rem;box-shadow:0 3px 12px rgba(34,197,94,0.3)">📥 Download ↗</a>';
+          dlHtml += '<button onclick="navigator.clipboard.writeText(\'' + url + '\').then(function(){alert(\'Link copied!\');})" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:0.85rem">📋</button>';
+          dlHtml += '</div>';
+          dlHtml += '</div>';
+        });
+        dlHtml += '</div>';
+      }
+
+      dlHtml += '<div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3);border-radius:10px;padding:14px;margin-top:16px;text-align:left">';
+      dlHtml += '<p style="color:#22c55e;font-size:0.88rem;font-weight:700;margin-bottom:4px">✅ Profile me permanently save ho gaya hai:</p>';
+      dlHtml += '<p style="color:var(--text-muted);font-size:0.82rem;margin:0">Next time jab bhi aap login karoge, <strong>Dashboard → My Courses</strong> ya <strong>My Library</strong> me ye course aur master prompts hamesha milenge.</p>';
       dlHtml += '</div>';
-      dlHtml += '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:12px;margin-top:16px;max-width:400px;margin-left:auto;margin-right:auto">';
-      dlHtml += '<p style="color:#f59e0b;font-size:0.85rem;font-weight:600;margin-bottom:4px">💡 Important:</p>';
-      dlHtml += '<p style="color:var(--text-muted);font-size:0.8rem;margin:0">Sab links copy karke safe jagah save kar lo (Notes/WhatsApp). Ye links expire nahi hote — kabhi bhi access kar sakte ho!</p>';
-      dlHtml += '</div>';
-      dlHtml += '<p style="color:var(--text-muted);font-size:0.75rem;margin-top:12px">Koi problem ho toh <a href="contact.html" style="color:var(--accent)">Contact Us</a> par payment ID ke saath message karo</p>';
+      dlHtml += '<div style="margin-top:16px"><a href="dashboard.html" style="color:var(--accent);font-size:0.85rem;text-decoration:none">Go to Dashboard Profile →</a></div>';
       dlHtml += '</div>';
 
-      // Insert after the hero section
       var heroSidebar = document.getElementById('heroSidebar');
       if (heroSidebar) {
         heroSidebar.innerHTML = dlHtml;
@@ -773,7 +833,6 @@
 
         // 🛑 Enforce login for video courses BEFORE payment
         if (isVideoCourse && !user) {
-          // Open auth modal first, then show message
           if (window.TDVAuth) {
             window.TDVAuth.openAuthModal();
           } else if (window.openAuthModal) {
@@ -804,18 +863,54 @@
           description: 'Purchase: ' + description,
           image: currentProduct.thumbnail || currentProduct.thumbnailUrl || '',
           handler: function(response) {
-            if (isVideoCourse) {
-              // Save purchase to Firebase and redirect to player
-              savePurchaseToFirebase(currentProduct.id, response.razorpay_payment_id);
-            } else {
-              // Record the purchase against the logged-in user (if any) so it
-              // appears in My Ebooks / My Library, then show the download section.
-              recordProductPurchase(currentProduct.id, response.razorpay_payment_id);
-              showDownloadSection(response.razorpay_payment_id, description, downloadUrls);
+            var payId = response.razorpay_payment_id;
+            var isCourseOrCombo = isVideoCourse || (productId.indexOf('_combo') !== -1) || (productId === currentProduct.id);
+
+            // Record purchase in Firebase
+            if (user && window.FirebaseDatabase) {
+              var updates = {};
+              updates['users/' + user.uid + '/purchases/' + currentProduct.id] = true;
+              updates['users/' + user.uid + '/purchases/' + productId] = true;
+
+              // If ai-masterclass or combo, grant all bonus prompts as well
+              if (currentProduct.id === 'ai-masterclass' || productId.startsWith('ai-masterclass')) {
+                updates['users/' + user.uid + '/purchases/master-prompt-1'] = true;
+                updates['users/' + user.uid + '/purchases/master-prompt-2'] = true;
+                updates['users/' + user.uid + '/purchases/ai-masterclass-full'] = true;
+              }
+
+              updates['users/' + user.uid + '/purchaseDetails/' + currentProduct.id] = {
+                paymentId: payId,
+                purchasedAt: new Date().toISOString(),
+                email: user.email || '',
+                name: user.displayName || '',
+                item: description
+              };
+
+              window.FirebaseDatabase.ref().update(updates).catch(function(e) {
+                console.error('Purchase update error:', e);
+              });
             }
+
+            // Determine all download links to present
+            var allDls = downloadUrls;
+            if ((!allDls || allDls.length === 0) && currentProduct.variants) {
+              allDls = currentProduct.variants.map(function(v) { return v.downloadUrl; }).filter(Boolean);
+            }
+            if ((!allDls || allDls.length === 0) && currentProduct.downloadUrl) {
+              allDls = [currentProduct.downloadUrl];
+            }
+
+            // Show download section immediately so user never misses their files!
+            showDownloadSection(payId, description, allDls, isCourseOrCombo, currentProduct.id);
           },
           prefill: prefill,
           theme: { color: '#d4af37' },
+          notes: {
+            product_id: productId,
+            course_id: currentProduct.id,
+            payment_capture: '1'
+          },
           modal: {
             ondismiss: function() {
               // User closed Razorpay without paying

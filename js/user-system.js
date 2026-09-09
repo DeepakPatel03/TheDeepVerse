@@ -60,11 +60,19 @@ const UserSystem = (function () {
 
   function isPurchased(uid, productId) {
     if (!uid || !productId || !db()) return Promise.resolve(false);
-    return new Promise(function (resolve) {
-      db().ref('users/' + uid + '/purchases/' + productId).once('value').then(function (snap) {
-        var v = snap.val();
-        resolve(!!v);
-      }).catch(function () { resolve(false); });
+    return getPurchases(uid).then(function (purchases) {
+      if (purchases[productId]) return true;
+      // Also check parent courses or variant aliases
+      if (productId.startsWith('ai-masterclass') && purchases['ai-masterclass']) return true;
+      if (purchases['ai-masterclass'] && (productId === 'master-prompt-1' || productId === 'master-prompt-2' || productId === 'ai-masterclass-full')) return true;
+      if (productId.startsWith('psychology-book') && purchases['psychology-book']) return true;
+      if (purchases['psychology-book'] && (productId === 'eng' || productId === 'hin')) return true;
+
+      // Generic prefix check (e.g. courseId_variantId)
+      var parts = productId.split('_');
+      if (parts.length > 1 && purchases[parts[0]]) return true;
+
+      return false;
     });
   }
 
@@ -78,25 +86,134 @@ const UserSystem = (function () {
       updates['users/' + uid + '/purchaseDetails/' + productId] = details || {
         purchasedAt: new Date().toISOString()
       };
+
+      // If full course is purchased (e.g. ai-masterclass), also grant access to its included prompts
+      if (productId === 'ai-masterclass' || productId.startsWith('ai-masterclass')) {
+        updates['users/' + uid + '/purchases/ai-masterclass'] = true;
+        updates['users/' + uid + '/purchases/master-prompt-1'] = true;
+        updates['users/' + uid + '/purchases/master-prompt-2'] = true;
+        updates['users/' + uid + '/purchases/ai-masterclass-full'] = true;
+      }
+
       db().ref().update(updates).then(function () { resolve(true); }).catch(reject);
     });
+  }
+
+  // Extracts downloadable resources (prompts, scripts, files) from a product
+  function getCourseResources(product) {
+    if (!product) return [];
+    var resources = [];
+    if (product.variants && product.variants.length) {
+      product.variants.forEach(function (v) {
+        var url = (v.downloadUrl || '').trim();
+        if (url && url.indexOf('youtu') === -1) {
+          resources.push({
+            id: v.id || ('res_' + Math.random().toString(36).substr(2, 5)),
+            name: v.name || 'Resource',
+            downloadUrl: url,
+            type: (v.name && v.name.toLowerCase().indexOf('prompt') !== -1) ? 'prompt' : 'file'
+          });
+        }
+      });
+    }
+    var mainUrl = (product.downloadUrl || '').trim();
+    if (mainUrl && mainUrl.indexOf('youtu') === -1) {
+      var exists = resources.some(function(r) { return r.downloadUrl === mainUrl; });
+      if (!exists) {
+        resources.push({
+          id: 'main_file',
+          name: product.title + ' (Files & Prompts)',
+          downloadUrl: mainUrl,
+          type: 'file'
+        });
+      }
+    }
+    return resources;
   }
 
   // Splits purchased product objects into the three dashboard sections.
   function classifyPurchases(products, purchasedIds) {
     var owned = [];
+    var ownedMap = {};
+
     (purchasedIds || []).forEach(function (pid) {
       var p = null;
       for (var i = 0; i < products.length; i++) {
         if (products[i] && products[i].id === pid) { p = products[i]; break; }
       }
-      owned.push(p || { id: pid, title: pid, type: 'digital', category: 'digital', emoji: '📦', active: false });
+
+      // If not top-level product, search inside product variants
+      if (!p) {
+        for (var i = 0; i < products.length; i++) {
+          var parent = products[i];
+          if (parent && parent.variants && parent.variants.length) {
+            for (var j = 0; j < parent.variants.length; j++) {
+              var v = parent.variants[j];
+              if (v && (v.id === pid || (parent.id + '_' + v.id) === pid || (parent.id + '_' + (v.name || '').replace(/[^a-zA-Z0-9]/g, '')) === pid)) {
+                p = {
+                  id: pid,
+                  title: v.name || parent.title,
+                  type: 'digital',
+                  category: (v.name && v.name.toLowerCase().indexOf('prompt') !== -1) ? 'prompt' : 'digital',
+                  downloadUrl: v.downloadUrl || '',
+                  emoji: (v.name && v.name.toLowerCase().indexOf('prompt') !== -1) ? '⚡' : '📄',
+                  parentCourseId: parent.id,
+                  parentCourseTitle: parent.title,
+                  active: true
+                };
+                break;
+              }
+            }
+          }
+          if (p) break;
+        }
+      }
+
+      if (p) {
+        if (!ownedMap[p.id]) {
+          ownedMap[p.id] = true;
+          owned.push(p);
+        }
+      } else {
+        if (!ownedMap[pid]) {
+          ownedMap[pid] = true;
+          owned.push({ id: pid, title: pid, type: 'digital', category: 'digital', emoji: '📦', active: false });
+        }
+      }
+    });
+
+    var courses = owned.filter(function (p) { return getProductType(p) === 'course'; });
+    var ebooks = owned.filter(function (p) { return getProductType(p) === 'ebook'; });
+    var digital = owned.filter(function (p) { return getProductType(p) === 'digital'; });
+
+    // For any course owned, make sure its downloadable prompts/materials are readily available
+    courses.forEach(function (c) {
+      var res = getCourseResources(c);
+      c.downloadableResources = res;
+      res.forEach(function (r) {
+        var resId = c.id + '_' + r.id;
+        if (!ownedMap[r.id] && !ownedMap[resId]) {
+          ownedMap[r.id] = true;
+          digital.push({
+            id: r.id,
+            title: r.name,
+            type: 'digital',
+            category: r.type === 'prompt' ? 'prompt' : 'digital',
+            downloadUrl: r.downloadUrl,
+            emoji: r.type === 'prompt' ? '⚡' : '📄',
+            parentCourseId: c.id,
+            parentCourseTitle: c.title,
+            isIncludedBonus: true,
+            active: true
+          });
+        }
+      });
     });
 
     return {
-      courses: owned.filter(function (p) { return getProductType(p) === 'course'; }),
-      ebooks: owned.filter(function (p) { return getProductType(p) === 'ebook'; }),
-      digital: owned.filter(function (p) { return getProductType(p) === 'digital'; }),
+      courses: courses,
+      ebooks: ebooks,
+      digital: digital,
       all: owned
     };
   }
@@ -333,7 +450,8 @@ const UserSystem = (function () {
     getProgress: getProgress,
     getProgressForUser: getProgressForUser,
     saveProgress: saveProgress,
-    computeProgressPercent: computeProgressPercent
+    computeProgressPercent: computeProgressPercent,
+    getCourseResources: getCourseResources
   };
 })();
 

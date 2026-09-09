@@ -680,23 +680,47 @@
       courses.forEach(function(p) {
         var prog = progressCache[p.id];
         var continueBtn = (prog && prog.lastTimestamp)
-          ? '▶️ Continue Course'
-          : '▶️ Watch Course';
+          ? '▶️ Continue Watching'
+          : '▶️ Watch Video Course';
         var actionUrl = 'course-player.html?id=' + encodeURIComponent(p.id);
         var progressHtml = (prog && prog.updatedAt)
           ? '<div class="course-card__meta"><span>🕐 Last watched ' + (prog.lastLessonTitle ? esc(prog.lastLessonTitle) : '') + '</span></div>'
           : '<div class="course-card__meta"><span>👨‍🏫 ' + (p.instructor || 'Deepak Patel') + '</span><span>⏱️ ' + (p.duration || 'Lifetime Access') + '</span></div>';
 
-        html += '<div class="course-card" onclick="window.location.href=\'' + actionUrl + '\'">' +
-          '<div class="course-card__banner">' +
+        // Check for included downloadable resources (master prompts, scripts, files)
+        var resources = p.downloadableResources || (window.UserSystem && window.UserSystem.getCourseResources ? window.UserSystem.getCourseResources(p) : []);
+        var resourcesHtml = '';
+        if (resources && resources.length > 0) {
+          resourcesHtml += '<div style="margin-top:14px;margin-bottom:14px;padding:12px;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.25);border-radius:10px">';
+          resourcesHtml += '<div style="font-size:0.8rem;font-weight:700;color:var(--gold,#d4af37);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">';
+          resourcesHtml += '<span>🎁 Included Prompts & Resources (' + resources.length + '):</span>';
+          resourcesHtml += '</div>';
+          resourcesHtml += '<div style="display:flex;flex-direction:column;gap:6px">';
+          resources.forEach(function(r) {
+            var icon = r.type === 'prompt' ? '⚡' : '📄';
+            resourcesHtml += '<a href="' + r.downloadUrl + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.05);padding:8px 12px;border-radius:6px;color:#fff;text-decoration:none;font-size:0.8rem;border:1px solid rgba(255,255,255,0.08);transition:background 0.2s">';
+            resourcesHtml += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px">' + icon + ' ' + esc(r.name) + '</span>';
+            resourcesHtml += '<span style="color:#22c55e;font-weight:700;flex-shrink:0">📥 Download ↗</span>';
+            resourcesHtml += '</a>';
+          });
+          resourcesHtml += '</div>';
+          resourcesHtml += '</div>';
+        }
+
+        html += '<div class="course-card">' +
+          '<div class="course-card__banner" onclick="window.location.href=\'' + actionUrl + '\'" style="cursor:pointer">' +
           '<span class="course-card__emoji">' + (p.emoji || '🎬') + '</span>' +
           '<span class="course-card__badge">Purchased ✓</span>' +
           '</div>' +
           '<div class="course-card__body">' +
           '<div class="course-card__type">Course</div>' +
-          '<h3 class="course-card__title">' + esc(p.title || p.id) + '</h3>' +
+          '<h3 class="course-card__title" onclick="window.location.href=\'' + actionUrl + '\'" style="cursor:pointer">' + esc(p.title || p.id) + '</h3>' +
           progressHtml +
+          resourcesHtml +
+          '<div style="display:flex;gap:8px;flex-direction:column">' +
           '<a href="' + actionUrl + '" class="course-card__btn">' + continueBtn + '</a>' +
+          (resources && resources.length > 0 ? '<button type="button" class="course-card__btn" style="background:rgba(255,255,255,0.08);border:1px solid rgba(212,175,55,0.3);color:var(--gold,#d4af37)" onclick="showCourseResourcesModal(\'' + p.id + '\')">📂 View All Downloads & Links</button>' : '') +
+          '</div>' +
           '</div>' +
           '</div>';
       });
@@ -705,7 +729,11 @@
     }
 
     // ── My Ebooks / My Library (Read/Download with ownership verification) ──
-    function openOwnedProduct(pid) {
+    function openOwnedProduct(pid, directUrl) {
+      if (directUrl) {
+        window.open(directUrl, '_blank');
+        return;
+      }
       if (!currentUid || !window.UserSystem) return;
       UserSystem.isPurchased(currentUid, pid).then(function(owned) {
         if (!owned) {
@@ -714,14 +742,20 @@
         }
         var p = null;
         try { p = StoreEngine.getProduct(pid); } catch(e) {}
-        if (!p) { window.location.href = 'course-detail.html?id=' + encodeURIComponent(pid); return; }
+        if (!p) {
+          // If not found directly, check if it's a course resource
+          showCourseResourcesModal(pid);
+          return;
+        }
         var urls = [];
         if (p.variants && p.variants.length) {
-          p.variants.forEach(function(v) { if (v.downloadUrl) urls.push(v.downloadUrl); });
+          p.variants.forEach(function(v) { if (v.downloadUrl && v.downloadUrl.indexOf('youtu') === -1) urls.push({ name: v.name, url: v.downloadUrl }); });
         }
-        if (p.downloadUrl) urls.push(p.downloadUrl);
-        if (urls.length) {
-          urls.forEach(function(u) { window.open(u, '_blank'); });
+        if (p.downloadUrl && p.downloadUrl.indexOf('youtu') === -1) urls.push({ name: p.title, url: p.downloadUrl });
+        if (urls.length === 1) {
+          window.open(urls[0].url, '_blank');
+        } else if (urls.length > 1) {
+          showCourseResourcesModal(pid);
         } else {
           window.location.href = 'course-detail.html?id=' + encodeURIComponent(pid);
         }
@@ -772,23 +806,94 @@
 
       var html = '<div class="course-grid">';
       digital.forEach(function(p) {
-        var actionUrl = 'course-detail.html?id=' + encodeURIComponent(p.id);
-        html += '<div class="course-card" onclick="window.location.href=\'' + actionUrl + '\'">' +
+        var actionUrl = p.downloadUrl ? p.downloadUrl : ('course-detail.html?id=' + encodeURIComponent(p.parentCourseId || p.id));
+        var isPrompt = (p.category === 'prompt') || (p.title && p.title.toLowerCase().indexOf('prompt') !== -1);
+        var btnText = isPrompt ? '⚡ Download Prompt ↗' : '📥 Download / Open ↗';
+        var badgeText = p.isIncludedBonus ? 'Course Bonus 🎁' : 'Owned ✓';
+        var badgeStyle = p.isIncludedBonus ? 'background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff' : '';
+
+        var btnHtml = '';
+        if (p.downloadUrl) {
+          btnHtml = '<a href="' + p.downloadUrl + '" target="_blank" rel="noopener" class="course-card__btn" onclick="event.stopPropagation()">' + btnText + '</a>';
+        } else {
+          btnHtml = '<button class="course-card__btn" onclick="event.stopPropagation(); openOwnedProduct(\'' + p.id + '\')">📂 Open</button>';
+        }
+
+        html += '<div class="course-card" onclick="' + (p.downloadUrl ? 'window.open(\'' + p.downloadUrl + '\', \'_blank\')' : 'openOwnedProduct(\'' + p.id + '\')') + '" style="cursor:pointer">' +
           '<div class="course-card__banner">' +
-          '<span class="course-card__emoji">' + (p.emoji || '📦') + '</span>' +
-          '<span class="course-card__badge">Owned ✓</span>' +
+          '<span class="course-card__emoji">' + (p.emoji || (isPrompt ? '⚡' : '📦')) + '</span>' +
+          '<span class="course-card__badge" style="' + badgeStyle + '">' + badgeText + '</span>' +
           '</div>' +
           '<div class="course-card__body">' +
-          '<div class="course-card__type">' + (p.category || 'Digital') + '</div>' +
+          '<div class="course-card__type">' + (isPrompt ? 'AI Prompt' : (p.category || 'Digital')) + '</div>' +
           '<h3 class="course-card__title">' + esc(p.title || p.id) + '</h3>' +
-          '<div class="course-card__meta"><span>' + (p.duration || 'Digital Product') + '</span></div>' +
-          '<button class="course-card__btn" onclick="event.stopPropagation(); openOwnedProduct(\'' + p.id + '\')">📂 Open</button>' +
+          (p.parentCourseTitle ? '<div class="course-card__meta"><span>Included with: ' + esc(p.parentCourseTitle) + '</span></div>' : '<div class="course-card__meta"><span>' + (p.duration || 'Instant Download') + '</span></div>') +
+          btnHtml +
           '</div>' +
           '</div>';
       });
       html += '</div>';
       container.innerHTML = html;
     }
+
+    // Modal to display all downloads, master prompts, and links for a course
+    function showCourseResourcesModal(courseId) {
+      var p = null;
+      try { p = StoreEngine.getProduct(courseId); } catch(e) {}
+      if (!p) {
+        var all = StoreEngine.getProducts ? StoreEngine.getProducts() : [];
+        p = all.find(function(x) { return x.id === courseId; });
+      }
+      var title = (p && p.title) || 'Course Resources';
+      var resources = (p && p.downloadableResources) || (window.UserSystem && p ? window.UserSystem.getCourseResources(p) : []);
+
+      var modal = document.getElementById('courseResourcesModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'courseResourcesModal';
+        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;';
+        document.body.appendChild(modal);
+      }
+
+      var contentHtml = '<div style="background:#121212;border:1px solid rgba(212,175,55,0.3);border-radius:16px;max-width:550px;width:100%;max-height:90vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 20px 50px rgba(0,0,0,0.8);font-family:Inter,sans-serif">';
+      contentHtml += '<button onclick="document.getElementById(\'courseResourcesModal\').style.display=\'none\'" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#aaa;font-size:1.5rem;cursor:pointer;padding:4px 8px;line-height:1">×</button>';
+      contentHtml += '<div style="font-size:2rem;margin-bottom:8px">🎁</div>';
+      contentHtml += '<h2 style="font-size:1.3rem;color:#fff;margin:0 0 6px 0;font-family:\'Playfair Display\',serif">' + esc(title) + '</h2>';
+      contentHtml += '<p style="font-size:0.85rem;color:#aaa;margin:0 0 20px 0">Download your master prompts, scripts, and practice files anytime. All links are permanently saved in your account.</p>';
+
+      if (resources && resources.length > 0) {
+        contentHtml += '<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">';
+        resources.forEach(function(r) {
+          var isPrompt = r.type === 'prompt' || (r.name && r.name.toLowerCase().indexOf('prompt') !== -1);
+          contentHtml += '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">';
+          contentHtml += '<div style="flex:1;min-width:180px">';
+          contentHtml += '<div style="font-weight:700;color:#f5f5f5;font-size:0.9rem">' + (isPrompt ? '⚡ ' : '📄 ') + esc(r.name) + '</div>';
+          contentHtml += '<div style="font-size:0.75rem;color:#888;margin-top:2px">Google Drive / Direct Access</div>';
+          contentHtml += '</div>';
+          contentHtml += '<div style="display:flex;gap:8px;flex-shrink:0">';
+          contentHtml += '<a href="' + r.downloadUrl + '" target="_blank" rel="noopener" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;text-decoration:none;font-weight:700;font-size:0.85rem;padding:8px 14px;border-radius:6px;display:inline-flex;align-items:center;gap:4px">📥 Download ↗</a>';
+          contentHtml += '<button onclick="navigator.clipboard.writeText(\'' + r.downloadUrl + '\').then(function(){alert(\'Link copied!\');})" style="background:rgba(255,255,255,0.08);color:#ddd;border:1px solid rgba(255,255,255,0.15);font-size:0.85rem;padding:8px 10px;border-radius:6px;cursor:pointer" title="Copy Link">📋</button>';
+          contentHtml += '</div>';
+          contentHtml += '</div>';
+        });
+        contentHtml += '</div>';
+      } else {
+        contentHtml += '<div style="padding:20px;text-align:center;background:rgba(255,255,255,0.02);border-radius:8px;color:#888;font-size:0.85rem;margin-bottom:20px">No standalone download files attached to this course yet. All video lessons are accessible in the video player.</div>';
+      }
+
+      contentHtml += '<div style="display:flex;gap:10px">';
+      contentHtml += '<a href="course-player.html?id=' + encodeURIComponent(courseId) + '" style="flex:1;text-align:center;background:linear-gradient(135deg,#d4af37,#b8962e);color:#000;font-weight:700;padding:12px;border-radius:8px;text-decoration:none;font-size:0.9rem">▶️ Open Course Player</a>';
+      contentHtml += '<button onclick="document.getElementById(\'courseResourcesModal\').style.display=\'none\'" style="background:rgba(255,255,255,0.08);color:#fff;border:none;padding:12px 18px;border-radius:8px;cursor:pointer;font-size:0.9rem">Close</button>';
+      contentHtml += '</div>';
+      contentHtml += '</div>';
+
+      modal.innerHTML = contentHtml;
+      modal.style.display = 'flex';
+    }
+
+    // Expose for inline onclick handlers
+    window.openOwnedProduct = openOwnedProduct;
+    window.showCourseResourcesModal = showCourseResourcesModal;
 
     function renderExplore(purchasedIds, allProducts) {
       var container = document.getElementById('dashExplore');

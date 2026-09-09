@@ -639,7 +639,7 @@
               }).catch(function(err) { console.error('Record purchase failed:', err); });
             }
             if (isVideoCourse) {
-              window.location.href = 'course-player.html?id=' + productId;
+              window.location.href = 'course-player.html?id=' + encodeURIComponent(productId) + '&new_purchase=1';
               return;
             }
             showPaymentSuccess(productName, response.razorpay_payment_id, downloadUrl);
@@ -651,7 +651,8 @@
           },
           notes: {
             product_id: productId,
-            product_name: productName
+            product_name: productName,
+            payment_capture: '1'
           }
         };
 

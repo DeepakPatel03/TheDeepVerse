@@ -321,6 +321,34 @@
                 display: none;
             }
         }
+
+        .sidebar-tab {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .sidebar-tab:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-tab.active {
+            background: rgba(212, 175, 55, 0.15);
+            color: var(--gold);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
     </style>
 </head>
 <body oncontextmenu="return false">
@@ -336,9 +364,14 @@
         <div class="top-bar">
             <a href="index.html" class="logo">TheDeepVerse</a>
             <div class="course-title" id="topCourseTitle">Loading Course...</div>
-            <a href="dashboard.html" class="back-btn">
-                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
-            </a>
+            <div style="display:flex;align-items:center;gap:10px">
+                <button type="button" onclick="switchPlayerTab('resources')" class="back-btn" style="background:linear-gradient(135deg,#d4af37,#b8962e);color:#000;font-weight:700;border:none;cursor:pointer">
+                    🎁 Master Prompts & Files
+                </button>
+                <a href="dashboard.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
         </div>
 
         <!-- Progress Bar -->
@@ -355,14 +388,22 @@
                 </div>
             </div>
 
-            <!-- Chapters Sidebar -->
+            <!-- Chapters & Resources Sidebar -->
             <div class="sidebar">
-                <div class="sidebar-header">
-                    <h3>Course Chapters</h3>
+                <div class="sidebar-header" style="padding-bottom:12px">
+                    <div style="display:flex;gap:6px;background:rgba(255,255,255,0.05);padding:4px;border-radius:8px">
+                        <button type="button" id="tabBtnChapters" class="sidebar-tab active" onclick="switchPlayerTab('chapters')">📑 Chapters</button>
+                        <button type="button" id="tabBtnResources" class="sidebar-tab" onclick="switchPlayerTab('resources')">🎁 Prompts & Files <span id="resBadge" style="background:#22c55e;color:#000;padding:2px 6px;border-radius:10px;font-size:0.7rem;font-weight:700;display:none">0</span></button>
+                    </div>
                 </div>
-                <ul class="chapters-list" id="chaptersList">
-                    <!-- Chapters populated via JS -->
-                </ul>
+                <div id="chaptersContainer">
+                    <ul class="chapters-list" id="chaptersList">
+                        <!-- Chapters populated via JS -->
+                    </ul>
+                </div>
+                <div id="resourcesContainer" style="display:none;padding:16px">
+                    <!-- Resources populated via JS -->
+                </div>
             </div>
         </div>
     </div>
@@ -698,11 +739,105 @@
             player.playVideo();
         }
 
+        // Tab switching between Chapters and Resources
+        function switchPlayerTab(tab) {
+            const btnCh = document.getElementById('tabBtnChapters');
+            const btnRes = document.getElementById('tabBtnResources');
+            const contCh = document.getElementById('chaptersContainer');
+            const contRes = document.getElementById('resourcesContainer');
+
+            if (tab === 'resources') {
+                btnCh.classList.remove('active');
+                btnRes.classList.add('active');
+                contCh.style.display = 'none';
+                contRes.style.display = 'block';
+                renderPlayerResources();
+            } else {
+                btnCh.classList.add('active');
+                btnRes.classList.remove('active');
+                contCh.style.display = 'block';
+                contRes.style.display = 'none';
+            }
+        }
+
+        function renderPlayerResources() {
+            const cont = document.getElementById('resourcesContainer');
+            if (!cont || !productData) return;
+
+            const resources = (window.UserSystem && window.UserSystem.getCourseResources)
+                ? window.UserSystem.getCourseResources(productData)
+                : [];
+
+            // Update badge in tab
+            const badge = document.getElementById('resBadge');
+            if (badge) {
+                if (resources.length > 0) {
+                    badge.textContent = resources.length;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            if (!resources.length) {
+                cont.innerHTML = `
+                    <div style="text-align:center;padding:40px 16px;background:rgba(255,255,255,0.03);border-radius:12px;border:1px dashed rgba(255,255,255,0.1)">
+                        <div style="font-size:2rem;margin-bottom:8px">📂</div>
+                        <div style="font-weight:600;color:var(--text-main);margin-bottom:4px">No Extra Files Attached</div>
+                        <div style="font-size:0.8rem;color:var(--text-muted)">All instructional material is fully covered inside the video lessons.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div style="margin-bottom:16px">
+                    <div style="font-size:1.05rem;font-weight:700;color:var(--gold);margin-bottom:4px">🎁 Master Prompts & Files</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">Click any item below to open/download your materials directly from Google Drive.</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:12px">
+            `;
+
+            resources.forEach((r) => {
+                const isPrompt = r.type === 'prompt' || (r.name && r.name.toLowerCase().indexOf('prompt') !== -1);
+                const icon = isPrompt ? 'fa-solid fa-bolt' : 'fa-solid fa-file-arrow-down';
+                const tag = isPrompt ? 'AI Master Prompt' : 'Course Material';
+
+                html += `
+                    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(212,175,55,0.25);border-radius:10px;padding:14px;box-shadow:0 4px 15px rgba(0,0,0,0.3)">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                            <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--gold);background:rgba(212,175,55,0.15);padding:2px 8px;border-radius:4px">${tag}</span>
+                            <span style="font-size:0.75rem;color:#22c55e">● Lifetime Access</span>
+                        </div>
+                        <div style="font-weight:600;font-size:0.92rem;color:#fff;margin-bottom:10px;line-height:1.4">${(r.name || 'Material').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</div>
+                        <div style="display:flex;gap:8px">
+                            <a href="${r.downloadUrl}" target="_blank" rel="noopener" style="flex:1;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;text-decoration:none;font-weight:700;font-size:0.82rem;padding:9px 12px;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 12px rgba(34,197,94,0.3)">
+                                <i class="${icon}"></i> Download / Open ↗
+                            </a>
+                            <button type="button" onclick="navigator.clipboard.writeText('${r.downloadUrl}').then(() => alert('Link copied to clipboard!'))" style="background:rgba(255,255,255,0.08);color:#ddd;border:1px solid rgba(255,255,255,0.15);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:0.82rem" title="Copy Link">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            cont.innerHTML = html;
+        }
+
         // Save on leaving the page or tab hidden
         window.addEventListener('beforeunload', function () { if (currentUid && productKey) lastSaved(); });
         document.addEventListener('visibilitychange', function () { if (document.hidden) lastSaved(); });
 
-        window.addEventListener('load', initPlayer);
+        window.addEventListener('load', function() {
+            initPlayer();
+            // Check if user requested resources directly
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('tab') === 'resources' || urlParams.get('new_purchase') === '1') {
+                setTimeout(() => switchPlayerTab('resources'), 400);
+            }
+        });
 
     </script>
 </body>
