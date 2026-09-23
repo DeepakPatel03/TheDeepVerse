@@ -354,7 +354,6 @@
 
       /* Meta chips */
       const meta = [];
-      if (doc.readTime || data.readTime) meta.push('⏱ ' + (doc.readTime || data.readTime));
       if (doc.level || data.level) meta.push('📊 ' + (doc.level || data.level));
       if (data.discoveredBy) meta.push('🔬 ' + data.discoveredBy);
       document.getElementById('conceptMeta').innerHTML = meta.map(function (m) { return '<span>' + esc(m) + '</span>'; }).join('');
