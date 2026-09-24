@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Mind Lab — Psychological Tests & Personality Decoders | TheDeepVerse</title>
+  <meta name="description" content="Discover your hidden psychology in 3 minutes. Take science-backed tests on Attachment Styles, Dark Triad traits, and Cognitive Biases with instant deep breakdown.">
+  <meta name="author" content="Deepak Patel">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph Meta Tags -->
+  <link rel="canonical" href="https://thedeepverse.in/quiz.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TheDeepVerse">
+  <meta property="og:title" content="The Mind Lab — Decode Your Inner Psychology | TheDeepVerse">
+  <meta property="og:description" content="Are you Secure, Anxious, or Avoidant? What is your Dark Triad percentage? Take the 3-minute psychological tests and decode your mind.">
+  <meta property="og:image" content="https://thedeepverse.in/assets/images/og-home.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Mind Lab — Decode Your Inner Psychology | TheDeepVerse">
+  <meta name="twitter:description" content="Science-backed psychological assessments for human behavior and relationships.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23050505'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-size='18' font-weight='bold' fill='%23F5F5F5'%3ED%3C/text%3E%3C/svg%3E">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <style>
+    :root {
+      --accent-gold: #C0A062;
+      --bg-dark: #050505;
+      --card-bg: #0C0C0C;
+      --border-soft: rgba(255, 255, 255, 0.08);
+      --border-gold: rgba(192, 160, 98, 0.3);
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #E0E0E0;
+      font-family: 'Inter', sans-serif;
+      line-height: 1.7;
+    }
+
+    .lab-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 100px 20px 80px;
+    }
+
+    /* ── HERO HEADER ── */
+    .lab-hero {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .lab-hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-gold);
+      background: rgba(192, 160, 98, 0.08);
+      border: 1px solid var(--border-gold);
+      padding: 6px 16px;
+      border-radius: 99px;
+      margin-bottom: 20px;
+    }
+    .lab-hero__title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 700;
+      color: #FFF;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .lab-hero__title span {
+      color: var(--accent-gold);
+      font-style: italic;
+    }
+    .lab-hero__subtitle {
+      font-size: 1.1rem;
+      color: #A0A0A0;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    /* ── TEST SELECTOR CARDS ── */
+    .test-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .test-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 28px 24px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+      text-align: left;
+    }
+    .test-card:hover {
+      border-color: var(--border-gold);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    }
+    .test-card.is-active {
+      border-color: var(--accent-gold);
+      background: linear-gradient(180deg, #14120B 0%, #0A0A0A 100%);
+      box-shadow: 0 0 25px rgba(192, 160, 98, 0.12);
+    }
+    .test-card__icon {
+      font-size: 2.2rem;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+    .test-card__title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      color: #FFF;
+      margin-bottom: 6px;
+    }
+    .test-card__hi {
+      font-family: 'Noto Sans Devanagari', sans-serif;
+      font-size: 0.88rem;
+      color: var(--accent-gold);
+      margin-bottom: 12px;
+      display: block;
+    }
+    .test-card__desc {
+      font-size: 0.88rem;
+      color: #888;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .test-card__meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: #666;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 12px;
+    }
+
+    /* ── QUIZ CONTAINER ── */
+    .quiz-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-soft);
+      border-radius: 20px;
+      padding: 40px;
+      position: relative;
+    }
+
+    /* Progress bar */
+    .quiz-progress {
+      margin-bottom: 32px;
+    }
+    .quiz-progress__bar-bg {
+      height: 6px;
+      background: #181818;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .quiz-progress__fill {
+      height: 100%;
+      background: linear-gradient(90deg, #A88B50, #E0CFA0);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .quiz-progress__text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Question */
+    .quiz-question {
+      margin-bottom: 32px;
+    }
+    .quiz-question__en {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.55rem;
+      color: #FFF;
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+    .quiz-question__hi {
+      font-family: 'Noto Sans Devanagari', sans-serif;
+      font-size: 1.05rem;
+      color: var(--accent-gold);
+      line-height: 1.6;
+    }
+
+    /* Options */
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .quiz-option {
+      background: #111;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 18px 22px;
+      color: #DDD;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      font-size: 0.98rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      width: 100%;
+    }
+    .quiz-option:hover {
+      border-color: var(--border-gold);
+      background: #161511;
+      transform: translateX(4px);
+    }
+    .quiz-option.is-selected {
+      border-color: var(--accent-gold);
+      background: rgba(192, 160, 98, 0.12);
+      color: #FFF;
+    }
+    .quiz-option__letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #222;
+      color: var(--accent-gold);
+      font-size: 0.82rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .quiz-option__content {
+      flex: 1;
+    }
+    .quiz-option__en {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+    .quiz-option__hi {
+      font-family: 'Noto Sans Devanagari', sans-serif;
+      font-size: 0.88rem;
+      color: #999;
+      display: block;
+    }
+
+    /* Nav Buttons */
+    .quiz-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 24px;
+    }
+
+    /* ── RESULT VIEW ── */
+    .result-view {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .result-header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .result-badge {
+      font-size: 3.5rem;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+    .result-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      color: #FFF;
+      margin-bottom: 6px;
+    }
+    .result-titleHi {
+      font-family: 'Noto Sans Devanagari', sans-serif;
+      font-size: 1.25rem;
+      color: var(--accent-gold);
+      margin-bottom: 16px;
+    }
+    .result-tagline {
+      font-size: 1.05rem;
+      color: #AAA;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Breakdown cards */
+    .result-breakdown {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+    .breakdown-card {
+      background: #111;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .breakdown-card__title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-gold);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .breakdown-card__text {
+      font-size: 0.92rem;
+      color: #CCC;
+      line-height: 1.6;
+    }
+    .breakdown-card__text-hi {
+      font-family: 'Noto Sans Devanagari', sans-serif;
+      color: #999;
+      font-size: 0.85rem;
+      margin-top: 6px;
+    }
+
+    /* Share Section */
+    .result-share-box {
+      background: linear-gradient(180deg, #14120B 0%, #0C0C0C 100%);
+      border: 1px solid var(--border-gold);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .result-share-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: #FFF;
+      margin-bottom: 8px;
+    }
+    .result-share-desc {
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 20px;
+    }
+    .share-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .lab-container { padding: 80px 16px 60px; }
+      .quiz-box { padding: 24px 18px; }
+      .quiz-question__en { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       NAVIGATION
+       ============================================================ -->
+  <nav class="nav" role="navigation" aria-label="Main navigation" id="mainNav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo" aria-label="TheDeepVerse Home">TheDeepVerse</a>
+
+      <div class="nav__links">
+        <a href="index.html" class="nav__link">Home</a>
+        <a href="hub.html" class="nav__link">DeepVerse Hub</a>
+        <a href="quiz.html" class="nav__link is-active">Mind Lab 🧪</a>
+        <a href="videos.html" class="nav__link">Videos</a>
+        <a href="shorts.html" class="nav__link">Shorts</a>
+        <a href="store.html" class="nav__link">Store</a>
+        <a href="about.html" class="nav__link">About</a>
+        <a href="contact.html" class="nav__link">Contact</a>
+      </div>
+
+      <div class="nav__cta">
+        <a href="https://youtube.com/@TheDeepVerse-YT" target="_blank" rel="noopener noreferrer" class="btn btn--youtube btn--sm">
+          <span>YouTube</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       MAIN LAB CONTENT
+       ============================================================ -->
+  <main class="lab-container">
+
+    <!-- Hero -->
+    <header class="lab-hero">
+      <div class="lab-hero__badge">🔬 The DeepVerse Psychological Assessment Engine</div>
+      <h1 class="lab-hero__title">Decode Your <span>Hidden Mind</span></h1>
+      <p class="lab-hero__subtitle">Discover your unconscious relationship blueprint, dark personality spectrum, and decision blindspots in 3 minutes.</p>
+    </header>
+
+    <!-- Quiz Selector -->
+    <div class="test-selector">
+      <div class="test-card is-active" data-test="attachment">
+        <div class="test-card__icon">🔗</div>
+        <h2 class="test-card__title">Attachment Style Test</h2>
+        <span class="test-card__hi">अटैचमेंट टेस्ट — आपका प्यार का तरीक़ा</span>
+        <p class="test-card__desc">Are you Secure, Anxious, or Avoidant? Uncover the childhood code governing your romantic relationships.</p>
+        <div class="test-card__meta">
+          <span>⏱️ 8 Questions</span>
+          <span>Based on Mary Ainsworth</span>
+        </div>
+      </div>
+
+      <div class="test-card" data-test="darktriad">
+        <div class="test-card__icon">🎭</div>
+        <h2 class="test-card__title">The Dark Triad Spectrum</h2>
+        <span class="test-card__hi">डार्क ट्राइड टेस्ट — आपके अंदर का रणनीतिकार</span>
+        <p class="test-card__desc">Measure your percentage alignment with Machiavellian Strategy, Narcissism, and Cold Detachment.</p>
+        <div class="test-card__meta">
+          <span>⏱️ 9 Questions</span>
+          <span>Based on Dirty Dozen Scale</span>
+        </div>
+      </div>
+
+      <div class="test-card" data-test="biases">
+        <div class="test-card__icon">🧠</div>
+        <h2 class="test-card__title">Cognitive Blindspots</h2>
+        <span class="test-card__hi">मानसिक भ्रम टेस्ट — फ़ैसलों की गुप्त ख़ामियाँ</span>
+        <p class="test-card__desc">Discover which psychological trap (Confirmation Bias, Sunk Cost, Anchoring) tricks your daily decisions.</p>
+        <div class="test-card__meta">
+          <span>⏱️ 6 Questions</span>
+          <span>Based on Kahneman & Tversky</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Quiz Box -->
+    <div class="quiz-box" id="quizBox">
+      <!-- Progress Bar -->
+      <div class="quiz-progress">
+        <div class="quiz-progress__bar-bg">
+          <div class="quiz-progress__fill" id="progressBar"></div>
+        </div>
+        <div class="quiz-progress__text">
+          <span id="questionCounter">Question 1 of 8</span>
+          <span id="testNameBadge">Attachment Style Assessment</span>
+        </div>
+      </div>
+
+      <!-- Question Container -->
+      <div class="quiz-question" id="quizQuestionWrap">
+        <h3 class="quiz-question__en" id="qTextEn">When my partner does not reply to my text message for a few hours:</h3>
+        <p class="quiz-question__hi" id="qTextHi">जब मेरा पार्टनर कुछ घंटों तक मेरे मैसेज का जवाब नहीं देता:</p>
+      </div>
+
+      <!-- Options Container -->
+      <div class="quiz-options" id="optionsContainer">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Actions -->
+      <div class="quiz-actions">
+        <button class="btn btn--outline btn--sm" id="prevBtn" style="visibility:hidden;">← Previous</button>
+        <span style="font-size:0.85rem;color:#777;">Click an option to proceed</span>
+        <button class="btn btn--primary btn--sm" id="nextBtn" style="display:none;">Next Question →</button>
+      </div>
+    </div>
+
+    <!-- Result View Container -->
+    <div class="quiz-box result-view" id="resultView">
+      <div class="result-header">
+        <div class="result-badge" id="resEmoji">🛡️</div>
+        <div style="text-transform:uppercase;letter-spacing:2px;font-size:0.85rem;color:#888;margin-bottom:8px;">Your Psychological Archetype</div>
+        <h2 class="result-title" id="resTitle">The Secure Explorer</h2>
+        <div class="result-titleHi" id="resTitleHi">संतुलित और सुरक्षित प्रेमी</div>
+        <p class="result-tagline" id="resTagline">You navigate intimate bonds with trust, open communication, and calm emotional autonomy.</p>
+      </div>
+
+      <!-- Detailed Breakdown Cards -->
+      <div class="result-breakdown" id="resBreakdown">
+        <!-- Dynamically filled -->
+      </div>
+
+      <!-- Viral Share Box -->
+      <div class="result-share-box">
+        <h3 class="result-share-title">Share Your Mind Lab Result</h3>
+        <p class="result-share-desc">Challenge your friends or partner to find out their psychological blueprint!</p>
+        <div class="share-buttons">
+          <button class="btn btn--primary btn--md" id="shareWaBtn" style="background:#25D366;border-color:#25D366;color:#FFF;">
+            <span>💬 Share on WhatsApp</span>
+          </button>
+          <button class="btn btn--outline btn--md" id="copyResultBtn">
+            <span>📋 Copy Result Card</span>
+          </button>
+          <button class="btn btn--outline btn--md" id="retakeBtn">
+            <span>🔄 Retake Test</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Related Reading Deep Dive -->
+      <div style="text-align:center;padding:20px;border-top:1px solid rgba(255,255,255,0.08);">
+        <p style="font-size:0.95rem;color:#888;margin-bottom:12px;">Want to master this psychological mechanism completely?</p>
+        <a href="concept-detail.html?id=attachment-theory" class="btn btn--outline btn--md" id="relatedArticleLink">
+          Read Full 3,500-Word Deep Dive →
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============================================================
+       QUIZ ENGINE SCRIPT
+       ============================================================ -->
+  <script>
+  (function () {
+    const QUIZ_DATA = {
+      attachment: {
+        name: "Attachment Style Assessment",
+        conceptId: "attachment-theory",
+        questions: [
+          {
+            en: "When your partner takes 3-4 hours to reply to an important text message, your first reaction is:",
+            hi: "जब आपका पार्टनर 3-4 घंटे तक आपके मैसेज का रिप्लाई नहीं करता, तो आपका पहला रिएक्शन क्या होता है?",
+            options: [
+              { en: "I assume they are busy or in a meeting; I continue my day calmly.", hi: "मैं मान लेता हूँ कि वो काम में व्यस्त होंगे, और अपने काम में लगा रहता हूँ।", type: "secure" },
+              { en: "A knot tightens in my stomach; I worry they are losing interest or upset with me.", hi: "पेट में घबराहट होने लगती है, लगता है वो मुझसे बोर हो गए हैं या नाराज़ हैं।", type: "anxious" },
+              { en: "I barely notice, and if they demand why I messaged, I feel slightly annoyed.", hi: "मुझे ज़्यादा फ़र्क़ नहीं पड़ता, बल्कि बार-बार बात करने पर थोड़ी चिढ़ होती है।", type: "avoidant" },
+              { en: "I oscillate between panic that they will leave, and furious anger that they don't care.", hi: "एक पल डर लगता है कि छोड़ देंगे, और दूसरे ही पल भयंकर ग़ुस्सा आता है।", type: "fearful" }
+            ]
+          },
+          {
+            en: "When a relationship begins to feel deeply intimate and emotionally close:",
+            hi: "जब कोई रिश्ता बहुत गहरा और भावनात्मक रूप से नज़दीक होने लगता है:",
+            options: [
+              { en: "I embrace it warmly; intimacy feels safe and fulfilling.", hi: "मुझे बहुत सुकून मिलता है; नज़दीकी मुझे सुरक्षित महसूस कराती है।", type: "secure" },
+              { en: "I crave even more reassurance; I constantly need to hear that they love me.", hi: "मुझे और ज़्यादा यक़ीन चाहिए होता है; मैं बार-बार प्यार का सबूत माँगता हूँ।", type: "anxious" },
+              { en: "I feel claustrophobic and begin finding small flaws to justify creating space.", hi: "मेरा दम घुटने लगता है और मैं दूरी बनाने के लिए उसमें कमियाँ ढूँढने लगता हूँ।", type: "avoidant" },
+              { en: "I want to be close, but I am terrified they will discover my flaws and destroy me.", hi: "क़रीब तो जाना चाहता हूँ, लेकिन डर रहता है कि वो मुझे बर्बाद कर देंगे।", type: "fearful" }
+            ]
+          },
+          {
+            en: "During a heated disagreement or fight with your partner:",
+            hi: "जब पार्टनर के साथ कोई तीखी बहस या झगड़ा होता है:",
+            options: [
+              { en: "I express my feelings calmly, listen to their side, and seek a fair resolution.", hi: "मैं शांति से अपनी बात रखता हूँ, उनकी बात सुनता हूँ और हल ढूँढता हूँ।", type: "secure" },
+              { en: "I become desperate to resolve it immediately; I cannot sleep or work until we make up.", hi: "मैं तुरंत सुलझाने के लिए बेचैन हो जाता हूँ; सुलह होने तक नींद-चैन उड़ जाता है।", type: "anxious" },
+              { en: "I shut down completely, walk away, or give the silent treatment for days.", hi: "मैं चुप हो जाता हूँ, बात करना बंद कर देता हूँ या हफ़्तों बात नहीं करता।", type: "avoidant" },
+              { en: "I erupt into intense fury, say hurtful things, and then weep with shame afterward.", hi: "मैं बहुत ज़हरीली बातें बोल देता हूँ और बाद में फूट-फूट कर रोता हूँ।", type: "fearful" }
+            ]
+          },
+          {
+            en: "When it comes to depending on other people in times of vulnerability:",
+            hi: "मुश्किल वक़्त में दूसरों पर निर्भर होने और मदद माँगने पर आपकी सोच:",
+            options: [
+              { en: "I have no problem asking for help; mutual interdependence is natural.", hi: "मुझे मदद माँगने में कोई झिझक नहीं होती; एक-दूसरे का सहारा बनना स्वाभाविक है।", type: "secure" },
+              { en: "I depend heavily on my partner for my emotional stability and happiness.", hi: "मेरी ख़ुशी और मानसिक शांति पूरी तरह मेरे पार्टनर के मूड पर निर्भर करती है।", type: "anxious" },
+              { en: "I hate depending on anyone; self-reliance is the only true safety in life.", hi: "मुझे किसी पर निर्भर होना पसंद नहीं; अपनी मदद ख़ुद करना ही सबसे सुरक्षित है।", type: "avoidant" },
+              { en: "I want to trust someone, but deep down I expect everyone to let me down.", hi: "भरोसा तो करना चाहता हूँ, लेकिन अंदर से लगता है कि सब धोखा ही देंगे।", type: "fearful" }
+            ]
+          },
+          {
+            en: "If your partner asks for a weekend alone to spend time with their friends:",
+            hi: "अगर आपका पार्टनर कहे कि वो वीकेंड पर अपने दोस्तों के साथ अकेला रहना चाहता है:",
+            options: [
+              { en: "I happily encourage them and enjoy my own free time.", hi: "मैं ख़ुशी से हामी भरता हूँ और अपने अकेले समय का आनंद लेता हूँ।", type: "secure" },
+              { en: "I say yes, but feel secretly rejected, wondering if they are growing tired of me.", hi: "हाँ तो बोल देता हूँ, लेकिन अंदर से डर लगता है कि वो मुझसे दूर जा रहे हैं।", type: "anxious" },
+              { en: "I feel immense relief and wish they would take more time away.", hi: "मुझे बहुत सुकून मिलता है और लगता है कि वो थोड़े और दिन दूर रहें तो अच्छा है।", type: "avoidant" },
+              { en: "I feel suspicious and prepare for the worst scenario.", hi: "मुझे शक होने लगता है और लगता है कि रिश्ता ख़त्म होने वाला है।", type: "fearful" }
+            ]
+          },
+          {
+            en: "How do you view your own worthiness of love?",
+            hi: "आप ख़ुद को प्यार पाने के क़ाबिल कितना समझते हैं?",
+            options: [
+              { en: "I know I have flaws, but I am inherently worthy of love and respect.", hi: "मुझमें कमियाँ हैं, लेकिन मैं इज़्ज़त और सच्चे प्यार के पूरा क़ाबिल हूँ।", type: "secure" },
+              { en: "I often feel not good enough; I worry people will realize I am unlovable.", hi: "मुझे अक्सर लगता है कि मुझमें कुछ कमी है और लोग मुझे छोड़ देंगे।", type: "anxious" },
+              { en: "My worth comes from my achievements, independence, and career, not romance.", hi: "मेरी क़ीमत मेरी कामयाबी और आज़ादी से है, प्यार-मोहब्बत से नहीं।", type: "avoidant" },
+              { en: "I feel fundamentally broken and defective inside.", hi: "मुझे अंदर से लगता है कि मेरी आत्मा ही कहीं से टूटी हुई है।", type: "fearful" }
+            ]
+          },
+          {
+            en: "After an emotional breakup:",
+            hi: "किसी ब्रेकअप या अलगाव के बाद आपकी मनोस्थिति:",
+            options: [
+              { en: "I grieve deeply, reflect on lessons, and gradually open my heart again.", hi: "मैं दुःख को महसूस करता हूँ, सबक़ सीखता हूँ और धीरे-धीरे आगे बढ़ जाता हूँ।", type: "secure" },
+              { en: "I obsessively check their social media, beg them to come back, and feel ruined.", hi: "मैं पागलों की तरह उनकी प्रोफ़ाइल देखता हूँ, गिड़गिड़ाता हूँ और टूट जाता हूँ।", type: "anxious" },
+              { en: "I convince myself I never cared, throw myself into gym or work, and feel nothing.", hi: "मैं ख़ुद को मना लेता हूँ कि मुझे कोई फ़र्क़ नहीं पड़ा और काम में डूब जाता हूँ।", type: "avoidant" },
+              { en: "I swing between stalker-like obsession and absolute numbness.", hi: "कभी पागलों जैसी तड़प होती है और कभी बिल्कुल पत्थर जैसा सुन्न हो जाता हूँ।", type: "fearful" }
+            ]
+          },
+          {
+            en: "In one sentence, your unconscious philosophy of love is:",
+            hi: "एक वाक्य में, प्यार को लेकर आपकी अवचेतन सोच:",
+            options: [
+              { en: "Love is a secure harbor of mutual growth and freedom.", hi: "प्यार साथ बढ़ने और एक-दूसरे को सुरक्षित आज़ादी देने का नाम है।", type: "secure" },
+              { en: "Love is oxygen; without constant closeness, I will suffocate.", hi: "प्यार ऑक्सीजन है; अगर लगातार न मिले तो मेरा दम घुट जाएगा।", type: "anxious" },
+              { en: "Love is a cage that threatens personal sovereignty.", hi: "प्यार एक पिंजरा है जो इंसान की व्यक्तिगत आज़ादी छीन लेता है।", type: "avoidant" },
+              { en: "Love is a fire that warms you, and then burns you alive.", hi: "प्यार वो आग है जो पहले सुकून देती है और फिर ज़िंदा जला देती है।", type: "fearful" }
+            ]
+          }
+        ],
+        results: {
+          secure: {
+            emoji: "🛡️",
+            title: "The Secure Explorer",
+            titleHi: "संतुलित और सुरक्षित प्रेमी (Secure Attachment)",
+            tagline: "You possess a balanced, resilient nervous system capable of deep intimacy without losing individual sovereignty.",
+            strengthsEn: "Direct communication, emotional regulation, comfortable with vulnerability, reliable partner during crises.",
+            strengthsHi: "साफ़ और सच्ची बातचीत, भावनाओं पर संतुलन, कमज़ोरी दिखाने में कोई झिझक नहीं, संकट में एक चट्टान जैसा सहारा।",
+            shadowEn: "May sometimes overestimate the emotional maturity of anxious or avoidant partners, getting stuck trying to 'fix' them.",
+            shadowHi: "कभी-कभी टॉक्सिक या भागने वाले पार्टनर्स को भी सुधारने की कोशिश में अपना समय बर्बाद कर सकते हैं।",
+            antidoteEn: "Continue choosing partners who honor reciprocity. Never lower your baseline respect for someone else's drama.",
+            antidoteHi: "हमेशा ऐसे साथी को चुनें जो बराबरी से प्यार निभाए। किसी के ड्रामे के लिए अपनी मानसिक शांति का सौदा मत कीजिए।"
+          },
+          anxious: {
+            emoji: "🌊",
+            title: "The Anxious Guardian",
+            titleHi: "भावुक और सतर्क प्रेमी (Anxious-Preoccupied)",
+            tagline: "Your heart has an extraordinary capacity for devotion, but lives under the constant shadow of abandonment terror.",
+            strengthsEn: "Fierce loyalty, hyper-empathy, deeply loving, willing to fight through any obstacle for connection.",
+            strengthsHi: "गहरी वफ़ादारी, दूसरों के दर्द को तुरंत महसूस करना, बेइंतहा प्यार और रिश्ते के लिए सब कुछ न्योछावर करने का जज़्बा।",
+            shadowEn: "Protest behaviors: sending panicked messages, testing your partner's love, confusing toxic drama with passion.",
+            shadowHi: "मैसेज न आने पर पैनिक अटैक, पार्टनर के प्यार की बार-बार परीक्षा लेना, और रोज़-रोज़ के क्लेश को 'गहरा प्यार' समझना।",
+            antidoteEn: "Enforce a 2-hour hold on protest communications. Build your self-worth outside romance through solo passions.",
+            antidoteHi: "घबराहट में कोई भी मैसेज भेजने से पहले 2 घंटे का ब्रेक लीजिए। अपनी ज़िंदगी और ख़ुशियों को सिर्फ़ पार्टनर पर मत छोड़िए।"
+          },
+          avoidant: {
+            emoji: "🏰",
+            title: "The Self-Reliant Fortress",
+            titleHi: "आज़ाद और सतर्क क़िला (Dismissive-Avoidant)",
+            tagline: "You have built an impenetrable armor of independence to protect an inner child that was once neglected or overwhelmed.",
+            strengthsEn: "Incredible crisis composure, high independence, rational analytical thinking, immune to emotional blackmail.",
+            strengthsHi: "मुश्किल वक़्त में गज़ब का धैर्य, आत्मनिर्भरता, दिमाग़ी लॉजिक, और किसी के इमोशनल ब्लैकमेल में न फँसना।",
+            shadowEn: "Deactivating strategies: running away when love deepens, finding petty flaws in partners, emotional deafness.",
+            shadowHi: "प्यार गहरा होते ही भाग जाना, पार्टनर में ज़बरदस्ती कमियाँ ढूँढना, और पत्थर जैसा ठंडा व्यवहार करना।",
+            antidoteEn: "Learn to stay in the room for 5 minutes after conflict. Recognize that independence is a shield, not true peace.",
+            antidoteHi: "झगड़े के बाद दरवाज़ा पटक कर भागने के बजाय 5 मिनट रुकिए। समझिए कि अकेलापन सुरक्षा है, लेकिन असली सुकून नहीं।"
+          },
+          fearful: {
+            emoji: "🌪️",
+            title: "The Tempestuous Soul",
+            titleHi: "तूफ़ानी अंतर्द्वंद (Fearful-Avoidant / Disorganized)",
+            tagline: "You are caught in the classic 'Come here, go away' storm—craving love with ferocious hunger, yet terrified of being incinerated.",
+            strengthsEn: "Deep artistic depth, intense passion, raw authenticity, acute radar for deception and insincerity.",
+            strengthsHi: "गहरी संवेदनशीलता, प्रचंड जुनून, बिल्कुल सच्चा स्वभाव, और किसी के भी झूठ को सेकंडों में पकड़ लेने की छठी इंद्री।",
+            shadowEn: "Whirlwind relationship cycles: pulling partners close in ecstasy, then pushing them off a cliff in sudden terror.",
+            shadowHi: "अचानक हद से ज़्यादा प्यार करना और अगले ही दिन ख़ौफ़ में आकर सामने वाले को अपनी ज़िंदगी से धक्के मारकर निकाल देना।",
+            antidoteEn: "Somatic therapy and nervous system regulation. Heal the childhood fracture before expecting a partner to be your sanctuary.",
+            antidoteHi: "अपने नर्वस सिस्टम को शांत करना सीखिए। किसी दूसरे से अपना घाव भरने की उम्मीद करने से पहले अपने बचपन के डर से सुलह कीजिए।"
+          }
+        }
+      },
+
+      darktriad: {
+        name: "The Dark Triad Spectrum",
+        conceptId: "machiavellian",
+        questions: [
+          {
+            en: "When an opportunity arises to gain a major advantage by bending the truth without getting caught:",
+            hi: "जब बिना पकड़े गए थोड़ा-बहुत झूठ बोलकर कोई बड़ा फ़ायदा उठाने का मौक़ा मिले:",
+            options: [
+              { en: "I calculate the risks and rewards dispassionately; if the payoff is high, I take it.", hi: "मैं ठंडे दिमाग़ से नफ़ा-नुक़सान नापता हूँ; अगर फ़ायदा बड़ा हो तो मैं मौक़ा नहीं छोड़ता।", type: "mach" },
+              { en: "I take it because someone of my caliber deserves to be at the top anyway.", hi: "मैं ज़रूर लूँगा, क्योंकि मेरी क़ाबलियत वाले इंसान को सबसे ऊपर होना ही चाहिए।", type: "narc" },
+              { en: "I don't lose sleep over small rules; the world belongs to those who take what they want.", hi: "नियम कमज़ोरों के लिए होते हैं; दुनिया उसी की है जो छीनना जानता है।", type: "psych" },
+              { en: "I decline; my personal integrity is worth more than any temporary advantage.", hi: "मैं मना कर दूँगा; मेरा ईमान किसी भी फ़ायदे से ज़्यादा क़ीमती है।", type: "light" }
+            ]
+          },
+          {
+            en: "When you walk into a crowded party or boardroom meeting:",
+            hi: "जब आप किसी भरी महफ़िल या ज़रूरी मीटिंग में क़दम रखते हैं:",
+            options: [
+              { en: "I quietly observe the power dynamics, noting who holds the real influence.", hi: "मैं चुपचाप देखता हूँ कि कमरे में असली ताक़त किसके हाथ में है।", type: "mach" },
+              { en: "I expect to be noticed and enjoy commanding the room's admiration.", hi: "मुझे सबका ध्यान अपनी तरफ़ खींचना और अपनी तारीफ़ सुनना बहुत पसंद है।", type: "narc" },
+              { en: "I feel largely indifferent to social rituals and pleasantries; they are pointless.", hi: "मुझे इन दिखावे की मुलाक़ातों से कोई फ़र्क़ नहीं पड़ता; सब बेमतलब लगता है।", type: "psych" },
+              { en: "I look for genuine, warm connections with people I can learn from.", hi: "मैं सच्चे और अच्छे लोगों से जुड़ने की कोशिश करता हूँ जिनसे कुछ सीख सकूँ।", type: "light" }
+            ]
+          },
+          {
+            en: "When someone publicly insults or disrespects you:",
+            hi: "जब कोई सबके सामने आपका अपमान करता है या नीचा दिखाता है:",
+            options: [
+              { en: "I smile politely, wait patiently, and strike back when they least expect it.", hi: "मैं मुस्कुरा देता हूँ, सब्र करता हूँ और सही वक़्त आने पर ऐसा वार करता हूँ कि होश उड़ जाएँ।", type: "mach" },
+              { en: "I feel volcanic rage; how dare an inferior person question my stature?", hi: "मुझे भयंकर ग़ुस्सा आता है; किसी की इतनी हिम्मत कैसे हुई कि मेरी शान में गुस्ताख़ी करे?", type: "narc" },
+              { en: "I feel a cold impulse to crush them immediately without remorse.", hi: "मेरा दिल करता है कि अभी के अभी इसे बिना किसी दया के कुचल दूँ।", type: "psych" },
+              { en: "I evaluate if their critique has truth; if not, I recognize it as their own insecurity.", hi: "मैं देखता हूँ कि क्या बात में दम है; अगर नहीं, तो मैं समझ जाता हूँ कि वो उसकी अपनी कमज़ोरी है।", type: "light" }
+            ]
+          },
+          {
+            en: "How do you view human relationships in general?",
+            hi: "आम तौर पर इंसानी रिश्तों को लेकर आपका नज़रिया क्या है?",
+            options: [
+              { en: "Strategic alliances. You protect those who provide mutual utility.", hi: "रणनीतिक साझेदारियाँ। आप उनकी हिफ़ाज़त करते हैं जो आपके काम आ सकें।", type: "mach" },
+              { en: "An audience designed to reflect my brilliance and support my ascent.", hi: "एक ऐसा मंच जो मेरी तारीफ़ करे और मुझे आसमान तक पहुँचाने में मदद करे।", type: "narc" },
+              { en: "Temporary arrangements that can be terminated the second they become inconvenient.", hi: "अस्थायी सौदे जो काम ख़त्म होते ही तोड़े जा सकते हैं।", type: "psych" },
+              { en: "Sacred bridges of vulnerability, mutual love, and shared humanity.", hi: "सच्चे प्रेम, अपनेपन और इंसानियत के सबसे पवित्र धागे।", type: "light" }
+            ]
+          },
+          {
+            en: "When you see someone crying in acute emotional distress:",
+            hi: "जब आप किसी को बेइंतहा दर्द में रोते हुए देखते हैं:",
+            options: [
+              { en: "I analyze why they are crying and whether this emotional state affects my plans.", hi: "मैं सोचता हूँ कि ये क्यों रो रहा है और क्या इससे मेरे किसी काम पर असर पड़ेगा।", type: "mach" },
+              { en: "I feel uncomfortable if their grief takes attention away from me.", hi: "अगर उसके रोने से सारा ध्यान मुझ पर से हट जाए, तो मुझे थोड़ी चिढ़ होती है।", type: "narc" },
+              { en: "I feel completely detached; tears do not move me emotionally at all.", hi: "मैं बिल्कुल ठंडा रहता हूँ; किसी के आँसू मुझे अंदर से हिला नहीं पाते।", type: "psych" },
+              { en: "My chest aches with empathy; I instinctively want to offer comfort.", hi: "मेरे सीने में भी एक टीस उठती है और मैं तुरंत उसकी मदद करना चाहता हूँ।", type: "light" }
+            ]
+          },
+          {
+            en: "Flattery and insincere praise are:",
+            hi: "झूठी तारीफ़ और चापलूसी के बारे में आपका क्या मानना है?",
+            options: [
+              { en: "Essential social lubricants to manipulate gatekeepers and move pawns.", hi: "दूसरों से अपना काम निकलवाने का सबसे सस्ता और ताक़तवर हथियार।", type: "mach" },
+              { en: "Enjoyable and usually well-deserved, even if slightly exaggerated.", hi: "सुनने में अच्छी लगती है और सच कहूँ तो मैं इसके पूरा हक़दार भी हूँ।", type: "narc" },
+              { en: "A tool used by the weak to survive among the strong.", hi: "कमज़ोरों का औज़ार ताकि वो ताक़तवर लोगों के बीच ज़िंदा रह सकें।", type: "psych" },
+              { en: "Distasteful; I prefer brutal honesty over sweet poison.", hi: "बेहद घटिया; मुझे मीठे ज़हर से कड़वा सच हज़ार गुना पसंद है।", type: "light" }
+            ]
+          },
+          {
+            en: "In a high-stakes competition:",
+            hi: "किसी बड़े मुक़ाबले या रेस में आपकी सोच:",
+            options: [
+              { en: "Winning requires mastering the board, concealing your intentions, and timing your strike.", hi: "जीतने के लिए अपने इरादे छुपाना और सही समय पर पासा फेंकना ज़रूरी है।", type: "mach" },
+              { en: "Second place is for losers; I was born to hold the trophy.", hi: "दूसरा नंबर हारने वालों के लिए है; मैं सिर्फ़ नंबर वन बनने के लिए पैदा हुआ हूँ।", type: "narc" },
+              { en: "Whatever it takes. The winner writes the history; morals are for the defeated.", hi: "जो करना पड़े करूँगा। जीतने वाला इतिहास लिखता है, नियम हारने वालों के लिए हैं।", type: "psych" },
+              { en: "I give 100% effort, but I respect the rules and celebrate genuine excellence.", hi: "मैं पूरी जान लगाता हूँ, लेकिन खेल के नियमों और सच्ची मेहनत का सम्मान करता हूँ।", type: "light" }
+            ]
+          },
+          {
+            en: "Guilt and remorse after making a mistake that hurt someone:",
+            hi: "किसी को अनजाने में नुक़सान पहुँचाने के बाद आपके अंदर का पछतावा (गिल्ट):",
+            options: [
+              { en: "I don't waste energy on guilt; I focus on repairing the strategic damage.", hi: "मैं रोने-धोने में वक़्त बर्बाद नहीं करता; मैं नुक़सान की भरपाई पर ध्यान देता हूँ।", type: "mach" },
+              { en: "I usually feel the other person provoked me or brought it on themselves.", hi: "मुझे लगता है कि ग़लती उसी की थी, उसने ही मुझे उकसाया था।", type: "narc" },
+              { en: "I rarely, if ever, feel internal guilt.", hi: "मुझे अंदर से कभी शायद ही कोई पछतावा या गिल्ट महसूस होता है।", type: "psych" },
+              { en: "I feel deep remorse, apologize sincerely, and work hard to make amends.", hi: "मुझे बहुत अफ़सोस होता है, मैं सच्चे दिल से माफ़ी माँगता हूँ और सुधार करता हूँ।", type: "light" }
+            ]
+          },
+          {
+            en: "Your ultimate definition of personal power is:",
+            hi: "व्यक्तिगत ताक़त की आपकी सबसे बड़ी परिभाषा:",
+            options: [
+              { en: "Moving the invisible levers of the world while remaining in the shadows.", hi: "पर्दे के पीछे रहकर पूरी दुनिया की डोरियों को अपने इशारों पर नचाना।", type: "mach" },
+              { en: "Unquestioned reverence, fame, and leaving a legendary name.", hi: "हर तरफ़ मेरा नाम गूँजना, शोहरत पाना और दुनिया पर अपनी छाप छोड़ना।", type: "narc" },
+              { en: "Absolute fearlessness, freedom from guilt, and total independence from society.", hi: "किसी भी नियम या डर से पूरी तरह बेपरवाह होना और अपनी शर्तों पर जीना।", type: "psych" },
+              { en: "Mastery over my own desires, ego, and using my strength to protect others.", hi: "अपने ही अहंकार पर विजय पाना और अपनी ताक़त से कमज़ोरों की रक्षा करना।", type: "light" }
+            ]
+          }
+        ],
+        results: {
+          mach: {
+            emoji: "♟️",
+            title: "The Grand Chessmaster",
+            titleHi: "द ग्रैंड चेसमास्टर (Machiavellian Strategist)",
+            tagline: "You possess a cold, hyper-analytical strategic intellect that views human interaction as an intricate game of leverage.",
+            strengthsEn: "Exceptional foresight, political immunity, master negotiator, never acts on blind emotion.",
+            strengthsHi: "दूर की सोच, दफ़्तर की राजनीति से सुरक्षा, बेहतरीन बातचीत का हुनर, कभी जज़्बातों में बहकर ग़लती न करना।",
+            shadowEn: "Chronic cynicism. By assuming everyone has a hidden selfish agenda, you may never experience the bliss of pure trust.",
+            shadowHi: "हर किसी पर शक करना। सबको मतलबी मानकर आप कभी सच्चे और निस्वार्थ प्रेम का स्वाद नहीं चख पाते।",
+            antidoteEn: "Read Machiavellianism on TheDeepVerse. Channel your tactical brain toward noble causes, not zero-sum exploitation.",
+            antidoteHi: "अपने इस शातिर दिमाग़ का इस्तेमाल दुनिया को बेहतर बनाने में लगाइए, किसी को नीचा दिखाने में नहीं।"
+          },
+          narc: {
+            emoji: "🪞",
+            title: "The Golden Sovereign",
+            titleHi: "द गोल्डन सॉवरेन (High Ego & Charisma)",
+            tagline: "You possess magnetic presence, grand ambitions, and an unshakeable belief that you were destined for greatness.",
+            strengthsEn: "Inspiring charisma, immense drive, natural authority, willingness to aim for impossible heights.",
+            strengthsHi: "गज़ब का आकर्षण, बहुत बड़ा करने की भूख, स्वाभाविक लीडरशिप, और नामुमकिन लक्ष्यों को हासिल करने का जुनून।",
+            shadowEn: "Fragile ego underneath. Criticism feels like a mortal wound, triggering retaliatory anger or devaluation.",
+            shadowHi: "अंदर बैठा नाज़ुक अहंकार। ज़रा सी आलोचना पर भी दिल तिलमिला जाता है और बदला लेने की आग भड़क उठती है।",
+            antidoteEn: "Anchor your identity in internal character rather than external applause. Learn the power of humble silence.",
+            antidoteHi: "अपनी पहचान को दूसरों की तालियों पर मत टिकाइए। विनम्रता और मौन की असली ताक़त को पहचानिए।"
+          },
+          psych: {
+            emoji: "🗡️",
+            title: "The Steel Sentinel",
+            titleHi: "द स्टील सेंटिनल (Low Emotional Friction)",
+            tagline: "You possess an unusually low heart-rate response to fear, social shame, and emotional manipulation.",
+            strengthsEn: "Superhuman crisis composure, immunity to peer pressure, fearless decision-maker in chaos.",
+            strengthsHi: "भयंकर तूफ़ान में भी बर्फ़ जैसी शांति, किसी के दबाव में न आना, और ख़तरनाक फ़ैसले चुटकियों में लेने का दम।",
+            shadowEn: "Blunted affective empathy. You may inadvertently trample the hearts of those who genuinely care for you.",
+            shadowHi: "दूसरों के दर्द के प्रति संवेदनहीनता। आप जाने-अनजाने उन लोगों का दिल तोड़ देते हैं जो आपसे सच्चा प्यार करते हैं।",
+            antidoteEn: "Cultivate cognitive empathy. Use your fearlessness to protect vulnerable people rather than walking over them.",
+            antidoteHi: "अपनी इस निर्भयता का इस्तेमाल कमज़ोर लोगों की ढाल बनने के लिए कीजिए, उन पर तलवार चलाने के लिए नहीं।"
+          },
+          light: {
+            emoji: "🕊️",
+            title: "The Sovereign Guardian",
+            titleHi: "द सॉवरेन गार्डियन (High Moral Clarity)",
+            tagline: "You navigate a dark world with rare integrity, deep empathy, and an unshakeable internal moral compass.",
+            strengthsEn: "Pure authenticity, profound empathy, deep relational trust, creates genuine peace wherever you walk.",
+            strengthsHi: "सच्चा और साफ़ चरित्र, दूसरों का दर्द बाँटने का दिल, अटूट भरोसा, और जहाँ भी जाएँ वहाँ सुकून फैलाने का हुनर।",
+            shadowEn: "Naivety risk. You may project your own goodness onto predatory manipulators, falling prey to their traps.",
+            shadowHi: "भोलेपन का ख़तरा। आप सबमें अपनी जैसी अच्छाई देखने की भूल कर बैठते हैं और चालाक लोगों के जाल में फँस जाते हैं।",
+            antidoteEn: "Study Dark Psychology on TheDeepVerse. Be wise as a serpent, yet innocent as a dove.",
+            antidoteHi: "डार्क साइकोलॉजी को ज़रूर समझिए। दिल कबूतर जैसा साफ़ रखिए, लेकिन नज़र बाज़ जैसी तेज़ रखिए ताकि कोई ठग न सके!"
+          }
+        }
+      },
+
+      biases: {
+        name: "Cognitive Bias Blindspots",
+        conceptId: "confirmation-bias",
+        questions: [
+          {
+            en: "You bought a movie ticket for ₹500. After 30 minutes, the movie is unbearable, boring, and gives you a headache. You:",
+            hi: "आपने ₹500 का मूवी टिकट लिया। 30 मिनट बाद पता चला कि फ़िल्म बेहद बकवास और सिरदर्द है। आप क्या करेंगे?",
+            options: [
+              { en: "Stay until the very end because I paid ₹500 and cannot waste my money.", hi: "आख़िर तक बैठूँगा क्योंकि ₹500 ख़र्च किए हैं, पैसे बर्बाद नहीं होने दूँगा।", type: "sunk_cost" },
+              { en: "Walk out immediately; the money is gone anyway, why waste 2 more hours of my life?", hi: "तुरंत बाहर आ जाऊँगा; पैसे तो गए ही, अपनी ज़िंदगी के 2 घंटे और क्यों बर्बाद करूँ?", type: "rational" },
+              { en: "Concur with online reviews that said it was bad, feeling validated.", hi: "फ़ोन पर रिव्यू देखूँगा और ख़ुश होऊँगा कि मैं सही था कि फ़िल्म बकवास है।", type: "confirmation" },
+              { en: "Ask the person next to me what they think before deciding.", hi: "बगल वाले से पूछूँगा कि उसे कैसी लग रही है, फिर फ़ैसला लूँगा।", type: "bandwagon" }
+            ]
+          },
+          {
+            en: "When researching a political or philosophical controversy that deeply matters to you:",
+            hi: "जब आप किसी ऐसे राजनीतिक या धार्मिक मुद्दे पर पढ़ते हैं जिससे आपकी भावनाएँ जुड़ी हैं:",
+            options: [
+              { en: "I search for articles and videos that prove my current opinion is right.", hi: "मैं वही वीडियो और लेख ढूँढता हूँ जो साबित करें कि मेरी सोच बिल्कुल सही है।", type: "confirmation" },
+              { en: "I actively seek out the strongest arguments of the opposing side to test my logic.", hi: "मैं विरोधी पक्ष के सबसे मज़बूत तर्कों को पढ़ता हूँ ताकि अपनी सोच की परीक्षा ले सकूँ।", type: "rational" },
+              { en: "I align with whatever the majority of respected intellectuals in my circle believe.", hi: "मेरे ग्रुप के ज़्यादातर लोग जो मानते हैं, मैं भी उसी राय पर टिक जाता हूँ।", type: "bandwagon" },
+              { en: "I remember that vivid scandal from the news last week and judge based on that.", hi: "मुझे पिछले हफ़्ते टीवी पर देखा एक ख़ास कांड याद आता है और उसी से राय बना लेता हूँ।", type: "availability" }
+            ]
+          },
+          {
+            en: "You see a luxury leather jacket marked: 'Original Price: ₹18,000 — Today Only: ₹5,999'. You think:",
+            hi: "आपने एक जैकेट देखी जिस पर लिखा है: 'असली क़ीमत: ₹18,000 — आज की छूट: ₹5,999'। आप सोचते हैं:",
+            options: [
+              { en: "What an incredible ₹12,000 saving! I must buy it before the discount ends.", hi: "अरे वाह! ₹12,000 की बचत हो रही है, इसे छूट ख़त्म होने से पहले ले लेता हूँ।", type: "anchoring" },
+              { en: "The ₹18,000 anchor is fictitious. The only question is: Is this jacket worth ₹5,999 to me?", hi: "वो 18,000 का नंबर सिर्फ़ एक छलावा है। सवाल यह है कि क्या यह जैकेट ₹6,000 की है भी?", type: "rational" },
+              { en: "Everyone on social media is wearing these jackets; I should get one too.", hi: "इंस्टाग्राम पर सब ऐसी जैकेट पहन रहे हैं, मुझे भी एक ले लेनी चाहिए।", type: "bandwagon" },
+              { en: "I've already spent 2 hours in this mall, I might as well buy something.", hi: "2 घंटे से मॉल में घूम रहा हूँ, कुछ तो ख़रीद कर ही जाऊँगा।", type: "sunk_cost" }
+            ]
+          },
+          {
+            en: "After watching a dramatic documentary about plane crashes, you have a flight tomorrow. You feel:",
+            hi: "प्लेन क्रैश पर एक भयानक डॉक्युमेंट्री देखने के अगले दिन आपकी फ़्लाइट है। आप महसूस करते हैं:",
+            options: [
+              { en: "Terrified and anxious; the image of flames feels overwhelmingly real and likely.", hi: "बहुत ज़्यादा डर और घबराहट; लगता है जैसे मेरे साथ भी वही होने वाला है।", type: "availability" },
+              { en: "Calm; I recall that statistically driving to the airport was 100x more dangerous than flying.", hi: "बिल्कुल शांत; आँकड़े बताते हैं कि कार चलाने से 100 गुना ज़्यादा सुरक्षित हवाई जहाज़ है।", type: "rational" },
+              { en: "I look around at fellow passengers; since they look calm, I feel calm.", hi: "बाकी यात्रियों को देखता हूँ; वो शांत हैं तो मैं भी शांत हो जाता हूँ।", type: "bandwagon" },
+              { en: "I seek out news about that specific airline to confirm if it has good safety.", hi: "उस एयरलाइन की पुरानी अच्छी ख़बरें ढूँढता हूँ ताकि तसल्ली मिल सके।", type: "confirmation" }
+            ]
+          },
+          {
+            en: "You have invested 3 years and ₹4,00,000 into a business venture that is steadily bleeding money:",
+            hi: "आपने 3 साल और ₹4 लाख एक बिज़नेस में लगा दिए जो लगातार घाटे में चल रहा है:",
+            options: [
+              { en: "I keep pouring money in; I cannot walk away and admit all that effort was for nothing.", hi: "मैं और पैसे लगाता रहता हूँ; 3 साल की मेहनत को ऐसे बेकार नहीं जाने दे सकता।", type: "sunk_cost" },
+              { en: "I look at future projections with zero emotion; if the future ROI is negative, I shut it down.", hi: "मैं बिना किसी जज़्बात के आगे का हिसाब देखता हूँ; अगर फ़ायदा नहीं तो तुरंत बंद कर देता हूँ।", type: "rational" },
+              { en: "I focus only on the rare success stories and tell myself my breakthrough is tomorrow.", hi: "मैं सिर्फ़ उन दो-चार लोगों की कहानियाँ देखता हूँ जो सफल हुए और ख़ुद को दिलासा देता हूँ।", type: "confirmation" },
+              { en: "I check what the initial expert estimated when I started.", hi: "मैं सोचता रहता हूँ कि शुरुआत में उस सीए ने तो बहुत मुनाफ़ा बताया था।", type: "anchoring" }
+            ]
+          },
+          {
+            en: "A charismatic, handsome candidate gives a speech using simple slogans. You notice:",
+            hi: "एक बेहद स्मार्ट, सुंदर और तेज़ बोलने वाला नेता भाषण दे रहा है। आप ध्यान देते हैं:",
+            options: [
+              { en: "Because he looks so trustworthy and competent, I assume his policies must be good.", hi: "वो देखने में इतना सुलझा हुआ लग रहा है, तो उसकी नीतियाँ भी अच्छी ही होंगी।", type: "halo" },
+              { en: "I ignore his looks and charisma, analyzing only the budget math and policy feasibility.", hi: "मैं उसके चेहरे को नज़रअंदाज़ करके सिर्फ़ उसके बजट और नीतियों का गणित जाँचता हूँ।", type: "rational" },
+              { en: "Since thousands of people are cheering wildly, he must be the right choice.", hi: "जब हज़ारों लोग तालियाँ पीट रहे हैं, तो वो सही ही बोल रहा होगा।", type: "bandwagon" },
+              { en: "I find myself repeating his slogans to my friends.", hi: "मैं भी उसके नारों को अपने दोस्तों के सामने दोहराने लगता हूँ।", type: "confirmation" }
+            ]
+          }
+        ],
+        results: {
+          sunk_cost: {
+            emoji: "⚓",
+            title: "The Sunk Cost Prisoner",
+            titleHi: "डूबी हुई लागत का क़ैदी (Sunk Cost Fallacy)",
+            tagline: "Your primary mental blindspot is the inability to let go of past investments of time, money, or emotional pain.",
+            strengthsEn: "Incredible tenacity, high grit, hates quitting, deeply committed.",
+            strengthsHi: "गज़ब का समर्पण, कभी हार न मानने की ज़िद, और किए गए वादों पर टिके रहना।",
+            shadowEn: "Staying in toxic relationships, dead-end careers, or failing projects simply because 'I have already put in 5 years.'",
+            shadowHi: "ज़हरीले रिश्तों या घाटे के बिज़नेस में सिर्फ़ इसलिए फँसे रहना कि 'मैंने इसमें अपने 5 साल दिए हैं'।",
+            antidoteEn: "Past investments are gone forever. Make decisions based ONLY on tomorrow's future returns, not yesterday's costs.",
+            antidoteHi: "बीता हुआ समय वापस नहीं आ सकता। फ़ैसले हमेशा 'कल के मुनाफ़े' पर लीजिए, 'कल के ख़र्चे' पर नहीं।"
+          },
+          confirmation: {
+            emoji: "🔍",
+            title: "The Echo Chamber Seeker",
+            titleHi: "पुष्टि पूर्वाग्रह का शिकार (Confirmation Bias)",
+            tagline: "Your mind has an automatic filter that absorbs only the evidence that proves your existing worldview.",
+            strengthsEn: "Passionate convictions, strong identity, loyal to community and traditions.",
+            strengthsHi: "अपने विचारों पर पक्का यक़ीन, मज़बूत पहचान, और अपने संस्कारों के प्रति वफ़ादारी।",
+            shadowEn: "Vulnerability to fake news, blind spots in investments, dismissing uncomfortable truths as 'lies'.",
+            shadowHi: "झूठी ख़बरों पर जल्दी भरोसा कर लेना, और कड़वे सच को 'साज़िश' मानकर ख़ारिज कर देना।",
+            antidoteEn: "Read Confirmation Bias on TheDeepVerse. Deliberately read the smartest critic of your most cherished belief once a month.",
+            antidoteHi: "महीने में एक बार अपने सबसे पक्के विचार के विरोधी की किताब पढ़िए ताकि दिमाग़ की खिड़कियाँ खुली रहें।"
+          },
+          availability: {
+            emoji: "🦈",
+            title: "The Vivid Alarmist",
+            titleHi: "ताज़ा यादों का शिकार (Availability Heuristic)",
+            tagline: "You mistake emotional memorability for statistical reality, judging probability by what frightened you recently.",
+            strengthsEn: "High emotional awareness, fast crisis intuition, deeply attuned to storytelling.",
+            strengthsHi: "भावनाओं की गहरी समझ, संकट में तुरंत सचेत होना, और कहानियों से गहरा जुड़ाव।",
+            shadowEn: "Irrational fear of rare disasters (plane crashes, shark attacks) while ignoring mundane daily killers (heart disease, poor sleep).",
+            shadowHi: "दुर्लभ हादसों से डर कर काँपना, लेकिन रोज़ की बड़ी बीमारियों और ख़राब आदतों को नज़रअंदाज़ कर देना।",
+            antidoteEn: "Never make a life decision on fear alone. Look up the cold, hard actuarial statistics before panicking.",
+            antidoteHi: "डर के साए में कभी फ़ैसला मत लीजिए। घबराने से पहले उस चीज़ के असली आँकड़े (Data) ज़रूर देखिए।"
+          },
+          rational: {
+            emoji: "⚖️",
+            title: "The Calibrated Realist",
+            titleHi: "तार्किक और निष्पक्ष विचारक (Objective Mind)",
+            tagline: "You possess a rare, highly disciplined prefrontal cortex that resists emotional traps and evaluates evidence objectively.",
+            strengthsEn: "Immunity to marketing gimmicks, calm financial wisdom, intellectual humility, updates beliefs on new data.",
+            strengthsHi: "बाज़ार के छलावों से सुरक्षा, पैसों की समझदारी, विनम्र सोच, और नई जानकारी मिलने पर अपनी ग़लती मान लेना।",
+            shadowEn: "May sometimes appear overly cold or detached to highly emotional friends and partners.",
+            shadowHi: "कभी-कभी ज़रूरत से ज़्यादा लॉजिकल होने की वजह से अपनों को थोड़े ठंडे या रूखे लग सकते हैं।",
+            antidoteEn: "Balance your sharp intellect with warm empathy. Help others see reality without mocking their illusions.",
+            antidoteHi: "अपनी बुद्धि के साथ दिल की कोमलता भी जोड़िए। दूसरों को सच समझाइए, लेकिन उनके भ्रम का मज़ाक़ उड़ाए बिना।"
+          }
+        }
+      }
+    };
+
+    let currentTestKey = 'attachment';
+    let currentQIdx = 0;
+    let userAnswers = [];
+
+    const testCards = document.querySelectorAll('.test-card');
+    const quizBox = document.getElementById('quizBox');
+    const resultView = document.getElementById('resultView');
+    const progressBar = document.getElementById('progressBar');
+    const questionCounter = document.getElementById('questionCounter');
+    const testNameBadge = document.getElementById('testNameBadge');
+    const qTextEn = document.getElementById('qTextEn');
+    const qTextHi = document.getElementById('qTextHi');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const prevBtn = document.getElementById('prevBtn');
+
+    const resEmoji = document.getElementById('resEmoji');
+    const resTitle = document.getElementById('resTitle');
+    const resTitleHi = document.getElementById('resTitleHi');
+    const resTagline = document.getElementById('resTagline');
+    const resBreakdown = document.getElementById('resBreakdown');
+    const shareWaBtn = document.getElementById('shareWaBtn');
+    const copyResultBtn = document.getElementById('copyResultBtn');
+    const retakeBtn = document.getElementById('retakeBtn');
+    const relatedArticleLink = document.getElementById('relatedArticleLink');
+
+    function renderQuestion() {
+      const test = QUIZ_DATA[currentTestKey];
+      const q = test.questions[currentQIdx];
+      const total = test.questions.length;
+
+      const pct = Math.round(((currentQIdx + 1) / total) * 100);
+      progressBar.style.width = pct + '%';
+      questionCounter.textContent = 'Question ' + (currentQIdx + 1) + ' of ' + total;
+      testNameBadge.textContent = test.name;
+
+      qTextEn.textContent = q.en;
+      qTextHi.textContent = q.hi;
+
+      const letters = ['A', 'B', 'C', 'D'];
+      optionsContainer.innerHTML = q.options.map(function(opt, idx) {
+        const isSelected = userAnswers[currentQIdx] === opt.type;
+        return '<button class="quiz-option ' + (isSelected ? 'is-selected' : '') + '" data-type="' + opt.type + '">' +
+          '<span class="quiz-option__letter">' + letters[idx] + '</span>' +
+          '<div class="quiz-option__content">' +
+            '<span class="quiz-option__en">' + opt.en + '</span>' +
+            '<span class="quiz-option__hi">' + opt.hi + '</span>' +
+          '</div>' +
+        '</button>';
+      }).join('');
+
+      optionsContainer.querySelectorAll('.quiz-option').forEach(function(btn) {
+        btn.addEventListener('click', function () {
+          const type = this.getAttribute('data-type');
+          userAnswers[currentQIdx] = type;
+          
+          setTimeout(function() {
+            if (currentQIdx < total - 1) {
+              currentQIdx++;
+              renderQuestion();
+            } else {
+              calculateAndShowResult();
+            }
+          }, 200);
+        });
+      });
+
+      prevBtn.style.visibility = currentQIdx > 0 ? 'visible' : 'hidden';
+    }
+
+    function calculateAndShowResult() {
+      const test = QUIZ_DATA[currentTestKey];
+      const counts = {};
+      userAnswers.forEach(function(t) {
+        counts[t] = (counts[t] || 0) + 1;
+      });
+
+      let topType = Object.keys(counts)[0] || 'secure';
+      let maxCount = 0;
+      for (const [type, count] of Object.entries(counts)) {
+        if (count > maxCount) {
+          maxCount = count;
+          topType = type;
+        }
+      }
+
+      const res = test.results[topType] || Object.values(test.results)[0];
+
+      resEmoji.textContent = res.emoji;
+      resTitle.textContent = res.title;
+      resTitleHi.textContent = res.titleHi;
+      resTagline.textContent = res.tagline;
+
+      resBreakdown.innerHTML = 
+        '<div class="breakdown-card">' +
+          '<div class="breakdown-card__title">⭐ Core Superpower · मुख्य ताक़त</div>' +
+          '<div class="breakdown-card__text">' + res.strengthsEn + '</div>' +
+          '<div class="breakdown-card__text-hi">' + res.strengthsHi + '</div>' +
+        '</div>' +
+        '<div class="breakdown-card">' +
+          '<div class="breakdown-card__title">⚠️ The Blindspot · छुपा हुआ ख़तरा</div>' +
+          '<div class="breakdown-card__text">' + res.shadowEn + '</div>' +
+          '<div class="breakdown-card__text-hi">' + res.shadowHi + '</div>' +
+        '</div>' +
+        '<div class="breakdown-card" style="grid-column: 1 / -1;">' +
+          '<div class="breakdown-card__title">🛡️ The Antidote · बचाव का नियम</div>' +
+          '<div class="breakdown-card__text">' + res.antidoteEn + '</div>' +
+          '<div class="breakdown-card__text-hi">' + res.antidoteHi + '</div>' +
+        '</div>';
+
+      relatedArticleLink.href = 'concept-detail.html?id=' + test.conceptId;
+
+      const shareUrl = 'https://thedeepverse.in/quiz.html?test=' + currentTestKey;
+      const shareMsg = 'I just took TheDeepVerse Psychological Test and got: ' + res.emoji + ' "' + res.title + '" (' + res.titleHi + ')!
+
+Find out your unconscious mental blueprint in 2 minutes: ' + shareUrl;
+      
+      shareWaBtn.onclick = function () {
+        window.open('https://wa.me/?text=' + encodeURIComponent(shareMsg), '_blank');
+      };
+
+      copyResultBtn.onclick = function () {
+        navigator.clipboard.writeText(shareMsg);
+        this.textContent = 'Copied to Clipboard ✓';
+        const b = this;
+        setTimeout(function() { b.textContent = '📋 Copy Result Card'; }, 2000);
+      };
+
+      quizBox.style.display = 'none';
+      resultView.style.display = 'block';
+      resultView.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function switchTest(testKey) {
+      currentTestKey = testKey;
+      currentQIdx = 0;
+      userAnswers = [];
+
+      testCards.forEach(function(c) {
+        c.classList.toggle('is-active', c.getAttribute('data-test') === testKey);
+      });
+
+      resultView.style.display = 'none';
+      quizBox.style.display = 'block';
+      renderQuestion();
+    }
+
+    testCards.forEach(function(card) {
+      card.addEventListener('click', function () {
+        switchTest(this.getAttribute('data-test'));
+      });
+    });
+
+    prevBtn.addEventListener('click', function () {
+      if (currentQIdx > 0) {
+        currentQIdx--;
+        renderQuestion();
+      }
+    });
+
+    retakeBtn.addEventListener('click', function () {
+      switchTest(currentTestKey);
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedTest = urlParams.get('test');
+    if (requestedTest && QUIZ_DATA[requestedTest]) {
+      switchTest(requestedTest);
+    } else {
+      renderQuestion();
+    }
+
+  })();
+  </script>
+</body>
+</html>
