@@ -408,6 +408,27 @@
           <span>YouTube</span>
         </a>
       </div>
+
+      <!-- Mobile hamburger -->
+      <button class="nav__toggle" aria-label="Toggle navigation menu" aria-expanded="false" id="navToggle">
+        <div class="nav__toggle-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div class="nav__mobile" id="mobileMenu">
+      <a href="index.html" class="nav__mobile-link">Home</a>
+      <a href="hub.html" class="nav__mobile-link">DeepVerse Hub</a>
+      <a href="quiz.html" class="nav__mobile-link is-active" style="color:var(--color-gold-400);">Mind Lab 🧪</a>
+      <a href="videos.html" class="nav__mobile-link">Videos</a>
+      <a href="shorts.html" class="nav__mobile-link">Shorts</a>
+      <a href="store.html" class="nav__mobile-link">Store</a>
+      <a href="about.html" class="nav__mobile-link">About</a>
+      <a href="contact.html" class="nav__mobile-link">Contact</a>
     </div>
   </nav>
 
@@ -937,6 +958,42 @@
             shadowHi: "कभी-कभी ज़रूरत से ज़्यादा लॉजिकल होने की वजह से अपनों को थोड़े ठंडे या रूखे लग सकते हैं।",
             antidoteEn: "Balance your sharp intellect with warm empathy. Help others see reality without mocking their illusions.",
             antidoteHi: "अपनी बुद्धि के साथ दिल की कोमलता भी जोड़िए। दूसरों को सच समझाइए, लेकिन उनके भ्रम का मज़ाक़ उड़ाए बिना।"
+          },
+          bandwagon: {
+            emoji: "🐑",
+            title: "The Herd Conformist",
+            titleHi: "भीड़ चाल का शिकार (Bandwagon Effect)",
+            tagline: "You seek psychological comfort in numbers and unconsciously outsource personal judgment to the majority opinion.",
+            strengthsEn: "High cooperativeness, team solidarity, smooth social integration, builds rapid community rapport.",
+            strengthsHi: "दूसरों के साथ मिलकर काम करने की आदत, सामाजिक तालमेल, और समूह में सबको साथ लेकर चलना।",
+            shadowEn: "Vulnerable to hype cycles, financial bubbles, peer pressure, and suppressing your own voice to fit in.",
+            shadowHi: "भीड़ के पीछे अंधी दौड़, फ़ैशन और ट्रेंड्स के दबाव में ग़लत फ़ैसले, और FOMO (छूट जाने का डर)।",
+            antidoteEn: "Before agreeing with the consensus, ask: 'If nobody else knew what I chose, would I still make this choice?'",
+            antidoteHi: "भीड़ के साथ चलने से पहले ख़ुद से पूछिए: 'अगर दुनिया में कोई न देख रहा होता, क्या तब भी मैं यही फ़ैसला लेता?'"
+          },
+          anchoring: {
+            emoji: "⚓",
+            title: "The Initial Anchor Captive",
+            titleHi: "पहले आँकड़े का बंधक (Anchoring Bias)",
+            tagline: "Your brain anchors heavily to the first price, figure, or claim presented, warping all subsequent estimates.",
+            strengthsEn: "Quick comparative benchmarking, structured framework reliance, decisive in rule-bound environments.",
+            strengthsHi: "तुलना करने की तेज़ क्षमता, शुरुआती जानकारी से जल्दी हिसाब लगाना, और अनुशासित सोच।",
+            shadowEn: "Susceptible to fake 'original price' sales, rigid salary negotiations, and judging people on first rumors.",
+            shadowHi: "दुकानदारों की झूठी सेल (Discounts) में फँसना, और पहली सुनी बात को ही अंतिम सच मान लेना।",
+            antidoteEn: "Establish your own independent baseline. Always research genuine market data before looking at asking numbers.",
+            antidoteHi: "दुकानदार या विक्रेता की पहली बोली सुनने से पहले बाज़ार की असली लागत का पता लगाइए।"
+          },
+          halo: {
+            emoji: "✨",
+            title: "The Aura Believer",
+            titleHi: "आभामंडल का मुरीद (Halo Effect)",
+            tagline: "You allow one outstanding quality (charm, attractiveness, status) to blind you to unrelated flaws and red flags.",
+            strengthsEn: "Inspiring optimism, sees the best in others, deeply appreciative of aesthetics, art, and eloquence.",
+            strengthsHi: "दूसरों में अच्छाई ढूँढना, सकारात्मक नज़रिया, और कला व सुंदरता की क़द्र करना।",
+            shadowEn: "Over-trusting charismatic manipulators, excusing destructive behaviors of people you admire.",
+            shadowHi: "खूबसूरत और मीठा बोलने वाले धूर्त लोगों पर अंधा भरोसा, और चेतावनी भरे संकेतों (Red Flags) को नज़रअंदाज़ करना।",
+            antidoteEn: "Evaluate traits independently. Being articulate or charismatic does not make someone honest, ethical, or wise.",
+            antidoteHi: "हुनर और चरित्र को अलग-अलग आँकिए। अच्छा बोलने वाला इंसान हमेशा ईमानदार हो, यह ज़रूरी नहीं।"
           }
         }
       }
@@ -1054,9 +1111,7 @@
       relatedArticleLink.href = 'concept-detail.html?id=' + test.conceptId;
 
       const shareUrl = 'https://thedeepverse.in/quiz.html?test=' + currentTestKey;
-      const shareMsg = 'I just took TheDeepVerse Psychological Test and got: ' + res.emoji + ' "' + res.title + '" (' + res.titleHi + ')!
-
-Find out your unconscious mental blueprint in 2 minutes: ' + shareUrl;
+      const shareMsg = 'I just took TheDeepVerse Psychological Test and got: ' + res.emoji + ' "' + res.title + '" (' + res.titleHi + ')!\n\nFind out your unconscious mental blueprint in 2 minutes: ' + shareUrl;
       
       shareWaBtn.onclick = function () {
         window.open('https://wa.me/?text=' + encodeURIComponent(shareMsg), '_blank');
@@ -1115,5 +1170,23 @@ Find out your unconscious mental blueprint in 2 minutes: ' + shareUrl;
 
   })();
   </script>
+
+  <!-- FOOTER -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand"><div class="footer__logo">TheDeepVerse</div><p class="footer__tagline">Stories That Change The Way You Think</p></div>
+        <div><div class="footer__heading">Quick Links</div><a href="index.html" class="footer__link">Home</a><a href="hub.html" class="footer__link">DeepVerse Hub</a><a href="shorts.html" class="footer__link">Shorts</a><a href="store.html" class="footer__link">Store</a><a href="about.html" class="footer__link">About</a><a href="contact.html" class="footer__link">Contact</a></div>
+        <div><div class="footer__heading">Connect</div><a href="https://youtube.com/@TheDeepVerse-YT" class="footer__link" target="_blank" rel="noopener noreferrer">YouTube</a><a href="https://instagram.com/thedeepverse03/" class="footer__link" target="_blank" rel="noopener noreferrer">Instagram</a><a href="https://whatsapp.com/channel/0029VbCOHN0AojYp5TozJ50N" target="_blank" rel="noopener noreferrer" class="footer__link">WhatsApp Channel</a><a href="https://www.facebook.com/thedeepverse03" class="footer__link" target="_blank" rel="noopener noreferrer">Facebook</a></div>
+        <div><div class="footer__heading">Legal</div><a href="privacy.html" class="footer__link">Privacy Policy</a><a href="terms.html" class="footer__link">Terms &amp; Conditions</a><a href="refund.html" class="footer__link">Refund Policy</a><a href="disclaimer.html" class="footer__link">Disclaimer</a></div>
+      </div>
+      <div class="footer__bottom">
+        <div class="footer__copyright">&copy; 2025 TheDeepVerse. All Rights Reserved. Stories That Change The Way You Think</div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></button>
+  <script src="js/main.js"></script>
 </body>
 </html>
